@@ -1,25 +1,19 @@
 package doublenegation.mods.compactores;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +27,6 @@ public class CompactOres
     public CompactOres() {
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -66,25 +59,7 @@ public class CompactOres
 
     @SubscribeEvent
     public void startServer(final FMLServerAboutToStartEvent event) {
-        ImmutableMap.Builder<ResourceLocation, LootTable> mapBuilder = ImmutableMap.builder();
-        for(CompactOre ore : compactOres.values()) {
-            mapBuilder.put(ore.getLootTableLocation(), ore.getLootTable());
-        }
-        MinecraftServer server = event.getServer();
-        Field f = ObfuscationReflectionHelper.findField(MinecraftServer.class, "field_200256_aj");
-        try {
-            f.set(server, new InjectingLootTableManager((LootTableManager) f.get(server), mapBuilder.build()));
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SubscribeEvent
-    public void loadComplete(final FMLLoadCompleteEvent event) {
-        LOGGER.debug("LOAD COMPLETE!  " + event);
-        for(CompactOre ore : compactOres.values()) {
-            ore.init3_final();
-        }
+        event.getServer().getResourcePacks().addPackFinder(new CompactOresResourcePack(compactOres));
     }
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD

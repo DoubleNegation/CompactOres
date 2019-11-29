@@ -4,13 +4,11 @@ import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.*;
 
 public class CompactOre {
 
     private CompactOreBlock block;
     private Item blockItem;
-    private LootTable lootTable;
 
     private Block baseBlock;
     private int minRolls;
@@ -24,11 +22,6 @@ public class CompactOre {
         this.baseLootTable = baseLootTable;
     }
 
-    private LootTable makeLootTable() {
-        return LootTable.builder().addLootPool(LootPool.builder().name("pool0").rolls(RandomValueRange.of(minRolls, maxRolls))
-                .addEntry(TableLootEntry.builder(baseLootTable))).build();
-    }
-
     public void init1_block() {
         block = new CompactOreBlock(baseBlock);
         CompactOres.LOGGER.debug(block);
@@ -36,10 +29,6 @@ public class CompactOre {
 
     public void init2_item() {
         blockItem = new BlockItem(block, new Item.Properties()).setRegistryName(block.getRegistryName());
-    }
-
-    public void init3_final() {
-        lootTable = makeLootTable();
     }
 
     public CompactOreBlock getBlock() {
@@ -50,12 +39,20 @@ public class CompactOre {
         return blockItem;
     }
 
-    public LootTable getLootTable() {
-        return lootTable;
+    public Block getBaseBlock() {
+        return baseBlock;
     }
 
-    public ResourceLocation getLootTableLocation() {
-        return block.getRegistryName();
+    public ResourceLocation getBaseLootTable() {
+        return baseLootTable;
+    }
+
+    public int getMinRolls() {
+        return minRolls;
+    }
+
+    public int getMaxRolls() {
+        return maxRolls;
     }
 
 }
