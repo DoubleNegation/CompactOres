@@ -2,12 +2,16 @@ package doublenegation.mods.compactores;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -23,10 +27,12 @@ public class CompactOres
     public static final Logger LOGGER = LogManager.getLogger();
 
     private static final Map<ResourceLocation, CompactOre> compactOres = new HashMap<>();
+    private static CompactOresResourcePack resourcePack;
 
     public CompactOres() {
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -46,11 +52,24 @@ public class CompactOres
                 new CompactOre(Blocks.DIAMOND_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/diamond_ore")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_emerald_ore"),
                 new CompactOre(Blocks.EMERALD_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/emerald_ore")));
+        // create the resource pack finder as early as possible, and register it to the client immediately
+        // the resource pack will be created only when the game attempts to load it for the first time
+        // this makes sure that it will exist by the time the resources are loaded for the first time on the client
+        resourcePack = new CompactOresResourcePack(this::getOreList);
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+            LOGGER.info("Attaching CompactOre resources to the Minecraft client");
+            Minecraft.getInstance().getResourcePackList().addPackFinder(resourcePack);
+        });
     }
 
-    private void setup(final FMLCommonSetupEvent event)
-    {
-        // some preinit code
+    private Map<ResourceLocation, CompactOre> getOreList() {
+        return compactOres;
+    }
+
+    private void setup(final FMLCommonSetupEvent event) {
+    }
+
+    private void setupClient(final FMLClientSetupEvent event) {
     }
 
     public static CompactOre getFor(ResourceLocation loc) {
@@ -59,7 +78,8 @@ public class CompactOres
 
     @SubscribeEvent
     public void startServer(final FMLServerAboutToStartEvent event) {
-        event.getServer().getResourcePacks().addPackFinder(new CompactOresResourcePack(compactOres));
+        LOGGER.info("Attaching CompactOre resources to the Minecraft server");
+        event.getServer().getResourcePacks().addPackFinder(resourcePack);
     }
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
