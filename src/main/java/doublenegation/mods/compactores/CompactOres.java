@@ -52,6 +52,8 @@ public class CompactOres
                 new CompactOre(Blocks.DIAMOND_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/diamond_ore")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_emerald_ore"),
                 new CompactOre(Blocks.EMERALD_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/emerald_ore")));
+        compactOres.put(new ResourceLocation("compactores", "dense_minecraft_nether_quartz_ore"),
+                new CompactOre(Blocks.NETHER_QUARTZ_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/nether_quartz_ore")));
         // create the resource pack finder as early as possible, and register it to the client immediately
         // the resource pack will be created only when the game attempts to load it for the first time
         // this makes sure that it will exist by the time the resources are loaded for the first time on the client
