@@ -16,15 +16,17 @@ public class CompactOre {
     private ResourceLocation baseLootTable;
     private ResourceLocation baseOreTexture;
     private ResourceLocation baseUnderlyingTexture;
+    private float spawnProbability;
 
     public CompactOre(Block baseBlock, int minRolls, int maxRolls, ResourceLocation baseLootTable,
-                      ResourceLocation baseOreTexture, ResourceLocation baseUnderlyingTexture) {
+                      ResourceLocation baseOreTexture, ResourceLocation baseUnderlyingTexture, float spawnProbability) {
         this.baseBlock = baseBlock;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
         this.baseLootTable = baseLootTable;
         this.baseOreTexture = baseOreTexture;
         this.baseUnderlyingTexture = baseUnderlyingTexture;
+        this.spawnProbability = spawnProbability;
     }
 
     public void init1_block() {
@@ -66,6 +68,10 @@ public class CompactOre {
 
     public ResourceLocation getBaseUnderlyingTexture() {
         return baseUnderlyingTexture;
+    }
+
+    public float getSpawnProbability() {
+        return spawnProbability;
     }
 
 }
