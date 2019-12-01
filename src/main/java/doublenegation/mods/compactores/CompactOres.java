@@ -40,25 +40,25 @@ public class CompactOres
         // Initialize the compact ore types here for now
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_coal_ore"),
                 new CompactOre(Blocks.COAL_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/coal_ore"),
-                    new ResourceLocation("minecraft", "textures/block/coal_ore.png"), new ResourceLocation("minecraft", "textures/block/stone.png")));
+                    new ResourceLocation("minecraft", "textures/block/coal_ore.png"), new ResourceLocation("compactores", "textures/ore_underlay_minecraft_default.png")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_iron_ore"),
                 new CompactOre(Blocks.IRON_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/iron_ore"),
-                        new ResourceLocation("minecraft", "textures/block/iron_ore.png"), new ResourceLocation("minecraft", "textures/block/stone.png")));
+                        new ResourceLocation("minecraft", "textures/block/iron_ore.png"), new ResourceLocation("compactores", "textures/ore_underlay_minecraft_default.png")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_gold_ore"),
                 new CompactOre(Blocks.GOLD_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/gold_ore"),
-                        new ResourceLocation("minecraft", "textures/block/gold_ore.png"), new ResourceLocation("minecraft", "textures/block/stone.png")));
+                        new ResourceLocation("minecraft", "textures/block/gold_ore.png"), new ResourceLocation("compactores", "textures/ore_underlay_minecraft_default.png")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_redstone_ore"),
                 new CompactOre(Blocks.REDSTONE_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/redstone_ore"),
-                        new ResourceLocation("minecraft", "textures/block/redstone_ore.png"), new ResourceLocation("minecraft", "textures/block/stone.png")));
+                        new ResourceLocation("minecraft", "textures/block/redstone_ore.png"), new ResourceLocation("compactores", "textures/ore_underlay_minecraft_default.png")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_lapis_ore"),
                 new CompactOre(Blocks.LAPIS_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/lapis_ore"),
-                        new ResourceLocation("minecraft", "textures/block/lapis_ore.png"), new ResourceLocation("minecraft", "textures/block/stone.png")));
+                        new ResourceLocation("minecraft", "textures/block/lapis_ore.png"), new ResourceLocation("compactores", "textures/ore_underlay_minecraft_lapis.png")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_diamond_ore"),
                 new CompactOre(Blocks.DIAMOND_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/diamond_ore"),
-                        new ResourceLocation("minecraft", "textures/block/diamond_ore.png"), new ResourceLocation("minecraft", "textures/block/stone.png")));
+                        new ResourceLocation("minecraft", "textures/block/diamond_ore.png"), new ResourceLocation("compactores", "textures/ore_underlay_minecraft_default.png")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_emerald_ore"),
                 new CompactOre(Blocks.EMERALD_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/emerald_ore"),
-                        new ResourceLocation("minecraft", "textures/block/emerald_ore.png"), new ResourceLocation("minecraft", "textures/block/stone.png")));
+                        new ResourceLocation("minecraft", "textures/block/emerald_ore.png"), new ResourceLocation("compactores", "textures/ore_underlay_minecraft_emerald.png")));
         compactOres.put(new ResourceLocation("compactores", "dense_minecraft_nether_quartz_ore"),
                 new CompactOre(Blocks.NETHER_QUARTZ_ORE, 3, 5, new ResourceLocation("minecraft", "blocks/nether_quartz_ore"),
                         new ResourceLocation("minecraft", "textures/block/nether_quartz_ore.png"), new ResourceLocation("minecraft", "textures/block/netherrack.png")));

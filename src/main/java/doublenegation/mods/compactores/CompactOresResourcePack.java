@@ -125,11 +125,7 @@ public class CompactOresResourcePack implements IPackFinder {
                 IResource baseUnderlyingTexture = rm.getResource(ore.getBaseUnderlyingTexture());
                 BufferedImage baseOre = ImageIO.read(baseOreTexture.getInputStream());
                 BufferedImage baseRock = ImageIO.read(baseUnderlyingTexture.getInputStream());
-                int w = baseOre.getWidth(), h = baseOre.getHeight();
-                BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-                Graphics2D g = result.createGraphics();
-                g.drawImage(baseOre.getSubimage(0, 0, w / 2, h), 0, 0, null);
-                g.drawImage(baseRock.getSubimage(w / 2, 0, w / 2, h), w / 2, 0, null);
+                BufferedImage result = CompactOreTexture.generate(baseRock, baseOre);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
                     ImageIO.write(result, "PNG", baos);
