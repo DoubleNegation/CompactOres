@@ -2,8 +2,8 @@ package doublenegation.mods.compactores;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.IPackFinder;
-import net.minecraft.resources.ResourcePackInfo;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.*;
 import net.minecraft.util.ResourceLocation;
 
 import javax.imageio.ImageIO;
@@ -29,14 +29,15 @@ public class CompactOresResourcePack implements IPackFinder {
         if(pack == null) {
             Map<ResourceLocation, CompactOre> ores = oreListSupplier.get();
             CompactOres.LOGGER.info("Generating CompactOre resources for " + ores.size() + " compact ore blocks");
-            Map<String, byte[]> resPack = new HashMap<>();
+            Map<String, Supplier<byte[]>> resPack = new HashMap<>();
             // pack.mcmeta start
             JsonObject packmcmeta = new JsonObject();
             JsonObject packmcmetapack = new JsonObject();
             packmcmetapack.addProperty("pack_format", 4);
             packmcmetapack.addProperty("description", "CompactOres dynamic resources");
             packmcmeta.add("pack", packmcmetapack);
-            resPack.put("pack.mcmeta", packmcmeta.toString().getBytes(StandardCharsets.UTF_8));
+            final byte[] packmcmetaBytes = packmcmeta.toString().getBytes(StandardCharsets.UTF_8);
+            resPack.put("pack.mcmeta", () -> packmcmetaBytes);
             // pack.mcmeta end
             // pack.png start - to prevent crash on opening resource packs menu
             BufferedImage packpng = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
@@ -49,20 +50,22 @@ public class CompactOresResourcePack implements IPackFinder {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            resPack.put("pack.png", baos.toByteArray());
+            final byte[] packpngBytes = baos.toByteArray();
+            resPack.put("pack.png", () -> packpngBytes);
             // pack.png end
             for (CompactOre ore : ores.values()) {
                 makeLootTable(resPack, ore);
                 makeBlockstate(resPack, ore);
                 makeBlockModel(resPack, ore);
                 makeItemModel(resPack, ore);
+                makeBlockTexture(resPack, ore);
             }
             pack = new InMemoryResourcePack(resPack);
         }
         return pack;
     }
 
-    private void makeLootTable(Map<String, byte[]> resourcePack, CompactOre ore) {
+    private void makeLootTable(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
         JsonObject table = new JsonObject();
         table.addProperty("type", "block");
         JsonArray pools = new JsonArray();
@@ -79,36 +82,76 @@ public class CompactOresResourcePack implements IPackFinder {
         pool.add("entries", entries);
         pools.add(pool);
         table.add("pools", pools);
-        resourcePack.put("data/compactores/loot_tables/" + ore.getBlock().getRegistryName().getPath() + ".json",
-                table.toString().getBytes(StandardCharsets.UTF_8));
+        final byte[] bytes = table.toString().getBytes(StandardCharsets.UTF_8);
+        resourcePack.put("data/compactores/loot_tables/" + ore.getBlock().getRegistryName().getPath() + ".json", () -> bytes);
     }
 
-    private void makeBlockstate(Map<String, byte[]> resourcePack, CompactOre ore) {
+    private void makeBlockstate(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
         JsonObject defaultVariant = new JsonObject();
         defaultVariant.addProperty("model", "compactores:block/" + ore.getBlock().getRegistryName().getPath());
         variants.add("", defaultVariant);
         blockstate.add("variants", variants);
+        final byte[] bytes = blockstate.toString().getBytes(StandardCharsets.UTF_8);
         resourcePack.put("assets/compactores/blockstates/" + ore.getBlock().getRegistryName().getPath() + ".json",
-                blockstate.toString().getBytes(StandardCharsets.UTF_8));
+                () -> bytes);
     }
 
-    private void makeBlockModel(Map<String, byte[]> resourcePack, CompactOre ore) {
+    private void makeBlockModel(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", "minecraft:block/cube_all");
         JsonObject textures = new JsonObject();
         textures.addProperty("all", "compactores:" + ore.getBlock().getRegistryName().getPath());
         model.add("textures", textures);
+        final byte[] bytes = model.toString().getBytes(StandardCharsets.UTF_8);
         resourcePack.put("assets/compactores/models/block/" + ore.getBlock().getRegistryName().getPath() + ".json",
-                model.toString().getBytes(StandardCharsets.UTF_8));
+                () -> bytes);
     }
 
-    private void makeItemModel(Map<String, byte[]> resourcePack, CompactOre ore) {
+    private void makeItemModel(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", "compactores:block/" + ore.getBlock().getRegistryName().getPath());
+        final byte[] bytes = model.toString().getBytes(StandardCharsets.UTF_8);
         resourcePack.put("assets/compactores/models/item/" + ore.getBlock().getRegistryName().getPath() + ".json",
-                model.toString().getBytes(StandardCharsets.UTF_8));
+                () -> bytes);
+    }
+
+    private void makeBlockTexture(Map<String, Supplier<byte[]>> resourcePack, final CompactOre ore) {
+        resourcePack.put("assets/compactores/textures/" + ore.getBlock().getRegistryName().getPath() + ".png", () -> {
+            try {
+                IResourceManager rm = Minecraft.getInstance().getResourceManager();
+                IResource baseOreTexture = rm.getResource(ore.getBaseOreTexture());
+                IResource baseUnderlyingTexture = rm.getResource(ore.getBaseUnderlyingTexture());
+                BufferedImage baseOre = ImageIO.read(baseOreTexture.getInputStream());
+                BufferedImage baseRock = ImageIO.read(baseUnderlyingTexture.getInputStream());
+                int w = baseOre.getWidth(), h = baseOre.getHeight();
+                BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = result.createGraphics();
+                g.drawImage(baseOre.getSubimage(0, 0, w / 2, h), 0, 0, null);
+                g.drawImage(baseRock.getSubimage(w / 2, 0, w / 2, h), w / 2, 0, null);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                try {
+                    ImageIO.write(result, "PNG", baos);
+                } catch(Exception e){e.printStackTrace();}
+                return baos.toByteArray();
+            } catch(Exception e) {
+                CompactOres.LOGGER.error("Failed to generate texture for " + ore.getBlock().getRegistryName() +
+                        ", using missing texture instead: " + e.getClass().getName() + ": " + e.getMessage());
+                BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = img.createGraphics();
+                g.setColor(Color.BLACK);
+                g.fillRect(0, 0, 16, 16);
+                g.setColor(Color.MAGENTA);
+                g.fillRect(0, 8, 8, 8);
+                g.fillRect(8, 0, 8, 8);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                try {
+                    ImageIO.write(img, "PNG", baos);
+                } catch(Exception ex) {ex.printStackTrace();}
+                return baos.toByteArray();
+            }
+        });
     }
 
     @Override

@@ -14,12 +14,17 @@ public class CompactOre {
     private int minRolls;
     private int maxRolls;
     private ResourceLocation baseLootTable;
+    private ResourceLocation baseOreTexture;
+    private ResourceLocation baseUnderlyingTexture;
 
-    public CompactOre(Block baseBlock, int minRolls, int maxRolls, ResourceLocation baseLootTable) {
+    public CompactOre(Block baseBlock, int minRolls, int maxRolls, ResourceLocation baseLootTable,
+                      ResourceLocation baseOreTexture, ResourceLocation baseUnderlyingTexture) {
         this.baseBlock = baseBlock;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
         this.baseLootTable = baseLootTable;
+        this.baseOreTexture = baseOreTexture;
+        this.baseUnderlyingTexture = baseUnderlyingTexture;
     }
 
     public void init1_block() {
@@ -53,6 +58,14 @@ public class CompactOre {
 
     public int getMaxRolls() {
         return maxRolls;
+    }
+
+    public ResourceLocation getBaseOreTexture() {
+        return baseOreTexture;
+    }
+
+    public ResourceLocation getBaseUnderlyingTexture() {
+        return baseUnderlyingTexture;
     }
 
 }
