@@ -77,7 +77,9 @@ public class CompactOresResourcePack implements IPackFinder {
         JsonArray entries = new JsonArray();
         JsonObject entry = new JsonObject();
         entry.addProperty("type", "loot_table");
-        entry.addProperty("name", ore.getBaseLootTable().getNamespace() + ":" + ore.getBaseLootTable().getPath());
+        // This /should/ only happen after the registry events, let's just hope that that is always the case...
+        ResourceLocation baseLootTable = ore.getBaseBlock().getLootTable();
+        entry.addProperty("name", baseLootTable.toString());
         entries.add(entry);
         pool.add("entries", entries);
         pools.add(pool);

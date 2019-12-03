@@ -10,28 +10,29 @@ public class CompactOre {
     private CompactOreBlock block;
     private Item blockItem;
 
-    private Block baseBlock;
+    private ResourceLocation baseBlockLoc;
     private int minRolls;
     private int maxRolls;
-    private ResourceLocation baseLootTable;
     private ResourceLocation baseOreTexture;
     private ResourceLocation baseUnderlyingTexture;
     private float spawnProbability;
 
-    public CompactOre(Block baseBlock, int minRolls, int maxRolls, ResourceLocation baseLootTable,
-                      ResourceLocation baseOreTexture, ResourceLocation baseUnderlyingTexture, float spawnProbability) {
-        this.baseBlock = baseBlock;
+    private ResourceLocation registryName;
+
+    public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
+                      ResourceLocation baseUnderlyingTexture, float spawnProbability) {
+        this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
-        this.baseLootTable = baseLootTable;
-        this.baseOreTexture = baseOreTexture;
-        this.baseUnderlyingTexture = baseUnderlyingTexture;
+        this.baseOreTexture = new ResourceLocation(baseOreTexture.getNamespace(), "textures/" + baseOreTexture.getPath() + ".png");
+        this.baseUnderlyingTexture = new ResourceLocation(baseUnderlyingTexture.getNamespace(), "textures/" + baseUnderlyingTexture.getPath() + ".png");
         this.spawnProbability = spawnProbability;
+        this.registryName = new ResourceLocation("compactores", "compact_" +
+                baseBlockLoc.getNamespace() + "_" + baseBlockLoc.getPath());
     }
 
     public void init1_block() {
-        block = new CompactOreBlock(baseBlock);
-        CompactOres.LOGGER.debug(block);
+        block = new CompactOreBlock(registryName, baseBlockLoc);
     }
 
     public void init2_item() {
@@ -46,12 +47,9 @@ public class CompactOre {
         return blockItem;
     }
 
+    /**<b>Do NOT call before all mods have registered all their blocks.</b>*/
     public Block getBaseBlock() {
-        return baseBlock;
-    }
-
-    public ResourceLocation getBaseLootTable() {
-        return baseLootTable;
+        return block.baseBlock();
     }
 
     public int getMinRolls() {
@@ -72,6 +70,10 @@ public class CompactOre {
 
     public float getSpawnProbability() {
         return spawnProbability;
+    }
+
+    public ResourceLocation getRegistryName() {
+        return registryName;
     }
 
 }

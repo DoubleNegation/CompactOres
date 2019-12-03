@@ -1,0 +1,55 @@
+# The global configuration applies to all compact ores which don't overrule it
+[global]
+# The chance for an ore block to be a compact ore
+# Default = 0.1
+compactOreProbaility=0.1
+# The minimum drop multiplier to apply when breaking a compact ore
+# Default = 3
+minRolls=3
+# The maximum drop multiplier to apply when breaking a compact ore
+# Default = 5
+maxRolls=5
+
+# The following entries define seperate compact ores.
+
+# The name of the block is the base ore which should be compacted.
+# If the namespace (in this case minecraft) does not exist (i.e. the mod is not present), the ore is ignored.
+["minecraft:coal_ore"]
+# The texture of the ore block
+oreTexture="minecraft:block/coal_ore"
+# A texture which represents the texture "behind" the ore texture
+rockTexture="compactores:ore_underlay_minecraft_default"
+# Optionally, a spawn probability can be specified which will overrule the global configuration
+#compactOreProbability=0.2
+# Optionally, a minimum drop multiplier can be specified which will overrule the global configuration
+#minRolls=2
+# Optionally, a maximum drop multiplier can be specified which will overrule the global configuration
+#maxRolls=4
+
+["minecraft:iron_ore"]
+oreTexture="minecraft:block/iron_ore"
+rockTexture="compactores:ore_underlay_minecraft_default"
+
+["minecraft:gold_ore"]
+oreTexture="minecraft:block/gold_ore"
+rockTexture="compactores:ore_underlay_minecraft_default"
+
+["minecraft:redstone_ore"]
+oreTexture="minecraft:block/redstone_ore"
+rockTexture="compactores:ore_underlay_minecraft_default"
+
+["minecraft:diamond_ore"]
+oreTexture="minecraft:block/diamond_ore"
+rockTexture="compactores:ore_underlay_minecraft_default"
+
+["minecraft:lapis_ore"]
+oreTexture="minecraft:block/lapis_ore"
+rockTexture="compactores:ore_underlay_minecraft_lapis"
+
+["minecraft:emerald_ore"]
+oreTexture="minecraft:block/emerald_ore"
+rockTexture="compactores:ore_underlay_minecraft_emerald"
+
+["minecraft:nether_quartz_ore"]
+oreTexture="minecraft:block/nether_quartz_ore"
+rockTexture="minecraft:block/netherrack"
