@@ -16,23 +16,25 @@ public class CompactOre {
     private ResourceLocation baseOreTexture;
     private ResourceLocation baseUnderlyingTexture;
     private float spawnProbability;
+    private boolean useGetDrops;
 
     private ResourceLocation registryName;
 
     public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
-                      ResourceLocation baseUnderlyingTexture, float spawnProbability) {
+                      ResourceLocation baseUnderlyingTexture, float spawnProbability, boolean useGetDrops) {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
         this.baseOreTexture = new ResourceLocation(baseOreTexture.getNamespace(), "textures/" + baseOreTexture.getPath() + ".png");
         this.baseUnderlyingTexture = new ResourceLocation(baseUnderlyingTexture.getNamespace(), "textures/" + baseUnderlyingTexture.getPath() + ".png");
         this.spawnProbability = spawnProbability;
+        this.useGetDrops = useGetDrops;
         this.registryName = new ResourceLocation("compactores", "compact_" +
                 baseBlockLoc.getNamespace() + "_" + baseBlockLoc.getPath());
     }
 
     public void init1_block() {
-        block = new CompactOreBlock(registryName, baseBlockLoc);
+        block = new CompactOreBlock(registryName, baseBlockLoc, useGetDrops, minRolls, maxRolls);
     }
 
     public void init2_item() {

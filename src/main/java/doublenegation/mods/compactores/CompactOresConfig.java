@@ -50,8 +50,9 @@ public class CompactOresConfig {
                 float probability = (float) (double) c.getOrElse("compactOreProbability", (double) globalCompactOreProbability);
                 int minRolls = c.getOrElse("minRolls", globalMinRolls);
                 int maxRolls = c.getOrElse("maxRolls", globalMaxRolls);
+                boolean useGetDrops = c.getOrElse("useGetDrops", false);
                 if(ModList.get().isLoaded(baseBlock.getNamespace())) {
-                    ores.add(new CompactOre(baseBlock, minRolls, maxRolls, oreTexture, rockTexture, probability));
+                    ores.add(new CompactOre(baseBlock, minRolls, maxRolls, oreTexture, rockTexture, probability, useGetDrops));
                 } else {
                     CompactOres.LOGGER.info("Not creating a compact ore for " + baseBlock + " because the mod " + baseBlock.getNamespace() + " is not loaded.");
                 }

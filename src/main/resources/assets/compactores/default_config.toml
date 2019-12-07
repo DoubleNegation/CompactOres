@@ -25,6 +25,9 @@ rockTexture="compactores:ore_underlay_minecraft_default"
 #minRolls=2
 # Optionally, a maximum drop multiplier can be specified which will overrule the global configuration
 #maxRolls=4
+# By enabling this option, a different (depreacted) method of obtaining a block's drops is used.
+# This may be required for some modded ores to work, but it should not be used if not needed. Default: false
+#useGetDrops=true
 
 ["minecraft:iron_ore"]
 oreTexture="minecraft:block/iron_ore"

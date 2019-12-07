@@ -7,24 +7,35 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
+import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class CompactOreBlock extends Block {
 
     private ResourceLocation baseBlockLoc;
     private Block baseBlock = null;
+    private boolean useGetDrops;
+    private int minRolls, maxRolls;
 
-    public CompactOreBlock(ResourceLocation registryName, ResourceLocation baseBlockLoc) {
+    public CompactOreBlock(ResourceLocation registryName, ResourceLocation baseBlockLoc, boolean useGetDrops,
+                           int minRolls, int maxRolls) {
         super(Properties.create(Material.ROCK).sound(SoundType.STONE));
         this.baseBlockLoc = baseBlockLoc;
+        this.useGetDrops = useGetDrops;
+        this.minRolls = minRolls;
+        this.maxRolls = maxRolls;
         setRegistryName(registryName);
     }
 
@@ -98,4 +109,21 @@ public class CompactOreBlock extends Block {
         return getRegistryName();
     }
 
+    @Override
+    public List<ItemStack> getDrops(BlockState p_220076_1_, LootContext.Builder p_220076_2_) {
+        if(useGetDrops) {
+            List<ItemStack> drops = baseBlock().getDrops(p_220076_1_, p_220076_2_);
+            List<ItemStack> ret = new ArrayList<>();
+            int r = minRolls + new Random().nextInt(maxRolls - minRolls + 1);
+            for(int i = 0; i < r; i++) {
+                for(ItemStack stack : drops) {
+                    // adding the same item stack several times doesn't work properly - copy it instead
+                    ret.add(stack.copy());
+                }
+            }
+            return ret;
+        } else {
+            return super.getDrops(p_220076_1_, p_220076_2_);
+        }
+    }
 }
