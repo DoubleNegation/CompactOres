@@ -1,4 +1,5 @@
 {
   "compact_ore.prefix": "Kompaktes ",
-  "compact_ore.suffix": ""
+  "compact_ore.suffix": "",
+  "itemGroup.compactores": "Kompakte Erze"
 }

@@ -38,7 +38,7 @@ public class CompactOre {
     }
 
     public void init2_item() {
-        blockItem = new BlockItem(block, new Item.Properties()).setRegistryName(block.getRegistryName());
+        blockItem = new BlockItem(block, new Item.Properties().group(CompactOres.getItemGroup())).setRegistryName(block.getRegistryName());
     }
 
     public CompactOreBlock getBlock() {

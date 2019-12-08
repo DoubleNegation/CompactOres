@@ -3,6 +3,8 @@ package doublenegation.mods.compactores;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
@@ -53,6 +55,12 @@ public class CompactOres
         });
     }
 
+    private static ItemGroup itemGroup = new ItemGroup("compactores") {
+        @Override public ItemStack createIcon() {
+            return new ItemStack(compactOres.values().iterator().next().getBlock());
+        }
+    };
+
     private Map<ResourceLocation, CompactOre> getOreList() {
         return compactOres;
     }
@@ -66,6 +74,10 @@ public class CompactOres
 
     public static CompactOre getFor(ResourceLocation loc) {
         return compactOres.get(loc);
+    }
+
+    public static ItemGroup getItemGroup() {
+        return itemGroup;
     }
 
     @SubscribeEvent

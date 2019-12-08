@@ -1,4 +1,5 @@
 {
   "compact_ore.prefix": "Compact ",
-  "compact_ore.suffix": ""
+  "compact_ore.suffix": "",
+  "itemGroup.compactores": "Compact Ores"
 }
