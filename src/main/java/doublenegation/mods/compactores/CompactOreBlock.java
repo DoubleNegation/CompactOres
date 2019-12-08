@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.translation.LanguageMap;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
@@ -126,4 +127,14 @@ public class CompactOreBlock extends Block {
             return super.getDrops(p_220076_1_, p_220076_2_);
         }
     }
+
+    @Override
+    public String getTranslationKey() {
+        // This is not a pretty solution to this problem, but it's the only one that I found without
+        // creating my own language map by loading and parsing resources myself.
+        LanguageMap m = LanguageMap.getInstance();
+        return m.translateKey("compact_ore.prefix") + m.translateKey(baseBlock().getTranslationKey()) +
+                m.translateKey("compact_ore.suffix");
+    }
+
 }
