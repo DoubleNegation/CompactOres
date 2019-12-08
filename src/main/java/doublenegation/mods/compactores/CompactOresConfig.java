@@ -37,10 +37,8 @@ public class CompactOresConfig {
         Map<String, Object> confMap = conf.valueMap();
         CompactOres.LOGGER.debug("Map entries: " + confMap.size());
         for(String s : confMap.keySet()) {
-            CompactOres.LOGGER.debug("KEY: " + s);
             if(s.equals("global")) continue;
             Object val = confMap.get(s);
-            CompactOres.LOGGER.debug("VALUE: " + val);
             if(val instanceof Config) {
                 Config c = (Config)val;
                 if(!(hasString(c, "oreTexture") && hasString(c, "rockTexture"))) continue;
