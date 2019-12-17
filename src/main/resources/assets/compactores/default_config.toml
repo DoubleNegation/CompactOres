@@ -28,6 +28,10 @@ rockTexture="compactores:ore_underlay_minecraft_default"
 # By enabling this option, a different (depreacted) method of obtaining a block's drops is used.
 # This may be required for some modded ores to work, but it should not be used if not needed. Default: false
 #useGetDrops=true
+# This value is related to the way textures are generated since 1.1.0. The higher this value is, the larger the
+# range of pixels that will be considered part of the rock. Setting this value to a negative number will entirely
+# disable the new texture generator and fall back to the 1.0.0 version. Default: 30
+#maxOreLayerColorDiff=20
 
 ["minecraft:iron_ore"]
 oreTexture="minecraft:block/iron_ore"
@@ -63,40 +67,40 @@ rockTexture="minecraft:block/netherrack"
 
 ["bluepower:teslatite_ore"]
 oreTexture="bluepower:blocks/teslatite_ore"
-rockTexture="compactores:ore_underlay_bluepower_dust"
+rockTexture="minecraft:block/stone"
 
 ["bluepower:ruby_ore"]
 oreTexture="bluepower:blocks/ruby_ore"
-rockTexture="compactores:ore_underlay_bluepower_gem"
+rockTexture="minecraft:block/stone"
 
 ["bluepower:sapphire_ore"]
 oreTexture="bluepower:blocks/sapphire_ore"
-rockTexture="compactores:ore_underlay_bluepower_gem"
+rockTexture="minecraft:block/stone"
 
 ["bluepower:amethyst_ore"]
 oreTexture="bluepower:blocks/amethyst_ore"
-rockTexture="compactores:ore_underlay_bluepower_gem"
+rockTexture="minecraft:block/stone"
 
 ["bluepower:malachite_ore"]
 oreTexture="bluepower:blocks/malachite_ore"
-rockTexture="compactores:ore_underlay_bluepower_gem"
+rockTexture="minecraft:block/stone"
 
 ["bluepower:copper_ore"]
 oreTexture="bluepower:blocks/copper_ore"
-rockTexture="compactores:ore_underlay_bluepower_metal"
+rockTexture="minecraft:block/stone"
 useGetDrops=true
 
 ["bluepower:silver_ore"]
 oreTexture="bluepower:blocks/silver_ore"
-rockTexture="compactores:ore_underlay_bluepower_metal"
+rockTexture="minecraft:block/stone"
 useGetDrops=true
 
 ["bluepower:zinc_ore"]
 oreTexture="bluepower:blocks/zinc_ore"
-rockTexture="compactores:ore_underlay_bluepower_metal"
+rockTexture="minecraft:block/stone"
 useGetDrops=true
 
 ["bluepower:tungsten_ore"]
 oreTexture="bluepower:blocks/tungsten_ore"
-rockTexture="compactores:ore_underlay_bluepower_metal"
+rockTexture="minecraft:block/stone"
 useGetDrops=true
