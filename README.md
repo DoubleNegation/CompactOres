@@ -17,3 +17,9 @@ Compact ores can be defined by creating a new section in the configuration file 
  * `maxOreLayerColorDiff`: _(optional)_ Used in texture generation when determining which pixels of the base ore texture are rock and which ones are ore. This value defines how different, on a range from 0 to 3*255, a pixel on the ore texture can be from any pixel of the rock texture to still be considered rock. Setting this option to a negative value disables the smart generation and falls back to the legacy 1.0.0 generator. _(LEGACY GENERATOR NOTE: Sometimes, a seemingly matching rock texture may not perfectly match the background of the ore texture and may therefore lead to unexpected results.)_ (default = `30`)
 
 For more examples, see the [default configuration](src/main/resources/assets/compactores/default_config.toml).
+
+## Workspace setup
+To set up the mod workspace, simply import `build.gradle` as a project into your IDE.
+## Build Instructions
+Windows: `gradlew.bat build`  
+Unix/Linux: `./gradlew build`
