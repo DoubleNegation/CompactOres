@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -53,6 +54,7 @@ public class CompactOresResourcePack implements IPackFinder {
             final byte[] packpngBytes = baos.toByteArray();
             resPack.put("pack.png", () -> packpngBytes);
             // pack.png end
+            makeTags(resPack, ores.values());
             for (CompactOre ore : ores.values()) {
                 makeLootTable(resPack, ore);
                 makeBlockstate(resPack, ore);
@@ -63,6 +65,19 @@ public class CompactOresResourcePack implements IPackFinder {
             pack = new InMemoryResourcePack(resPack);
         }
         return pack;
+    }
+
+    private void makeTags(Map<String, Supplier<byte[]>> resourcePack, Collection<CompactOre> ores) {
+        JsonObject tag = new JsonObject();
+        tag.addProperty("replace", false);
+        JsonArray values = new JsonArray();
+        for(CompactOre ore : ores) {
+            values.add(ore.getRegistryName().toString());
+        }
+        tag.add("values", values);
+        final byte[] bytes = tag.toString().getBytes(StandardCharsets.UTF_8);
+        resourcePack.put("data/forge/tags/blocks/ores.json", () -> bytes);
+        resourcePack.put("data/forge/tags/items/ores.json", () -> bytes);
     }
 
     private void makeLootTable(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
