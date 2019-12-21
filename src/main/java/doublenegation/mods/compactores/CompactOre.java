@@ -1,7 +1,6 @@
 package doublenegation.mods.compactores;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 
@@ -41,7 +40,7 @@ public class CompactOre {
     }
 
     public void init2_item() {
-        blockItem = new BlockItem(block, new Item.Properties().group(CompactOres.getItemGroup())).setRegistryName(block.getRegistryName());
+        blockItem = new CompactOreBlockItem(block);
     }
 
     public CompactOreBlock getBlock() {
