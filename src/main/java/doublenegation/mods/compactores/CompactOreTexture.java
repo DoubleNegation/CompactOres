@@ -16,13 +16,14 @@ public class CompactOreTexture {
                 findOreLayerExactMatch(base, ore, w, h) : findOreLayerAttempt3(base, ore, w, h, maxOreLayerDiff);
         BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = result.createGraphics();
+        int xOff = Math.max(1, w / 16), yOff = Math.max(1, h / 16);
         // Some mods have ore textures without a background rock, so start by painting the rock
         g.drawImage(base, 0, 0, null);
         // then add the ore on top
         g.drawImage(ore, 0, 0, null);
-        g.drawImage(oreLayer, 1, 1, null);
-        g.drawImage(oreLayer, -1, -1, null);
-        g.drawImage(oreLayer, 1, 0, null);
+        g.drawImage(oreLayer, xOff, yOff, null);
+        g.drawImage(oreLayer, -xOff, -yOff, null);
+        g.drawImage(oreLayer, xOff, 0, null);
         return result;
     }
 
