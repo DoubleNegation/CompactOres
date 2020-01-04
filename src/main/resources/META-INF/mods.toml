@@ -20,9 +20,9 @@ displayName="Compact Ores" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
 #updateJSONURL="http://myurl.me/" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
-#displayURL="http://example.com/" #optional
+displayURL="https://www.curseforge.com/minecraft/mc-mods/compact-ores" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-#logoFile="examplemod.png" #optional
+logoFile="compactores_banner.png" #optional
 # A text field displayed in the mod UI
 credits="Inspired by RWTema's Dense Ores, made possible with the excellent tools provided by the Forge project!" #optional
 # A text field displayed in the mod UI
