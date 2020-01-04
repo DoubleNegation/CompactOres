@@ -147,6 +147,9 @@ public class CompactOresResourcePack implements IPackFinder {
                 try {
                     ImageIO.write(result, "PNG", baos);
                 } catch(Exception e){e.printStackTrace();}
+                if("true".equals(System.getProperty("compactores.dumpTextures"))) {
+                    TextureDumper.dump(ore, baos.toByteArray());
+                }
                 return baos.toByteArray();
             } catch(Exception e) {
                 CompactOres.LOGGER.error("Failed to generate texture for " + ore.getBlock().getRegistryName() +
