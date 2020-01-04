@@ -14,6 +14,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.ToolType;
@@ -22,6 +23,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class CompactOreBlock extends Block {
@@ -52,7 +54,9 @@ public class CompactOreBlock extends Block {
 
     @Override
     public int getExpDrop(BlockState state, IWorldReader world, BlockPos pos, int fortune, int silktouch) {
-        return baseBlock().getExpDrop(state, world, pos, fortune, silktouch);
+        Random rand = Optional.of(world.getChunk(pos).getWorldForge()).map(IWorld::getRandom).orElse(new Random());
+        int r = minRolls + rand.nextInt(maxRolls - minRolls + 1);
+        return baseBlock().getExpDrop(state, world, pos, fortune, silktouch) * r;
     }
 
     @Override
@@ -116,7 +120,7 @@ public class CompactOreBlock extends Block {
         if(useGetDrops) {
             List<ItemStack> drops = baseBlock().getDrops(p_220076_1_, p_220076_2_);
             List<ItemStack> ret = new ArrayList<>();
-            int r = minRolls + new Random().nextInt(maxRolls - minRolls + 1);
+            int r = minRolls + p_220076_2_.getWorld().getRandom().nextInt(maxRolls - minRolls + 1);
             for(int i = 0; i < r; i++) {
                 for(ItemStack stack : drops) {
                     // adding the same item stack several times doesn't work properly - copy it instead
