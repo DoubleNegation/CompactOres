@@ -171,6 +171,16 @@ oreTexture="polyores:block/levite_ore"
 rockTexture="minecraft:block/stone"
 maxOreLayerColorDiff=105
 
+["polyores:holy_ore"]
+oreTexture="polyores:block/holy_ore"
+rockTexture="minecraft:block/stone"
+maxOreLayerColorDiff=105
+
+["polyores:obscure_ore"]
+oreTexture="polyores:block/obscure_ore"
+rockTexture="minecraft:block/stone"
+maxOreLayerColorDiff=105
+
 ############################
 # MOD SUPPORT: SILENT GEAR #
 ############################
@@ -443,6 +453,30 @@ rockTexture="minecraft:block/stone"
 ["silents_mechanisms:uranium_ore"]
 oreTexture="silents_mechanisms:block/uranium_ore"
 rockTexture="minecraft:block/stone"
+
+############################
+# MOD SUPPORT: SIMPLE ORES #
+############################
+
+["simpleores:copper_ore"]
+oreTexture="simpleores:block/copper_ore"
+rockTexture="minecraft:block/stone"
+
+["simpleores:tin_ore"]
+oreTexture="simpleores:block/tin_ore"
+rockTexture="minecraft:block/stone"
+
+["simpleores:adamantium_ore"]
+oreTexture="simpleores:block/adamantium_ore"
+rockTexture="minecraft:block/stone"
+
+["simpleores:mythril_ore"]
+oreTexture="simpleores:block/mythril_ore"
+rockTexture="minecraft:block/stone"
+
+["simpleores:onyx_ore"]
+oreTexture="simpleores:block/onyx_ore"
+rockTexture="minecraft:block/netherrack"
 
 ###################################
 # MOD SUPPORT: TINKERS' MECHWORKS #
