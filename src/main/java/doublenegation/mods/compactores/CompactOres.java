@@ -6,10 +6,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -84,6 +86,24 @@ public class CompactOres
     public void startServer(final FMLServerAboutToStartEvent event) {
         LOGGER.info("Attaching CompactOre resources to the Minecraft server");
         event.getServer().getResourcePacks().addPackFinder(resourcePack);
+    }
+
+    // global block break listener that fires multiple events for the base block when a compact ore is broken
+    @SubscribeEvent
+    public void onBlockBroken(final BlockEvent.BreakEvent breakEvent) {
+        for(CompactOre ore : compactOres.values()) {
+            if(ore.getBlock().equals(breakEvent.getState().getBlock())) {
+                int numEvents = ore.getMinRolls() + breakEvent.getWorld().getRandom().nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
+                for(int i = 0; i < numEvents; i++) {
+                    MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(
+                            (World) breakEvent.getWorld(),
+                            breakEvent.getPos(),
+                            ore.getBaseBlock().getDefaultState(),
+                            breakEvent.getPlayer()));
+                }
+                break;
+            }
+        }
     }
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
