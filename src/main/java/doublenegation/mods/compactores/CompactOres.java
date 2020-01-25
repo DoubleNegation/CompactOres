@@ -54,6 +54,7 @@ public class CompactOres
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             LOGGER.info("Attaching CompactOre resources to the Minecraft client");
             Minecraft.getInstance().getResourcePackList().addPackFinder(resourcePack);
+            CompactOreTexture.registerCacheInvalidator();
         });
     }
 

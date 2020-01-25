@@ -5,9 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.resource.ISelectiveResourceReloadListener;
+import net.minecraftforge.resource.VanillaResourceType;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -18,15 +21,29 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class CompactOreTexture {
 
+    private static Map<ResourceLocation, TextureInfo> generatedTextureCache = new HashMap<>();
+    private static Map<ResourceLocation, TextureInfo> baseTextureCache = new HashMap<>();
+
     public static TextureInfo generate(ResourceLocation baseBlock, ResourceLocation baseTexture,
                                        ResourceLocation oreBlock, ResourceLocation oreTexture, int maxOreLayerDiff) {
+        if(generatedTextureCache.containsKey(oreBlock)) {
+            return generatedTextureCache.get(oreBlock);
+        }
         try {
-            TextureInfo base = TextureInfo.generate(baseBlock, baseTexture);
+            TextureInfo base;
+            if(baseTextureCache.containsKey(baseTexture)) {
+                base = baseTextureCache.get(baseTexture);
+            } else {
+                base = TextureInfo.generate(baseBlock, baseTexture);
+                baseTextureCache.put(baseTexture, base);
+            }
             TextureInfo ore = TextureInfo.generate(oreBlock, oreTexture);
             // Textures that need to be interpolated by the game don't play well with the texture generation,
             // so interpolate them now
@@ -63,7 +80,9 @@ public class CompactOreTexture {
                 ore = repeatAnimation(ore, animCommon / animOre);
             }
             // Finally generate the new texture
-            return generateCompactTexture(base, ore, maxOreLayerDiff);
+            TextureInfo result = generateCompactTexture(base, ore, maxOreLayerDiff);
+            generatedTextureCache.put(oreBlock, result);
+            return result;
         } catch(Exception e) {
             throw new RuntimeException("Unable to generate compact ore texture (baseBlock=" + baseBlock +
                     ", oreBlock=" + oreBlock + ", baseTexture=" + baseTexture + ", oreTexture=" + oreTexture + ")", e);
@@ -291,7 +310,6 @@ public class CompactOreTexture {
         private boolean interpolate;
         public TextureInfo(ResourceLocation textureOwner, List<BufferedImage> textures,
                            List<Integer> frametimes, boolean interpolate) {
-            CompactOres.LOGGER.debug("Creating texture for " + textureOwner + " with " + textures.size() + " textures and " + frametimes.size() + " frametimes.");
             this.textureOwner = textureOwner;
             this.textures = textures;
             this.frametimes = frametimes;
@@ -409,6 +427,18 @@ public class CompactOreTexture {
                 return new TextureInfo(textureOwner, textures, frametimes, interpolate);
             }
         }
+    }
+
+    public static void registerCacheInvalidator() {
+        ((IReloadableResourceManager)Minecraft.getInstance().getResourceManager()).addReloadListener(
+                (ISelectiveResourceReloadListener) (resourceManager, resourcePredicate) -> {
+                    if(resourcePredicate.test(VanillaResourceType.TEXTURES)) {
+                        // All texture caches are invalidated here immediately AFTER resource loading has COMPLETED.
+                        baseTextureCache.clear();
+                        generatedTextureCache.clear();
+                    }
+                }
+    );
     }
 
 }
