@@ -2,7 +2,6 @@ package doublenegation.mods.compactores;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.*;
 import net.minecraft.util.ResourceLocation;
 
@@ -137,23 +136,23 @@ public class CompactOresResourcePack implements IPackFinder {
     private void makeBlockTexture(Map<String, Supplier<byte[]>> resourcePack, final CompactOre ore) {
         resourcePack.put("assets/compactores/textures/" + ore.getBlock().getRegistryName().getPath() + ".png", () -> {
             try {
-                IResourceManager rm = Minecraft.getInstance().getResourceManager();
-                IResource baseOreTexture = rm.getResource(ore.getBaseOreTexture());
-                IResource baseUnderlyingTexture = rm.getResource(ore.getBaseUnderlyingTexture());
-                BufferedImage baseOre = ImageIO.read(baseOreTexture.getInputStream());
-                BufferedImage baseRock = ImageIO.read(baseUnderlyingTexture.getInputStream());
-                BufferedImage result = CompactOreTexture.generate(baseRock, baseOre, ore.getMaxOreLayerColorDiff());
+                CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
+                        ore.getBaseBlock().getRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
+                BufferedImage img = info.generateImage();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                try {
-                    ImageIO.write(result, "PNG", baos);
-                } catch(Exception e){e.printStackTrace();}
+                ImageIO.write(img, "PNG", baos);
                 if("true".equals(System.getProperty("compactores.dumpTextures"))) {
                     TextureDumper.dump(ore, baos.toByteArray());
                 }
                 return baos.toByteArray();
             } catch(Exception e) {
-                CompactOres.LOGGER.error("Failed to generate texture for " + ore.getBlock().getRegistryName() +
-                        ", using missing texture instead: " + e.getClass().getName() + ": " + e.getMessage());
+                CompactOres.LOGGER.error("Failed to generate compact ore texture for " + ore.getRegistryName() + ", using missing texture instead.");
+                Throwable ex = e;
+                do {
+                    CompactOres.LOGGER.error("   Caused by " + ex.getClass().getName() + ": " + ex.getMessage());
+                } while((ex = ex.getCause()) != null);
+                e.printStackTrace();
+                // missing texture
                 BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
                 Graphics2D g = img.createGraphics();
                 g.setColor(Color.BLACK);
@@ -164,8 +163,27 @@ public class CompactOresResourcePack implements IPackFinder {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
                     ImageIO.write(img, "PNG", baos);
-                } catch(Exception ex) {ex.printStackTrace();}
+                } catch(Exception exc) {exc.printStackTrace();}
                 return baos.toByteArray();
+            }
+        });
+        resourcePack.put("assets/compactores/textures/" + ore.getBlock().getRegistryName().getPath() + ".png.mcmeta", () -> {
+            try {
+                CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
+                        ore.getBaseBlock().getRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
+                if(info.getTotalAnimationTime() > 0) {
+                    return info.generateMeta().toString().getBytes(StandardCharsets.UTF_8);
+                }
+                // Produce an animated texture with only one frame for now. TODO: get rid of the animation entirely
+                return "{\"animation\":{\"frames\":[0]}}".getBytes(StandardCharsets.UTF_8);
+            } catch(Exception e) {
+                CompactOres.LOGGER.error("Failed to generate compact ore texture for " + ore.getRegistryName() + ", using missing texture instead.");
+                Throwable ex = e;
+                do {
+                    CompactOres.LOGGER.error("   Caused by " + ex.getClass().getName() + ": " + ex.getMessage());
+                } while((ex = ex.getCause()) != null);
+                e.printStackTrace();
+                throw e;
             }
         });
     }
