@@ -14,7 +14,7 @@ Compact ores can be defined by creating a new section in the configuration file 
  * `compactOreProbaility`: _(optional)_ Overrides the equivalent global value for this ore
  * `minRolls`/`maxRolls`: _(optional)_ Overrides the equivalent global values for this ore
  * `useGetDrops`: _(optional)_ use an alternative method to find out the drops of the base ore block (default = `false`)
- * `maxOreLayerColorDiff`: _(optional)_ Used in texture generation when determining which pixels of the base ore texture are rock and which ones are ore. This value defines how different, on a range from 0 to 3*255, a pixel on the ore texture can be from any pixel of the rock texture to still be considered rock. Setting this option to a negative value disables the smart generation and falls back to the legacy 1.0.0 generator. _(LEGACY GENERATOR NOTE: Sometimes, a seemingly matching rock texture may not perfectly match the background of the ore texture and may therefore lead to unexpected results.)_ (default = `30`)
+ * `maxOreLayerColorDiff`: _(optional)_ Used in texture generation when determining which pixels of the base ore texture are rock and which ones are ore. This value defines how different, on a range from 0 to 3*255, a pixel on the ore texture can be from any pixel of the rock texture to still be considered rock. Setting this option to a negative value disables the smart generation and falls back to the legacy 1.0.0 generator. _(LEGACY GENERATOR NOTE: Sometimes, a seemingly matching rock texture may not perfectly match the background of the ore texture and may therefore lead to unexpected results.)_ (default = `50`)
 
 For more examples, see the [default configuration](src/main/resources/assets/compactores/default_config.toml).
 

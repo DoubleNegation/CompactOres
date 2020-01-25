@@ -30,7 +30,7 @@ rockTexture="minecraft:block/stone"
 #useGetDrops=true
 # This value is related to the way textures are generated since 1.1.0. The higher this value is, the larger the
 # range of pixels that will be considered part of the rock. Setting this value to a negative number will entirely
-# disable the new texture generator and fall back to the 1.0.0 version. Default: 30
+# disable the new texture generator and fall back to the 1.0.0 version. Default: 50
 #maxOreLayerColorDiff=20
 
 ["minecraft:iron_ore"]
@@ -192,6 +192,7 @@ rockTexture="minecraft:block/stone"
 ["mysticalagriculture:prosperity_ore"]
 oreTexture="mysticalagriculture:block/prosperity_ore"
 rockTexture="minecraft:block/stone"
+maxOreLayerColorDiff=30
 
 ["mysticalagriculture:inferium_ore"]
 oreTexture="mysticalagriculture:block/inferium_ore"
@@ -481,6 +482,7 @@ rockTexture="minecraft:block/stone"
 ["silents_mechanisms:tin_ore"]
 oreTexture="silents_mechanisms:block/tin_ore"
 rockTexture="minecraft:block/stone"
+maxOreLayerColorDiff=30
 
 ["silents_mechanisms:silver_ore"]
 oreTexture="silents_mechanisms:block/silver_ore"
@@ -489,6 +491,7 @@ rockTexture="minecraft:block/stone"
 ["silents_mechanisms:lead_ore"]
 oreTexture="silents_mechanisms:block/lead_ore"
 rockTexture="minecraft:block/stone"
+maxOreLayerColorDiff=30
 
 ["silents_mechanisms:nickel_ore"]
 oreTexture="silents_mechanisms:block/nickel_ore"
@@ -501,6 +504,7 @@ rockTexture="minecraft:block/stone"
 ["silents_mechanisms:zinc_ore"]
 oreTexture="silents_mechanisms:block/zinc_ore"
 rockTexture="minecraft:block/stone"
+maxOreLayerColorDiff=30
 
 ["silents_mechanisms:bismuth_ore"]
 oreTexture="silents_mechanisms:block/bismuth_ore"

@@ -49,7 +49,7 @@ public class CompactOresConfig {
                 int minRolls = c.getOrElse("minRolls", globalMinRolls);
                 int maxRolls = c.getOrElse("maxRolls", globalMaxRolls);
                 boolean useGetDrops = c.getOrElse("useGetDrops", false);
-                int maxOreLayerColorDiff = c.getOrElse("maxOreLayerColorDiff", 30);
+                int maxOreLayerColorDiff = c.getOrElse("maxOreLayerColorDiff", 50);
                 if(ModList.get().isLoaded(baseBlock.getNamespace())) {
                     ores.add(new CompactOre(baseBlock, minRolls, maxRolls, oreTexture, rockTexture, probability, useGetDrops, maxOreLayerColorDiff));
                 } else {
