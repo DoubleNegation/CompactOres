@@ -6,6 +6,7 @@ A compact ore is a block which mimics an ore from Minecraft or another mod. It h
 Compact Ores are defined in a configuration file located in `.minecraft/config/compactores.toml`. The configuration file has the following global options in it's `[global]` section:
  * `compactOreProbability`: The likelihood that a newly generated ore block is replaced by a compact ore block
  * `minRolls`/`maxRolls`: range from which the drop multiplier will be chosen when breaking a compact ore
+ * `redrawOreBase`: whether the rock from the ore block texture should be kept instead of the rock from the rock texture should be used
 
 
 Compact ores can be defined by creating a new section in the configuration file for them. The name of the section needs to match the registry name of the base block, for example `["minecraft:coal_ore"]`. The compact ore definition supports the following parameters:

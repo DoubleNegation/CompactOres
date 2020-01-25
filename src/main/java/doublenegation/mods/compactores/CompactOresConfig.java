@@ -32,6 +32,7 @@ public class CompactOresConfig {
         float globalCompactOreProbability = global.getOrElse("compactOreProbability", .1f);
         int globalMinRolls = global.getOrElse("minRolls", 3);
         int globalMaxRolls = global.getOrElse("maxRolls", 5);
+        CompactOreTexture.setRedrawOreBase(global.getOrElse("redrawOreBase", false));
 
         Set<CompactOre> ores = new HashSet<>();
         Map<String, Object> confMap = conf.valueMap();

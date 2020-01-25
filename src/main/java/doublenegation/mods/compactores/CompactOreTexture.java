@@ -28,6 +28,7 @@ import java.util.Map;
 
 public class CompactOreTexture {
 
+    private static boolean redrawOreBase = false;
     private static Map<ResourceLocation, TextureInfo> generatedTextureCache = new HashMap<>();
     private static Map<ResourceLocation, TextureInfo> baseTextureCache = new HashMap<>();
 
@@ -232,10 +233,10 @@ public class CompactOreTexture {
         BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = result.createGraphics();
         int xOff = Math.max(1, w / 16), yOff = Math.max(1, h / 16);
-        // Some mods have ore textures without a background rock, so start by painting the rock
+        // Start with the background rock
         g.drawImage(base, 0, 0, null);
-        // then add the ore on top
-        g.drawImage(ore, 0, 0, null);
+        // Then add the ore on top (optionally with the ore's rock, specified by the config file)
+        g.drawImage(redrawOreBase ? ore : oreLayer, 0, 0, null);
         g.drawImage(oreLayer, xOff, yOff, null);
         g.drawImage(oreLayer, -xOff, -yOff, null);
         g.drawImage(oreLayer, xOff, 0, null);
@@ -438,7 +439,11 @@ public class CompactOreTexture {
                         generatedTextureCache.clear();
                     }
                 }
-    );
+        );
+    }
+
+    public static void setRedrawOreBase(boolean redrawOreBase) {
+        CompactOreTexture.redrawOreBase = redrawOreBase;
     }
 
 }

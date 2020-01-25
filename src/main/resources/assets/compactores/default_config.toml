@@ -9,6 +9,11 @@ minRolls=3
 # The maximum drop multiplier to apply when breaking a compact ore
 # Default = 5
 maxRolls=5
+# Specifies whether the base block texture from the ore texture should be re-drawn when generating textures.
+# If this is false, the rock behind an ore will look like the normal rock block does
+# If this is true, the rock behind an ore will look like it does on the normal ore block
+# Default = false
+redrawOreBase=false
 
 # The following entries define seperate compact ores.
 
