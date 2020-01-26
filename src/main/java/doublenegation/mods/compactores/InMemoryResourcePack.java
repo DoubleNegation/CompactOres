@@ -21,9 +21,11 @@ import java.util.stream.Collectors;
 public class InMemoryResourcePack implements IResourcePack {
 
     private Map<String, Supplier<byte[]>> data;
+    private Predicate<String> doesActuallyExist;
 
-    public InMemoryResourcePack(Map<String, Supplier<byte[]>> data) {
+    public InMemoryResourcePack(Map<String, Supplier<byte[]>> data, Predicate<String> doesActuallyExist) {
         this.data = data;
+        this.doesActuallyExist = doesActuallyExist;
     }
 
     private InputStream s(Supplier<byte[]> data) {
@@ -51,7 +53,7 @@ public class InMemoryResourcePack implements IResourcePack {
     @Override
     public Collection<ResourceLocation> getAllResourceLocations(ResourcePackType type, String pathIn, int maxDepth, Predicate<String> filter) {
         Collection<ResourceLocation> res =
-                data.keySet().stream().filter(s -> s.contains("/")).map(s -> {
+                data.keySet().stream().filter(s -> s.contains("/")).filter(doesActuallyExist).map(s -> {
                     String[] tk = s.split("/");
                     String typeStr = tk[0];
                     String namespace = tk[1];
@@ -69,7 +71,8 @@ public class InMemoryResourcePack implements IResourcePack {
 
     @Override
     public boolean resourceExists(ResourcePackType type, ResourceLocation location) {
-        return data.containsKey(type.getDirectoryName() + "/" + location.getNamespace() + "/" + location.getPath());
+        String path = type.getDirectoryName() + "/" + location.getNamespace() + "/" + location.getPath();
+        return data.containsKey(path) && doesActuallyExist.test(path);
     }
 
     @Override

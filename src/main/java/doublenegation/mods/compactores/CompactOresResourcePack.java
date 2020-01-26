@@ -2,6 +2,7 @@ package doublenegation.mods.compactores;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.*;
 import net.minecraft.util.ResourceLocation;
 
@@ -61,7 +62,20 @@ public class CompactOresResourcePack implements IPackFinder {
                 makeItemModel(resPack, ore);
                 makeBlockTexture(resPack, ore);
             }
-            pack = new InMemoryResourcePack(resPack);
+            pack = new InMemoryResourcePack(resPack, path -> {
+                if(!path.endsWith(".mcmeta")) return true;
+                String[] split = path.split("/");
+                String filename = split[split.length - 1];
+                String name = filename.substring(0, filename.length() - ".png.mcmeta".length());
+                ResourceLocation loc = new ResourceLocation("compactores", name);
+                CompactOre ore = CompactOres.getFor(loc);
+                ResourceLocation baseTexture = ore.getBaseUnderlyingTexture();
+                ResourceLocation oreTexture = ore.getBaseOreTexture();
+                ResourceLocation baseMeta = new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + ".mcmeta");
+                ResourceLocation oreMeta = new ResourceLocation(oreTexture.getNamespace(), oreTexture.getPath() + ".mcmeta");
+                IResourceManager rm = Minecraft.getInstance().getResourceManager();
+                return rm.hasResource(baseMeta) || rm.hasResource(oreMeta);
+            });
         }
         return pack;
     }
@@ -171,11 +185,7 @@ public class CompactOresResourcePack implements IPackFinder {
             try {
                 CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
                         ore.getBaseBlock().getRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
-                if(info.getTotalAnimationTime() > 0) {
-                    return info.generateMeta().toString().getBytes(StandardCharsets.UTF_8);
-                }
-                // Produce an animated texture with only one frame for now. TODO: get rid of the animation entirely
-                return "{\"animation\":{\"frames\":[0]}}".getBytes(StandardCharsets.UTF_8);
+                return info.generateMeta().toString().getBytes(StandardCharsets.UTF_8);
             } catch(Exception e) {
                 CompactOres.LOGGER.error("Failed to generate compact ore texture for " + ore.getRegistryName() + ", using missing texture instead.");
                 Throwable ex = e;
