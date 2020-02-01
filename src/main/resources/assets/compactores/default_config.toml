@@ -37,6 +37,10 @@ rockTexture="minecraft:block/stone"
 # range of pixels that will be considered part of the rock. Setting this value to a negative number will entirely
 # disable the new texture generator and fall back to the 1.0.0 version. Default: 50
 #maxOreLayerColorDiff=20
+# This option will cause compact ores to generate during a later phase of world generation than usual.
+# This can be necessary for some compact ores to generate at all, but it also means that the compact ore will not
+# be able to generate in certain circumstances. This should be false whenever possible. Default: false
+#lateGeneration=true
 
 ["minecraft:iron_ore"]
 oreTexture="minecraft:block/iron_ore"
@@ -216,36 +220,43 @@ maxOreLayerColorDiff=20
 oreTexture="polyores:block/blazing_ore"
 rockTexture="minecraft:block/stone"
 maxOreLayerColorDiff=105
+lateGeneration=true
 
 ["polyores:frosted_ore"]
 oreTexture="polyores:block/frosted_ore"
 rockTexture="minecraft:block/stone"
 maxOreLayerColorDiff=105
+lateGeneration=true
 
 ["polyores:toxic_ore"]
 oreTexture="polyores:block/toxic_ore"
 rockTexture="minecraft:block/stone"
 maxOreLayerColorDiff=105
+lateGeneration=true
 
 ["polyores:gravite_ore"]
 oreTexture="polyores:block/gravite_ore"
 rockTexture="minecraft:block/stone"
 maxOreLayerColorDiff=105
+lateGeneration=true
 
 ["polyores:levite_ore"]
 oreTexture="polyores:block/levite_ore"
 rockTexture="minecraft:block/stone"
 maxOreLayerColorDiff=105
+lateGeneration=true
 
 ["polyores:holy_ore"]
 oreTexture="polyores:block/holy_ore"
 rockTexture="minecraft:block/stone"
 maxOreLayerColorDiff=105
+lateGeneration=true
 
 ["polyores:obscure_ore"]
 oreTexture="polyores:block/obscure_ore"
 rockTexture="minecraft:block/stone"
 maxOreLayerColorDiff=105
+lateGeneration=true
 
 ############################
 # MOD SUPPORT: SILENT GEAR #

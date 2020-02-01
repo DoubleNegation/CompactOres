@@ -51,8 +51,9 @@ public class CompactOresConfig {
                 int maxRolls = c.getOrElse("maxRolls", globalMaxRolls);
                 boolean useGetDrops = c.getOrElse("useGetDrops", false);
                 int maxOreLayerColorDiff = c.getOrElse("maxOreLayerColorDiff", 50);
+                boolean lateGeneration = c.getOrElse("lateGeneration", false);
                 if(ModList.get().isLoaded(baseBlock.getNamespace())) {
-                    ores.add(new CompactOre(baseBlock, minRolls, maxRolls, oreTexture, rockTexture, probability, useGetDrops, maxOreLayerColorDiff));
+                    ores.add(new CompactOre(baseBlock, minRolls, maxRolls, oreTexture, rockTexture, probability, useGetDrops, maxOreLayerColorDiff, lateGeneration));
                 } else {
                     CompactOres.LOGGER.info("Not creating a compact ore for " + baseBlock + " because the mod " + baseBlock.getNamespace() + " is not loaded.");
                 }

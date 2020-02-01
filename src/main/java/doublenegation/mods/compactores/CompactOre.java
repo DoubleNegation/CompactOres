@@ -17,12 +17,13 @@ public class CompactOre {
     private float spawnProbability;
     private boolean useGetDrops;
     private int maxOreLayerColorDiff;
+    private boolean lateGeneration;
 
     private ResourceLocation registryName;
 
     public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
                       ResourceLocation baseUnderlyingTexture, float spawnProbability, boolean useGetDrops,
-                      int maxOreLayerColorDiff) {
+                      int maxOreLayerColorDiff, boolean lateGeneration) {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
@@ -31,6 +32,7 @@ public class CompactOre {
         this.spawnProbability = spawnProbability;
         this.useGetDrops = useGetDrops;
         this.maxOreLayerColorDiff = maxOreLayerColorDiff;
+        this.lateGeneration = lateGeneration;
         this.registryName = new ResourceLocation("compactores", "compact_" +
                 baseBlockLoc.getNamespace() + "_" + baseBlockLoc.getPath());
     }
@@ -82,6 +84,10 @@ public class CompactOre {
 
     public int getMaxOreLayerColorDiff() {
         return maxOreLayerColorDiff;
+    }
+
+    public boolean isLateGeneration() {
+        return lateGeneration;
     }
 
 }

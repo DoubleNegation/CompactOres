@@ -28,7 +28,7 @@ public class CompactOreWorldGen {
     public static void init(Map<ResourceLocation, CompactOre> ores) {
         for(Biome biome : ForgeRegistries.BIOMES) {
             for(CompactOre ore : ores.values()) {
-                biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
+                biome.addFeature(ore.isLateGeneration() ? GenerationStage.Decoration.UNDERGROUND_DECORATION : GenerationStage.Decoration.UNDERGROUND_ORES,
                         Biome.createDecoratedFeature(Feature.EMERALD_ORE /*ReplaceBlockFeature*/,
                                 new ReplaceBlockConfig(ore.getBaseBlock().getDefaultState(), ore.getBlock().getDefaultState()),
                                 ALL_WITH_PROBABILITY_PLACEMENT,
