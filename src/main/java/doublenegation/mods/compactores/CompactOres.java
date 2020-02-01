@@ -15,8 +15,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -35,8 +34,7 @@ public class CompactOres
 
     public CompactOres() {
         // Register the setup method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -68,11 +66,10 @@ public class CompactOres
         return compactOres;
     }
 
-    private void setup(final FMLCommonSetupEvent event) {
+    private void loadComplete(final FMLLoadCompleteEvent event) {
+        // This initialization needs to happen as late as possible to make sure that compact ores are generated
+        // after all other ores
         CompactOreWorldGen.init(compactOres);
-    }
-
-    private void setupClient(final FMLClientSetupEvent event) {
     }
 
     public static CompactOre getFor(ResourceLocation loc) {
