@@ -29,7 +29,7 @@ public class CompactOresConfig {
         conf.load();
         CompactOres.LOGGER.debug("Config: " + configFile);
         Config global = conf.getOrElse("global", Config.inMemory());
-        float globalCompactOreProbability = global.getOrElse("compactOreProbability", .1f);
+        double globalCompactOreProbability = global.getOrElse("compactOreProbability", .1);
         int globalMinRolls = global.getOrElse("minRolls", 3);
         int globalMaxRolls = global.getOrElse("maxRolls", 5);
         CompactOreTexture.setRedrawOreBase(global.getOrElse("redrawOreBase", false));
@@ -46,7 +46,7 @@ public class CompactOresConfig {
                 ResourceLocation baseBlock = parseResourceLocation(s);
                 ResourceLocation oreTexture = parseResourceLocation(c.get("oreTexture"));
                 ResourceLocation rockTexture = parseResourceLocation(c.get("rockTexture"));
-                float probability = (float) (double) c.getOrElse("compactOreProbability", (double) globalCompactOreProbability);
+                float probability = (float) (double) c.getOrElse("compactOreProbability", globalCompactOreProbability);
                 int minRolls = c.getOrElse("minRolls", globalMinRolls);
                 int maxRolls = c.getOrElse("maxRolls", globalMaxRolls);
                 boolean useGetDrops = c.getOrElse("useGetDrops", false);

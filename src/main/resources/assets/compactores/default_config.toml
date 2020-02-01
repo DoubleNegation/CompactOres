@@ -2,7 +2,7 @@
 [global]
 # The chance for an ore block to be a compact ore
 # Default = 0.1
-compactOreProbaility=0.1
+compactOreProbability=0.1
 # The minimum drop multiplier to apply when breaking a compact ore
 # Default = 3
 minRolls=3
