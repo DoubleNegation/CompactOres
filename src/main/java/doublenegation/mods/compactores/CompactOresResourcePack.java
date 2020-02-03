@@ -56,6 +56,13 @@ public class CompactOresResourcePack implements IPackFinder {
             // pack.png end
             makeTags(resPack, ores.values());
             for (CompactOre ore : ores.values()) {
+                if(ore.getBlock() == null) {
+                    // Some mod probably crashed during CONSTRUCT, causing resource loading without registry
+                    // initialization. Don't attempt to create this resource pack, because this would crash.
+                    // Without this resource pack, the game will make it to the forge error screen and display the
+                    // actual error. See #3
+                    continue;
+                }
                 makeLootTable(resPack, ore);
                 makeBlockstate(resPack, ore);
                 makeBlockModel(resPack, ore);
