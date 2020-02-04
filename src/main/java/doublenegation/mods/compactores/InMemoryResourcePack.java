@@ -51,7 +51,7 @@ public class InMemoryResourcePack implements IResourcePack {
     }
 
     @Override
-    public Collection<ResourceLocation> getAllResourceLocations(ResourcePackType type, String pathIn, int maxDepth, Predicate<String> filter) {
+    public Collection<ResourceLocation> getAllResourceLocations(ResourcePackType type, String namespaceIn, String pathIn, int maxDepthIn, Predicate<String> filterIn) {
         Collection<ResourceLocation> res =
                 data.keySet().stream().filter(s -> s.contains("/")).filter(doesActuallyExist).map(s -> {
                     String[] tk = s.split("/");
@@ -61,9 +61,10 @@ public class InMemoryResourcePack implements IResourcePack {
                     String filename = tk[tk.length - 1];
                     return new String[]{typeStr, namespace, path, filename};
                 }).filter(tk -> tk[0].equals(type.getDirectoryName()))
+                .filter(tk -> tk[1].startsWith(namespaceIn))
                 .filter(tk -> tk[2].startsWith(pathIn))
-                .filter(tk -> filter.test(tk[3]))
-                .filter(tk -> tk[2].split("/").length - 1 <= maxDepth)
+                .filter(tk -> filterIn.test(tk[3]))
+                .filter(tk -> tk[2].split("/").length - 1 <= maxDepthIn)
                 .map(tk -> new ResourceLocation(tk[1], tk[2]))
                 .collect(Collectors.toSet());
         return res;

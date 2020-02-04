@@ -7,8 +7,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.ReplaceBlockConfig;
+import net.minecraft.world.gen.placement.ConfiguredPlacement;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.gen.placement.SimplePlacement;
@@ -29,10 +31,13 @@ public class CompactOreWorldGen {
         for(Biome biome : ForgeRegistries.BIOMES) {
             for(CompactOre ore : ores.values()) {
                 biome.addFeature(ore.isLateGeneration() ? GenerationStage.Decoration.UNDERGROUND_DECORATION : GenerationStage.Decoration.UNDERGROUND_ORES,
-                        Biome.createDecoratedFeature(Feature.EMERALD_ORE /*ReplaceBlockFeature*/,
-                                new ReplaceBlockConfig(ore.getBaseBlock().getDefaultState(), ore.getBlock().getDefaultState()),
+                        new ConfiguredFeature<>(
+                                Feature.EMERALD_ORE,
+                                new ReplaceBlockConfig(ore.getBaseBlock().getDefaultState(), ore.getBlock().getDefaultState())
+                        ).func_227228_a_(new ConfiguredPlacement<>(
                                 ALL_WITH_PROBABILITY_PLACEMENT,
-                                new ProbabilityConfig(ore.getSpawnProbability())));
+                                new ProbabilityConfig(ore.getSpawnProbability())
+                        )));
             }
         }
     }
