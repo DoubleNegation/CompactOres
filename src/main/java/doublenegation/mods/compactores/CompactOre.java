@@ -37,12 +37,12 @@ public class CompactOre {
                 baseBlockLoc.getNamespace() + "_" + baseBlockLoc.getPath());
     }
 
-    public void init1_block() {
-        block = new CompactOreBlock(registryName, baseBlockLoc, useGetDrops, minRolls, maxRolls);
+    public CompactOreBlock init1_block() {
+        return block = new CompactOreBlock(baseBlockLoc, useGetDrops, minRolls, maxRolls);
     }
 
-    public void init2_item() {
-        blockItem = new CompactOreBlockItem(block);
+    public Item init2_item() {
+        return blockItem = new CompactOreBlockItem(block);
     }
 
     public CompactOreBlock getBlock() {

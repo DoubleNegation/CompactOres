@@ -33,14 +33,13 @@ public class CompactOreBlock extends Block {
     private boolean useGetDrops;
     private int minRolls, maxRolls;
 
-    public CompactOreBlock(ResourceLocation registryName, ResourceLocation baseBlockLoc, boolean useGetDrops,
+    public CompactOreBlock(ResourceLocation baseBlockLoc, boolean useGetDrops,
                            int minRolls, int maxRolls) {
         super(Properties.create(Material.ROCK).sound(SoundType.STONE));
         this.baseBlockLoc = baseBlockLoc;
         this.useGetDrops = useGetDrops;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
-        setRegistryName(registryName);
     }
 
     Block baseBlock() {

@@ -24,9 +24,6 @@ import java.util.stream.Stream;
 
 public class CompactOreWorldGen {
 
-    @ObjectHolder("compactores:all_with_probability")
-    private static Placement<ProbabilityConfig> ALL_WITH_PROBABILITY_PLACEMENT = null;
-
     public static void init(Map<ResourceLocation, CompactOre> ores) {
         for(Biome biome : ForgeRegistries.BIOMES) {
             for(CompactOre ore : ores.values()) {
@@ -35,7 +32,7 @@ public class CompactOreWorldGen {
                                 Feature.EMERALD_ORE,
                                 new ReplaceBlockConfig(ore.getBaseBlock().getDefaultState(), ore.getBlock().getDefaultState())
                         ).func_227228_a_(new ConfiguredPlacement<>(
-                                ALL_WITH_PROBABILITY_PLACEMENT,
+                                CompactOres.ALL_WITH_PROBABILITY.get(),
                                 new ProbabilityConfig(ore.getSpawnProbability())
                         )));
             }

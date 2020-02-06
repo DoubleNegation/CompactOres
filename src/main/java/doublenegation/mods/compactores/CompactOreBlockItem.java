@@ -13,7 +13,6 @@ public class CompactOreBlockItem extends BlockItem {
     public CompactOreBlockItem(Block blockIn) {
         super(blockIn, new Item.Properties().group(CompactOres.getItemGroup()));
         block = blockIn;
-        setRegistryName(blockIn.getRegistryName());
     }
 
     @Override

@@ -10,24 +10,34 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Mod("compactores")
+@Mod(CompactOres.MODID)
 public class CompactOres
 {
+    public static final String MODID = "compactores";
     public static final Logger LOGGER = LogManager.getLogger();
+
+    private static final DeferredRegister<Block> BLOCKS = new DeferredRegister<>(ForgeRegistries.BLOCKS, MODID);
+    private static final DeferredRegister<Item> ITEMS  = new DeferredRegister<>(ForgeRegistries.ITEMS, MODID);
+    private static final DeferredRegister<Placement<?>> DECORATORS = new DeferredRegister<>(ForgeRegistries.DECORATORS, MODID);
+
+    public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
+            "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig::deserialize));
 
     private static final Map<ResourceLocation, CompactOre> compactOres = new HashMap<>();
     private static CompactOresResourcePack resourcePack;
@@ -43,7 +53,13 @@ public class CompactOres
         for(CompactOre ore : CompactOresConfig.loadConfigs()) {
             LOGGER.info("Loaded compact ore " + ore.getRegistryName() + " from configuration!");
             compactOres.put(ore.getRegistryName(), ore);
+            BLOCKS.register(ore.getRegistryName().getPath(), ore::init1_block);
+            ITEMS.register(ore.getRegistryName().getPath(), ore::init2_item);
         }
+
+        BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        DECORATORS.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         // create the resource pack finder as early as possible, and register it to the client immediately
         // the resource pack will be created only when the game attempts to load it for the first time
@@ -101,31 +117,6 @@ public class CompactOres
                 }
                 break;
             }
-        }
-    }
-
-    // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
-    // Event bus for receiving Registry Events)
-    @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
-        @SubscribeEvent
-        public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            for(CompactOre ore : compactOres.values()) {
-                ore.init1_block();
-                blockRegistryEvent.getRegistry().register(ore.getBlock());
-            }
-        }
-        @SubscribeEvent
-        public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
-            for(CompactOre ore : compactOres.values()) {
-                ore.init2_item();
-                itemRegistryEvent.getRegistry().register(ore.getBlockItem());
-            }
-        }
-        @SubscribeEvent
-        public static void onDecoratorsRegistry(final RegistryEvent.Register<Placement<?>> decoratorRegistryEvent) {
-            decoratorRegistryEvent.getRegistry().register(new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig::deserialize)
-                    .setRegistryName(new ResourceLocation("compactores", "all_with_probability")));
         }
     }
 }
