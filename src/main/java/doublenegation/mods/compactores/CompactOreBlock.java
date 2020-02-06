@@ -16,6 +16,7 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -53,7 +54,7 @@ public class CompactOreBlock extends Block {
 
     @Override
     public int getExpDrop(BlockState state, IWorldReader world, BlockPos pos, int fortune, int silktouch) {
-        Random rand = Optional.of(world.getChunk(pos).getWorldForge()).map(IWorld::getRandom).orElse(new Random());
+        Random rand = Optional.of(world.getChunk(pos)).map(IChunk::getWorldForge).map(IWorld::getRandom).orElse(new Random());
         int r = minRolls + rand.nextInt(maxRolls - minRolls + 1);
         return baseBlock().getExpDrop(state, world, pos, fortune, silktouch) * r;
     }
@@ -141,6 +142,7 @@ public class CompactOreBlock extends Block {
     @Override
     public ITextComponent getNameTextComponent() {
         // provides translation to the BlockItem
-        return new TranslationTextComponent("block.compactores.compact_ore", baseBlock().getNameTextComponent());
+        final String namespace = getRegistryName() == null ? null : getRegistryName().getNamespace();
+        return new TranslationTextComponent("block." +  namespace + ".compact_ore", baseBlock().getNameTextComponent());
     }
 }

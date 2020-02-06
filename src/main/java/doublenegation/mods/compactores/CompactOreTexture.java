@@ -181,7 +181,7 @@ public class CompactOreTexture {
     private static TextureInfo generateCompactTexture(TextureInfo base, TextureInfo ore, int maxOreLayerDiff) {
         int animBase = base.getTotalAnimationTime();
         int animOre = ore.getTotalAnimationTime();
-        ResourceLocation finalTextureOwner = new ResourceLocation("compactores",
+        ResourceLocation finalTextureOwner = new ResourceLocation(CompactOres.MODID,
                 "compact_" + ore.getTextureOwner().getNamespace() + "_" + ore.getTextureOwner().getPath());
         if(animBase == 0 && animOre == 0) {
             return new TextureInfo(finalTextureOwner,

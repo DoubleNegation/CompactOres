@@ -20,10 +20,12 @@ import java.util.stream.Collectors;
 
 public class InMemoryResourcePack implements IResourcePack {
 
+    private String name;
     private Map<String, Supplier<byte[]>> data;
     private Predicate<String> doesActuallyExist;
 
-    public InMemoryResourcePack(Map<String, Supplier<byte[]>> data, Predicate<String> doesActuallyExist) {
+    public InMemoryResourcePack(String name, Map<String, Supplier<byte[]>> data, Predicate<String> doesActuallyExist) {
+        this.name = name;
         this.data = data;
         this.doesActuallyExist = doesActuallyExist;
     }
@@ -33,7 +35,7 @@ public class InMemoryResourcePack implements IResourcePack {
     }
 
     @Override
-    public InputStream getRootResourceStream(String fileName) throws IOException {
+    public InputStream getRootResourceStream(String fileName) {
         if(fileName.contains("/") || fileName.contains("\\")) {
             throw new IllegalArgumentException("Must be a root filename");
         }
@@ -52,8 +54,7 @@ public class InMemoryResourcePack implements IResourcePack {
 
     @Override
     public Collection<ResourceLocation> getAllResourceLocations(ResourcePackType type, String namespaceIn, String pathIn, int maxDepthIn, Predicate<String> filterIn) {
-        Collection<ResourceLocation> res =
-                data.keySet().stream().filter(s -> s.contains("/")).filter(doesActuallyExist).map(s -> {
+        return data.keySet().stream().filter(s -> s.contains("/")).filter(doesActuallyExist).map(s -> {
                     String[] tk = s.split("/");
                     String typeStr = tk[0];
                     String namespace = tk[1];
@@ -67,7 +68,6 @@ public class InMemoryResourcePack implements IResourcePack {
                 .filter(tk -> tk[2].split("/").length - 1 <= maxDepthIn)
                 .map(tk -> new ResourceLocation(tk[1], tk[2]))
                 .collect(Collectors.toSet());
-        return res;
     }
 
     @Override
@@ -87,20 +87,19 @@ public class InMemoryResourcePack implements IResourcePack {
     public <T> T getMetadata(IMetadataSectionSerializer<T> deserializer) throws IOException {
         // copied from net.minecraft.resources.VanillaPack
         try (InputStream inputstream = this.getRootResourceStream("pack.mcmeta")) {
-            Object object = ResourcePack.<T>getResourceMetadata(deserializer, inputstream);
-            return (T)object;
+            return ResourcePack.getResourceMetadata(deserializer, inputstream);
         } catch (FileNotFoundException | RuntimeException var16) {
-            return (T)null;
+            return null;
         }
     }
 
     @Override
     public String getName() {
-        return "CompactOres dynamic resources";
+        return name;
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
 
     }
 

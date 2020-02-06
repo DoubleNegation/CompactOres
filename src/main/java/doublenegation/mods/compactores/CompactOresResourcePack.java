@@ -19,6 +19,8 @@ import java.util.function.Supplier;
 
 public class CompactOresResourcePack implements IPackFinder {
 
+    private static final String PACK_NAME = "CompactOres dynamic resources";
+
     private Supplier<Map<ResourceLocation, CompactOre>> oreListSupplier;
     private InMemoryResourcePack pack;
 
@@ -35,7 +37,7 @@ public class CompactOresResourcePack implements IPackFinder {
             JsonObject packmcmeta = new JsonObject();
             JsonObject packmcmetapack = new JsonObject();
             packmcmetapack.addProperty("pack_format", 4);
-            packmcmetapack.addProperty("description", "CompactOres dynamic resources");
+            packmcmetapack.addProperty("description", PACK_NAME);
             packmcmeta.add("pack", packmcmetapack);
             final byte[] packmcmetaBytes = packmcmeta.toString().getBytes(StandardCharsets.UTF_8);
             resPack.put("pack.mcmeta", () -> packmcmetaBytes);
@@ -69,12 +71,12 @@ public class CompactOresResourcePack implements IPackFinder {
                 makeItemModel(resPack, ore);
                 makeBlockTexture(resPack, ore);
             }
-            pack = new InMemoryResourcePack(resPack, path -> {
+            pack = new InMemoryResourcePack(PACK_NAME, resPack, path -> {
                 if(!path.endsWith(".mcmeta")) return true;
                 String[] split = path.split("/");
                 String filename = split[split.length - 1];
                 String name = filename.substring(0, filename.length() - ".png.mcmeta".length());
-                ResourceLocation loc = new ResourceLocation("compactores", name);
+                ResourceLocation loc = new ResourceLocation(CompactOres.MODID, name);
                 CompactOre ore = CompactOres.getFor(loc);
                 ResourceLocation baseTexture = ore.getBaseUnderlyingTexture();
                 ResourceLocation oreTexture = ore.getBaseOreTexture();
@@ -101,6 +103,7 @@ public class CompactOresResourcePack implements IPackFinder {
     }
 
     private void makeLootTable(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
+        final String namespace = ore.getRegistryName().getNamespace();
         JsonObject table = new JsonObject();
         table.addProperty("type", "block");
         JsonArray pools = new JsonArray();
@@ -120,42 +123,46 @@ public class CompactOresResourcePack implements IPackFinder {
         pools.add(pool);
         table.add("pools", pools);
         final byte[] bytes = table.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("data/compactores/loot_tables/" + ore.getBlock().getRegistryName().getPath() + ".json", () -> bytes);
+        resourcePack.put("data/" + namespace + "/loot_tables/" + ore.getRegistryName().getPath() + ".json", () -> bytes);
     }
 
     private void makeBlockstate(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
+        final String namespace = ore.getRegistryName().getNamespace();
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
         JsonObject defaultVariant = new JsonObject();
-        defaultVariant.addProperty("model", "compactores:block/" + ore.getBlock().getRegistryName().getPath());
+        defaultVariant.addProperty("model", namespace + ":block/" + ore.getRegistryName().getPath());
         variants.add("", defaultVariant);
         blockstate.add("variants", variants);
         final byte[] bytes = blockstate.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("assets/compactores/blockstates/" + ore.getBlock().getRegistryName().getPath() + ".json",
+        resourcePack.put("assets/" + namespace + "/blockstates/" + ore.getRegistryName().getPath() + ".json",
                 () -> bytes);
     }
 
     private void makeBlockModel(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
+        final String namespace = ore.getRegistryName().getNamespace();
         JsonObject model = new JsonObject();
         model.addProperty("parent", "minecraft:block/cube_all");
         JsonObject textures = new JsonObject();
-        textures.addProperty("all", "compactores:" + ore.getBlock().getRegistryName().getPath());
+        textures.addProperty("all", namespace + ":" + ore.getRegistryName().getPath());
         model.add("textures", textures);
         final byte[] bytes = model.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("assets/compactores/models/block/" + ore.getBlock().getRegistryName().getPath() + ".json",
+        resourcePack.put("assets/" + namespace + "/models/block/" + ore.getRegistryName().getPath() + ".json",
                 () -> bytes);
     }
 
     private void makeItemModel(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
+        final String namespace = ore.getRegistryName().getNamespace();
         JsonObject model = new JsonObject();
-        model.addProperty("parent", "compactores:block/" + ore.getBlock().getRegistryName().getPath());
+        model.addProperty("parent", namespace + ":block/" + ore.getRegistryName().getPath());
         final byte[] bytes = model.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("assets/compactores/models/item/" + ore.getBlock().getRegistryName().getPath() + ".json",
+        resourcePack.put("assets/" + namespace + "/models/item/" + ore.getRegistryName().getPath() + ".json",
                 () -> bytes);
     }
 
     private void makeBlockTexture(Map<String, Supplier<byte[]>> resourcePack, final CompactOre ore) {
-        resourcePack.put("assets/compactores/textures/" + ore.getBlock().getRegistryName().getPath() + ".png", () -> {
+        final String namespace = ore.getRegistryName().getNamespace();
+        resourcePack.put("assets/" + namespace + "/textures/" + ore.getRegistryName().getPath() + ".png", () -> {
             try {
                 CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
                         ore.getBaseBlock().getRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
@@ -188,7 +195,7 @@ public class CompactOresResourcePack implements IPackFinder {
                 return baos.toByteArray();
             }
         });
-        resourcePack.put("assets/compactores/textures/" + ore.getBlock().getRegistryName().getPath() + ".png.mcmeta", () -> {
+        resourcePack.put("assets/" + namespace + "/textures/" + ore.getRegistryName().getPath() + ".png.mcmeta", () -> {
             try {
                 CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
                         ore.getBaseBlock().getRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
@@ -207,7 +214,7 @@ public class CompactOresResourcePack implements IPackFinder {
 
     @Override
     public <T extends ResourcePackInfo> void addPackInfosToMap(Map<String, T> map, ResourcePackInfo.IFactory<T> iFactory) {
-        map.put("CompactOres dynamic resources", ResourcePackInfo.createResourcePack("CompactOres dynamic resources",
+        map.put(PACK_NAME, ResourcePackInfo.createResourcePack(PACK_NAME,
                 true/*isAlwaysEnabled*/, this::getPack, iFactory, ResourcePackInfo.Priority.BOTTOM));
     }
 

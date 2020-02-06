@@ -17,10 +17,10 @@ public class CompactOresConfig {
 
     public static Set<CompactOre> loadConfigs() {
         CompactOres.LOGGER.debug("Loading configs!");
-        Path configFile = FMLPaths.CONFIGDIR.get().resolve("compactores.toml");
+        Path configFile = FMLPaths.CONFIGDIR.get().resolve(CompactOres.MODID + ".toml");
         if(!Files.exists(configFile)) {
             try {
-                Files.copy(CompactOresConfig.class.getResourceAsStream("/assets/compactores/default_config.toml"), configFile);
+                Files.copy(CompactOresConfig.class.getResourceAsStream("/assets/" + CompactOres.MODID + "/default_config.toml"), configFile);
             } catch(IOException e) {
                 e.printStackTrace();
             }

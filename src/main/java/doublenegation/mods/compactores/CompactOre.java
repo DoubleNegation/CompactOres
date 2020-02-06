@@ -33,15 +33,15 @@ public class CompactOre {
         this.useGetDrops = useGetDrops;
         this.maxOreLayerColorDiff = maxOreLayerColorDiff;
         this.lateGeneration = lateGeneration;
-        this.registryName = new ResourceLocation("compactores", "compact_" +
+        this.registryName = new ResourceLocation(CompactOres.MODID, "compact_" +
                 baseBlockLoc.getNamespace() + "_" + baseBlockLoc.getPath());
     }
 
-    public CompactOreBlock init1_block() {
+    public CompactOreBlock initBlock() {
         return block = new CompactOreBlock(baseBlockLoc, useGetDrops, minRolls, maxRolls);
     }
 
-    public Item init2_item() {
+    public Item initItem() {
         return blockItem = new CompactOreBlockItem(block);
     }
 

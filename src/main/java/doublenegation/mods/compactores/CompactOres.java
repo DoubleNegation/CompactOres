@@ -53,8 +53,8 @@ public class CompactOres
         for(CompactOre ore : CompactOresConfig.loadConfigs()) {
             LOGGER.info("Loaded compact ore " + ore.getRegistryName() + " from configuration!");
             compactOres.put(ore.getRegistryName(), ore);
-            BLOCKS.register(ore.getRegistryName().getPath(), ore::init1_block);
-            ITEMS.register(ore.getRegistryName().getPath(), ore::init2_item);
+            BLOCKS.register(ore.getRegistryName().getPath(), ore::initBlock);
+            ITEMS.register(ore.getRegistryName().getPath(), ore::initItem);
         }
 
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -72,7 +72,7 @@ public class CompactOres
         });
     }
 
-    private static ItemGroup itemGroup = new ItemGroup("compactores") {
+    private static ItemGroup itemGroup = new ItemGroup(CompactOres.MODID) {
         @Override public ItemStack createIcon() {
             return new ItemStack(compactOres.values().iterator().next().getBlock());
         }
