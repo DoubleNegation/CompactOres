@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.*;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -71,17 +73,21 @@ public class CompactOresResourcePack implements IPackFinder {
             }
             pack = new InMemoryResourcePack(resPack, path -> {
                 if(!path.endsWith(".mcmeta")) return true;
-                String[] split = path.split("/");
-                String filename = split[split.length - 1];
-                String name = filename.substring(0, filename.length() - ".png.mcmeta".length());
-                ResourceLocation loc = new ResourceLocation("compactores", name);
-                CompactOre ore = CompactOres.getFor(loc);
-                ResourceLocation baseTexture = ore.getBaseUnderlyingTexture();
-                ResourceLocation oreTexture = ore.getBaseOreTexture();
-                ResourceLocation baseMeta = new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + ".mcmeta");
-                ResourceLocation oreMeta = new ResourceLocation(oreTexture.getNamespace(), oreTexture.getPath() + ".mcmeta");
-                IResourceManager rm = Minecraft.getInstance().getResourceManager();
-                return rm.hasResource(baseMeta) || rm.hasResource(oreMeta);
+                boolean[] result = new boolean[]{false};
+                DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+                    String[] split = path.split("/");
+                    String filename = split[split.length - 1];
+                    String name = filename.substring(0, filename.length() - ".png.mcmeta".length());
+                    ResourceLocation loc = new ResourceLocation("compactores", name);
+                    CompactOre ore = CompactOres.getFor(loc);
+                    ResourceLocation baseTexture = ore.getBaseUnderlyingTexture();
+                    ResourceLocation oreTexture = ore.getBaseOreTexture();
+                    ResourceLocation baseMeta = new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + ".mcmeta");
+                    ResourceLocation oreMeta = new ResourceLocation(oreTexture.getNamespace(), oreTexture.getPath() + ".mcmeta");
+                    IResourceManager rm = Minecraft.getInstance().getResourceManager();
+                    result[0] = rm.hasResource(baseMeta) || rm.hasResource(oreMeta);
+                });
+                return result[0];
             });
         }
         return pack;
