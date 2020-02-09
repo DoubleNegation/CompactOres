@@ -7,142 +7,127 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.state.IProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
 public class CompactOreBlock extends Block {
 
-    private ResourceLocation baseBlockLoc;
-    private Block baseBlock = null;
-    private boolean useGetDrops;
-    private int minRolls, maxRolls;
+    public static final IProperty<CompactOre> ORE_PROPERTY = new CompactOreProperty<>("ore", CompactOre.class, CompactOres.compactOres());
 
-    public CompactOreBlock(ResourceLocation baseBlockLoc, boolean useGetDrops,
-                           int minRolls, int maxRolls) {
+    public CompactOreBlock() {
         super(Properties.create(Material.ROCK).sound(SoundType.STONE));
-        this.baseBlockLoc = baseBlockLoc;
-        this.useGetDrops = useGetDrops;
-        this.minRolls = minRolls;
-        this.maxRolls = maxRolls;
+        this.setDefaultState(this.stateContainer.getBaseState().with(ORE_PROPERTY, CompactOres.compactOres().get(0)));
     }
 
-    Block baseBlock() {
-        return baseBlock != null ? baseBlock : ForgeRegistries.BLOCKS.getValue(baseBlockLoc);
+    Block baseBlock(BlockState state) {
+        return state.get(ORE_PROPERTY).getBaseBlock();
+    }
+
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        builder.add(ORE_PROPERTY);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext context) {
+        BlockState state = super.getStateForPlacement(context);
+        state = state == null ? CompactOres.COMPACT_ORE.get().getDefaultState() : state;
+        CompactOreBlockItem item = CompactOres.COMPACT_ORE_ITEM.get();
+        CompactOre ore = item.findOreForStack(context.getItem());
+        return state.with(CompactOreBlock.ORE_PROPERTY, ore);
+    }
+
+
+    @Override
+    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+        CompactOre ore = state.get(ORE_PROPERTY);
+        return CompactOres.COMPACT_ORE_ITEM.get().getStackOfOre(ore, 1);
+    }
+
+    @Override
+    public boolean hasTileEntity(BlockState state) {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+        return new CompactOreTileEntity(state.get(ORE_PROPERTY));
     }
 
     @Override
     public float getExplosionResistance(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity exploder, Explosion explosion) {
-        return baseBlock().getExplosionResistance(state, world, pos, exploder, explosion);
+        return baseBlock(state).getExplosionResistance(state, world, pos, exploder, explosion);
     }
 
     @Override
     public int getExpDrop(BlockState state, IWorldReader world, BlockPos pos, int fortune, int silktouch) {
         Random rand = Optional.of(world.getChunk(pos)).map(IChunk::getWorldForge).map(IWorld::getRandom).orElse(new Random());
-        int r = minRolls + rand.nextInt(maxRolls - minRolls + 1);
-        return baseBlock().getExpDrop(state, world, pos, fortune, silktouch) * r;
+        CompactOre ore = state.get(ORE_PROPERTY);
+        int r = ore.getMinRolls() + rand.nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
+        return baseBlock(state).getExpDrop(state, world, pos, fortune, silktouch) * r;
     }
 
     @Override
     public int getHarvestLevel(BlockState state) {
-        return baseBlock().getHarvestLevel(state);
+        return baseBlock(state).getHarvestLevel(state);
     }
 
     @Nullable
     @Override
     public ToolType getHarvestTool(BlockState state) {
-        return baseBlock().getHarvestTool(state);
+        return baseBlock(state).getHarvestTool(state);
     }
 
     @Override
     public float getBlockHardness(BlockState state, IBlockReader p_176195_2_, BlockPos pos) {
-        return baseBlock().getBlockHardness(state, p_176195_2_, pos);
-    }
-
-    @Override
-    public float getExplosionResistance() {
-        return baseBlock().getExplosionResistance();
+        return baseBlock(state).getBlockHardness(state, p_176195_2_, pos);
     }
 
     @Override
     public Material getMaterial(BlockState state) {
-        return baseBlock().getMaterial(state);
+        return baseBlock(state).getMaterial(state);
     }
 
     @Override
     public MaterialColor getMaterialColor(BlockState state, IBlockReader p_180659_2_, BlockPos pos) {
-        return baseBlock().getMaterialColor(state, p_180659_2_, pos);
+        return baseBlock(state).getMaterialColor(state, p_180659_2_, pos);
     }
 
     @Override
     public boolean canHarvestBlock(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return baseBlock().canHarvestBlock(state, world, pos, player);
+        return baseBlock(state).canHarvestBlock(state, world, pos, player);
     }
 
     @Override
     public boolean isToolEffective(BlockState state, ToolType tool) {
-        return baseBlock().isToolEffective(state, tool);
+        return baseBlock(state).isToolEffective(state, tool);
     }
 
     @Override
     public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return baseBlock().getSoundType(state, world, pos, entity);
+        return baseBlock(state).getSoundType(state, world, pos, entity);
     }
 
     @Override
     public SoundType getSoundType(BlockState state) {
-        return baseBlock().getSoundType(state);
+        return baseBlock(state).getSoundType(state);
     }
 
-    @Override
-    public ResourceLocation getLootTable() {
-        return getRegistryName();
-    }
-
-    @Override
-    public List<ItemStack> getDrops(BlockState p_220076_1_, LootContext.Builder p_220076_2_) {
-        if(useGetDrops) {
-            List<ItemStack> drops = baseBlock().getDrops(p_220076_1_, p_220076_2_);
-            List<ItemStack> ret = new ArrayList<>();
-            int r = minRolls + p_220076_2_.getWorld().getRandom().nextInt(maxRolls - minRolls + 1);
-            for(int i = 0; i < r; i++) {
-                for(ItemStack stack : drops) {
-                    // adding the same item stack several times doesn't work properly - copy it instead
-                    ret.add(stack.copy());
-                }
-            }
-            return ret;
-        } else {
-            return super.getDrops(p_220076_1_, p_220076_2_);
-        }
-    }
-
-    @Override
-    public String getTranslationKey() {
-        // dirty hack to make Hwyla behave
-        return getNameTextComponent().getFormattedText();
-    }
-
-    @Override
-    public ITextComponent getNameTextComponent() {
-        // provides translation to the BlockItem
-        final String namespace = getRegistryName() == null ? null : getRegistryName().getNamespace();
-        return new TranslationTextComponent("block." +  namespace + ".compact_ore", baseBlock().getNameTextComponent());
-    }
 }

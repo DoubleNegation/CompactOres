@@ -5,32 +5,35 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.*;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.DistExecutor;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CompactOresResourcePack implements IPackFinder {
 
     private static final String PACK_NAME = "CompactOres dynamic resources";
 
-    private Supplier<Map<ResourceLocation, CompactOre>> oreListSupplier;
+    private Supplier<List<CompactOre>> oreListSupplier;
     private InMemoryResourcePack pack;
 
-    public CompactOresResourcePack(Supplier<Map<ResourceLocation, CompactOre>> oreListSupplier) {
+    public CompactOresResourcePack(Supplier<List<CompactOre>> oreListSupplier) {
         this.oreListSupplier = oreListSupplier;
     }
 
     private synchronized InMemoryResourcePack getPack() {
         if(pack == null) {
-            Map<ResourceLocation, CompactOre> ores = oreListSupplier.get();
+            List<CompactOre> ores = oreListSupplier.get();
             CompactOres.LOGGER.info("Generating CompactOre resources for " + ores.size() + " compact ore blocks");
             Map<String, Supplier<byte[]>> resPack = new HashMap<>();
             // pack.mcmeta start
@@ -56,116 +59,139 @@ public class CompactOresResourcePack implements IPackFinder {
             final byte[] packpngBytes = baos.toByteArray();
             resPack.put("pack.png", () -> packpngBytes);
             // pack.png end
-            makeTags(resPack, ores.values());
-            for (CompactOre ore : ores.values()) {
-                if(ore.getBlock() == null) {
-                    // Some mod probably crashed during CONSTRUCT, causing resource loading without registry
-                    // initialization. Don't attempt to create this resource pack, because this would crash.
-                    // Without this resource pack, the game will make it to the forge error screen and display the
-                    // actual error. See #3
-                    continue;
+            if(CompactOres.COMPACT_ORE.isPresent()) {
+                // If this condition fails, some mod probably crashed during CONSTRUCT, causing resource loading
+                // without registry initialization. Don't attempt to create this resource pack, because this would
+                // crash the game. Without this resource pack, the game will make it to the forge error screen and
+                // display the actual error. See #3
+                makeTags(resPack);
+                makeLootTable(resPack, ores);
+                makeBlockstate(resPack, ores);
+                makeItemModel(resPack, ores);
+                for (CompactOre ore : ores) {
+                    makeBlockModel(resPack, ore);
+                    makeBlockTexture(resPack, ore);
                 }
-                makeLootTable(resPack, ore);
-                makeBlockstate(resPack, ore);
-                makeBlockModel(resPack, ore);
-                makeItemModel(resPack, ore);
-                makeBlockTexture(resPack, ore);
             }
             pack = new InMemoryResourcePack(PACK_NAME, resPack, path -> {
                 if(!path.endsWith(".mcmeta")) return true;
-                String[] split = path.split("/");
-                String filename = split[split.length - 1];
-                String name = filename.substring(0, filename.length() - ".png.mcmeta".length());
-                ResourceLocation loc = new ResourceLocation(CompactOres.MODID, name);
-                CompactOre ore = CompactOres.getFor(loc);
-                ResourceLocation baseTexture = ore.getBaseUnderlyingTexture();
-                ResourceLocation oreTexture = ore.getBaseOreTexture();
-                ResourceLocation baseMeta = new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + ".mcmeta");
-                ResourceLocation oreMeta = new ResourceLocation(oreTexture.getNamespace(), oreTexture.getPath() + ".mcmeta");
-                IResourceManager rm = Minecraft.getInstance().getResourceManager();
-                return rm.hasResource(baseMeta) || rm.hasResource(oreMeta);
+                return DistExecutor.runForDist(() -> () -> {
+                    // Client only, server is always false
+                    String[] split = path.split("/");
+                    String filename = split[split.length - 1];
+                    String name = filename.substring(0, filename.length() - ".png.mcmeta".length());
+                    CompactOre ore = CompactOres.getForResourceName(name);
+                    if(ore == null) return false;
+                    ResourceLocation baseTexture = ore.getBaseUnderlyingTexture();
+                    ResourceLocation oreTexture = ore.getBaseOreTexture();
+                    ResourceLocation baseMeta = new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + ".mcmeta");
+                    ResourceLocation oreMeta = new ResourceLocation(oreTexture.getNamespace(), oreTexture.getPath() + ".mcmeta");
+                    IResourceManager rm = Minecraft.getInstance().getResourceManager();
+                    return rm.hasResource(baseMeta) || rm.hasResource(oreMeta);
+                }, () -> () -> false);
             });
         }
         return pack;
     }
 
-    private void makeTags(Map<String, Supplier<byte[]>> resourcePack, Collection<CompactOre> ores) {
+    private void makeTags(Map<String, Supplier<byte[]>> resourcePack) {
         JsonObject tag = new JsonObject();
         tag.addProperty("replace", false);
         JsonArray values = new JsonArray();
-        for(CompactOre ore : ores) {
-            values.add(ore.getRegistryName().toString());
-        }
+        Optional.ofNullable(CompactOres.COMPACT_ORE.get().getRegistryName()).map(ResourceLocation::toString).ifPresent(values::add);
         tag.add("values", values);
         final byte[] bytes = tag.toString().getBytes(StandardCharsets.UTF_8);
         resourcePack.put("data/forge/tags/blocks/ores.json", () -> bytes);
         resourcePack.put("data/forge/tags/items/ores.json", () -> bytes);
     }
 
-    private void makeLootTable(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
-        final String namespace = ore.getRegistryName().getNamespace();
+    private void makeLootTable(Map<String, Supplier<byte[]>> resourcePack, List<CompactOre> ores) {
         JsonObject table = new JsonObject();
         table.addProperty("type", "block");
         JsonArray pools = new JsonArray();
-        JsonObject pool = new JsonObject();
-        JsonObject rolls = new JsonObject();
-        rolls.addProperty("min", ore.getMinRolls());
-        rolls.addProperty("max", ore.getMaxRolls());
-        pool.add("rolls", rolls);
-        JsonArray entries = new JsonArray();
-        JsonObject entry = new JsonObject();
-        entry.addProperty("type", "loot_table");
-        // This /should/ only happen after the registry events, let's just hope that that is always the case...
-        ResourceLocation baseLootTable = ore.getBaseBlock().getLootTable();
-        entry.addProperty("name", baseLootTable.toString());
-        entries.add(entry);
-        pool.add("entries", entries);
-        pools.add(pool);
+        for(CompactOre ore : ores) {
+            JsonObject pool = new JsonObject();
+            JsonArray conditions = new JsonArray();
+            JsonObject condition = new JsonObject();
+            condition.addProperty("condition", "block_state_property");
+            condition.addProperty("block", CompactOres.COMPACT_ORE.getId().toString());
+            JsonObject properties = new JsonObject();
+            properties.addProperty(CompactOreBlock.ORE_PROPERTY.getName(), CompactOreBlock.ORE_PROPERTY.getName(ore));
+            condition.add("properties", properties);
+            conditions.add(condition);
+            pool.add("conditions", conditions);
+            JsonObject rolls = new JsonObject();
+            rolls.addProperty("min", ore.getMinRolls());
+            rolls.addProperty("max", ore.getMaxRolls());
+            pool.add("rolls", rolls);
+            JsonArray entries = new JsonArray();
+            JsonObject entry = new JsonObject();
+            entry.addProperty("type", "loot_table");
+            entry.addProperty("name", ore.getBaseBlock().getLootTable().toString());
+            entries.add(entry);
+            pool.add("entries", entries);
+            pools.add(pool);
+        }
         table.add("pools", pools);
         final byte[] bytes = table.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("data/" + namespace + "/loot_tables/" + ore.getRegistryName().getPath() + ".json", () -> bytes);
+        ResourceLocation loc = CompactOres.COMPACT_ORE.get().getLootTable();
+        resourcePack.put("data/" + loc.getNamespace() + "/loot_tables/" + loc.getPath() + ".json", () -> bytes);
     }
 
-    private void makeBlockstate(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
-        final String namespace = ore.getRegistryName().getNamespace();
+    private void makeBlockstate(Map<String, Supplier<byte[]>> resourcePack, List<CompactOre> ores) {
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
-        JsonObject defaultVariant = new JsonObject();
-        defaultVariant.addProperty("model", namespace + ":block/" + ore.getRegistryName().getPath());
-        variants.add("", defaultVariant);
+        for(CompactOre ore : ores) {
+            final String namespace = CompactOres.COMPACT_ORE.getId().getNamespace();
+            JsonObject variant = new JsonObject();
+            variant.addProperty("model", namespace + ":block/" + CompactOreBlock.ORE_PROPERTY.getName(ore));
+            variants.add("ore=" + CompactOreBlock.ORE_PROPERTY.getName(ore), variant);
+        }
         blockstate.add("variants", variants);
         final byte[] bytes = blockstate.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("assets/" + namespace + "/blockstates/" + ore.getRegistryName().getPath() + ".json",
-                () -> bytes);
+        resourcePack.put("assets/" + CompactOres.COMPACT_ORE.getId().getNamespace() + "/blockstates/" +
+                CompactOres.COMPACT_ORE.getId().getPath() + ".json", () -> bytes);
     }
 
     private void makeBlockModel(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
-        final String namespace = ore.getRegistryName().getNamespace();
+        ResourceLocation name = new ResourceLocation(CompactOres.COMPACT_ORE.getId().getNamespace(),
+                CompactOreBlock.ORE_PROPERTY.getName(ore));
         JsonObject model = new JsonObject();
         model.addProperty("parent", "minecraft:block/cube_all");
         JsonObject textures = new JsonObject();
-        textures.addProperty("all", namespace + ":" + ore.getRegistryName().getPath());
+        textures.addProperty("all", name.getNamespace() + ":" + name.getPath());
         model.add("textures", textures);
         final byte[] bytes = model.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("assets/" + namespace + "/models/block/" + ore.getRegistryName().getPath() + ".json",
+        resourcePack.put("assets/" + name.getNamespace() + "/models/block/" + name.getPath() + ".json",
                 () -> bytes);
     }
 
-    private void makeItemModel(Map<String, Supplier<byte[]>> resourcePack, CompactOre ore) {
-        final String namespace = ore.getRegistryName().getNamespace();
+    private void makeItemModel(Map<String, Supplier<byte[]>> resourcePack, List<CompactOre> ores) {
         JsonObject model = new JsonObject();
-        model.addProperty("parent", namespace + ":block/" + ore.getRegistryName().getPath());
+        model.addProperty("parent", CompactOres.COMPACT_ORE.getId().getNamespace() + ":block/" +
+                CompactOreBlock.ORE_PROPERTY.getName(ores.get(0)));
+        JsonArray overrides = new JsonArray();
+        for(CompactOre ore : ores) {
+            JsonObject override = new JsonObject();
+            JsonObject predicate = new JsonObject();
+            predicate.addProperty(CompactOres.MODID + ":ore", ores.indexOf(ore));
+            override.add("predicate", predicate);
+            override.addProperty("model", CompactOres.COMPACT_ORE.getId().getNamespace() + ":block/" +
+                    CompactOreBlock.ORE_PROPERTY.getName(ore));
+            overrides.add(override);
+        }
+        model.add("overrides", overrides);
         final byte[] bytes = model.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("assets/" + namespace + "/models/item/" + ore.getRegistryName().getPath() + ".json",
-                () -> bytes);
+        resourcePack.put("assets/" + CompactOres.COMPACT_ORE_ITEM.getId().getNamespace() + "/models/item/" +
+                CompactOres.COMPACT_ORE_ITEM.getId().getPath() + ".json", () -> bytes);
     }
 
     private void makeBlockTexture(Map<String, Supplier<byte[]>> resourcePack, final CompactOre ore) {
-        final String namespace = ore.getRegistryName().getNamespace();
-        resourcePack.put("assets/" + namespace + "/textures/" + ore.getRegistryName().getPath() + ".png", () -> {
+        resourcePack.put("assets/" + CompactOres.COMPACT_ORE.getId().getNamespace() + "/textures/" +
+                CompactOreBlock.ORE_PROPERTY.getName(ore) + ".png", () -> {
             try {
                 CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
-                        ore.getBaseBlock().getRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
+                        ore.getBaseBlockRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
                 BufferedImage img = info.generateImage();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(img, "PNG", baos);
@@ -174,11 +200,8 @@ public class CompactOresResourcePack implements IPackFinder {
                 }
                 return baos.toByteArray();
             } catch(Exception e) {
-                CompactOres.LOGGER.error("Failed to generate compact ore texture for " + ore.getRegistryName() + ", using missing texture instead.");
-                Throwable ex = e;
-                do {
-                    CompactOres.LOGGER.error("   Caused by " + ex.getClass().getName() + ": " + ex.getMessage());
-                } while((ex = ex.getCause()) != null);
+                CompactOres.LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
+                logExceptionCauseList(e);
                 e.printStackTrace();
                 // missing texture
                 BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
@@ -195,21 +218,25 @@ public class CompactOresResourcePack implements IPackFinder {
                 return baos.toByteArray();
             }
         });
-        resourcePack.put("assets/" + namespace + "/textures/" + ore.getRegistryName().getPath() + ".png.mcmeta", () -> {
+        resourcePack.put("assets/" + CompactOres.COMPACT_ORE.getId().getNamespace() + "/textures/" +
+                CompactOreBlock.ORE_PROPERTY.getName(ore) + ".png.mcmeta", () -> {
             try {
                 CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
-                        ore.getBaseBlock().getRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
+                        ore.getBaseBlockRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
                 return info.generateMeta().toString().getBytes(StandardCharsets.UTF_8);
             } catch(Exception e) {
-                CompactOres.LOGGER.error("Failed to generate compact ore texture for " + ore.getRegistryName() + ", using missing texture instead.");
-                Throwable ex = e;
-                do {
-                    CompactOres.LOGGER.error("   Caused by " + ex.getClass().getName() + ": " + ex.getMessage());
-                } while((ex = ex.getCause()) != null);
+                CompactOres.LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
+                logExceptionCauseList(e);
                 e.printStackTrace();
                 throw e;
             }
         });
+    }
+
+    private void logExceptionCauseList(Throwable th) {
+        do {
+            CompactOres.LOGGER.error("   Caused by " + th.getClass().getName() + ": " + th.getMessage());
+        } while((th = th.getCause()) != null);
     }
 
     @Override

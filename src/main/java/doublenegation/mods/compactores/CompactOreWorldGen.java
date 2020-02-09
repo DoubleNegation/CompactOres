@@ -3,7 +3,6 @@ package doublenegation.mods.compactores;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.types.DynamicOps;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
@@ -15,20 +14,21 @@ import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.SimplePlacement;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class CompactOreWorldGen {
 
-    public static void init(Map<ResourceLocation, CompactOre> ores) {
+    public static void init(List<CompactOre> ores) {
         for(Biome biome : ForgeRegistries.BIOMES) {
-            for(CompactOre ore : ores.values()) {
+            for(CompactOre ore : ores) {
                 biome.addFeature(ore.isLateGeneration() ? GenerationStage.Decoration.UNDERGROUND_DECORATION : GenerationStage.Decoration.UNDERGROUND_ORES,
                         new ConfiguredFeature<>(
                                 Feature.EMERALD_ORE,
-                                new ReplaceBlockConfig(ore.getBaseBlock().getDefaultState(), ore.getBlock().getDefaultState())
+                                new ReplaceBlockConfig(ore.getBaseBlock().getDefaultState(),
+                                        CompactOres.COMPACT_ORE.get().getDefaultState().with(CompactOreBlock.ORE_PROPERTY, ore))
                         ).func_227228_a_(new ConfiguredPlacement<>(
                                 CompactOres.ALL_WITH_PROBABILITY.get(),
                                 new ProbabilityConfig(ore.getSpawnProbability())

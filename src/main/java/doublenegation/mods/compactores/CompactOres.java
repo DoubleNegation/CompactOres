@@ -1,10 +1,12 @@
 package doublenegation.mods.compactores;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.placement.Placement;
@@ -23,8 +25,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Mod(CompactOres.MODID)
 public class CompactOres
@@ -34,12 +37,21 @@ public class CompactOres
 
     private static final DeferredRegister<Block> BLOCKS = new DeferredRegister<>(ForgeRegistries.BLOCKS, MODID);
     private static final DeferredRegister<Item> ITEMS  = new DeferredRegister<>(ForgeRegistries.ITEMS, MODID);
+    private static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = new DeferredRegister<>(ForgeRegistries.TILE_ENTITIES, MODID);
     private static final DeferredRegister<Placement<?>> DECORATORS = new DeferredRegister<>(ForgeRegistries.DECORATORS, MODID);
+
+    public static final RegistryObject<CompactOreBlock> COMPACT_ORE = BLOCKS.register("compact_ore", CompactOreBlock::new);
+
+    public static final RegistryObject<CompactOreBlockItem> COMPACT_ORE_ITEM = ITEMS.register(
+            "compact_ore", () -> new CompactOreBlockItem(COMPACT_ORE.get()));
+
+    public static final RegistryObject<TileEntityType<CompactOreTileEntity>> COMPACT_ORE_TE = TILE_ENTITIES.register(
+            "compact_ore", () -> TileEntityType.Builder.create(CompactOreTileEntity::new).build(null));
 
     public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
             "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig::deserialize));
 
-    private static final Map<ResourceLocation, CompactOre> compactOres = new HashMap<>();
+    private static List<CompactOre> compactOres;
     private static CompactOresResourcePack resourcePack;
 
     public CompactOres() {
@@ -50,21 +62,23 @@ public class CompactOres
         MinecraftForge.EVENT_BUS.register(this);
 
         // Load the ores from the config
+        List<CompactOre> compactOres = new ArrayList<>();
         for(CompactOre ore : CompactOresConfig.loadConfigs()) {
-            LOGGER.info("Loaded compact ore " + ore.getRegistryName() + " from configuration!");
-            compactOres.put(ore.getRegistryName(), ore);
-            BLOCKS.register(ore.getRegistryName().getPath(), ore::initBlock);
-            ITEMS.register(ore.getRegistryName().getPath(), ore::initItem);
+            compactOres.add(ore);
+            LOGGER.info("Loaded compact ore variant for " + ore.getBaseBlockRegistryName() + " from configuration!");
         }
+        compactOres.sort(CompactOre::compareTo);
+        CompactOres.compactOres = Collections.unmodifiableList(compactOres);
 
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         DECORATORS.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         // create the resource pack finder as early as possible, and register it to the client immediately
         // the resource pack will be created only when the game attempts to load it for the first time
         // this makes sure that it will exist by the time the resources are loaded for the first time on the client
-        resourcePack = new CompactOresResourcePack(this::getOreList);
+        resourcePack = new CompactOresResourcePack(CompactOres::compactOres);
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             LOGGER.info("Attaching CompactOre resources to the Minecraft client");
             Minecraft.getInstance().getResourcePackList().addPackFinder(resourcePack);
@@ -72,24 +86,38 @@ public class CompactOres
         });
     }
 
-    private static ItemGroup itemGroup = new ItemGroup(CompactOres.MODID) {
-        @Override public ItemStack createIcon() {
-            return new ItemStack(compactOres.values().iterator().next().getBlock());
-        }
-    };
-
-    private Map<ResourceLocation, CompactOre> getOreList() {
+    public static List<CompactOre> compactOres() {
         return compactOres;
     }
+
+    public static CompactOre getFor(ResourceLocation baseBlockLoc) {
+        for(CompactOre ore : compactOres) {
+            if(ore.getBaseBlockRegistryName().equals(baseBlockLoc)) {
+                return ore;
+            }
+        }
+        return null;
+    }
+
+    public static CompactOre getForResourceName(String resourceName) {
+        for(CompactOre ore : compactOres) {
+            if(ore.getName().equals(resourceName)) {
+                return ore;
+            }
+        }
+        return null;
+    }
+
+    private static ItemGroup itemGroup = new ItemGroup(CompactOres.MODID) {
+        @Override public ItemStack createIcon() {
+            return new ItemStack(COMPACT_ORE_ITEM.get(), 1);
+        }
+    };
 
     private void loadComplete(final FMLLoadCompleteEvent event) {
         // This initialization needs to happen as late as possible to make sure that compact ores are generated
         // after all other ores
         CompactOreWorldGen.init(compactOres);
-    }
-
-    public static CompactOre getFor(ResourceLocation loc) {
-        return compactOres.get(loc);
     }
 
     public static ItemGroup getItemGroup() {
@@ -105,18 +133,16 @@ public class CompactOres
     // global block break listener that fires multiple events for the base block when a compact ore is broken
     @SubscribeEvent
     public void onBlockBroken(final BlockEvent.BreakEvent breakEvent) {
-        for(CompactOre ore : compactOres.values()) {
-            if(ore.getBlock().equals(breakEvent.getState().getBlock())) {
-                int numEvents = ore.getMinRolls() + breakEvent.getWorld().getRandom().nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
-                for(int i = 0; i < numEvents; i++) {
-                    MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(
-                            (World) breakEvent.getWorld(),
-                            breakEvent.getPos(),
-                            ore.getBaseBlock().getDefaultState(),
-                            breakEvent.getPlayer()));
-                }
-                break;
-            }
+        BlockState state = breakEvent.getState();
+        if(!state.getBlock().equals(COMPACT_ORE.get())) return;
+        CompactOre ore = state.get(CompactOreBlock.ORE_PROPERTY);
+        int numEvents = ore.getMinRolls() + breakEvent.getWorld().getRandom().nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
+        for(int i = 0; i < numEvents; i++) {
+            MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(
+                    (World)breakEvent.getWorld(),
+                    breakEvent.getPos(),
+                    ore.getBaseBlock().getDefaultState(),
+                    breakEvent.getPlayer()));
         }
     }
 }

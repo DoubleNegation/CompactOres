@@ -1,61 +1,60 @@
 package doublenegation.mods.compactores;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class CompactOre {
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-    private CompactOreBlock block;
-    private Item blockItem;
+public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
+    private static Set<String> usedResourceNames = new HashSet<>();
+
+    private String resourceName;
     private ResourceLocation baseBlockLoc;
+    private Block baseBlock;
     private int minRolls;
     private int maxRolls;
     private ResourceLocation baseOreTexture;
     private ResourceLocation baseUnderlyingTexture;
     private float spawnProbability;
-    private boolean useGetDrops;
     private int maxOreLayerColorDiff;
     private boolean lateGeneration;
 
-    private ResourceLocation registryName;
-
     public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
-                      ResourceLocation baseUnderlyingTexture, float spawnProbability, boolean useGetDrops,
-                      int maxOreLayerColorDiff, boolean lateGeneration) {
+                      ResourceLocation baseUnderlyingTexture, float spawnProbability, int maxOreLayerColorDiff,
+                      boolean lateGeneration) {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
         this.baseOreTexture = new ResourceLocation(baseOreTexture.getNamespace(), "textures/" + baseOreTexture.getPath() + ".png");
         this.baseUnderlyingTexture = new ResourceLocation(baseUnderlyingTexture.getNamespace(), "textures/" + baseUnderlyingTexture.getPath() + ".png");
         this.spawnProbability = spawnProbability;
-        this.useGetDrops = useGetDrops;
         this.maxOreLayerColorDiff = maxOreLayerColorDiff;
         this.lateGeneration = lateGeneration;
-        this.registryName = new ResourceLocation(CompactOres.MODID, "compact_" +
-                baseBlockLoc.getNamespace() + "_" + baseBlockLoc.getPath());
+        String resourceName = baseBlockLoc.toString().replace(":", "__");
+        while(usedResourceNames.contains(resourceName)) {
+            resourceName += "_";
+        }
+        this.resourceName = resourceName;
+        usedResourceNames.add(resourceName);
     }
 
-    public CompactOreBlock initBlock() {
-        return block = new CompactOreBlock(baseBlockLoc, useGetDrops, minRolls, maxRolls);
-    }
-
-    public Item initItem() {
-        return blockItem = new CompactOreBlockItem(block);
-    }
-
-    public CompactOreBlock getBlock() {
-        return block;
-    }
-
-    public Item getBlockItem() {
-        return blockItem;
+    public ResourceLocation getBaseBlockRegistryName() {
+        return baseBlockLoc;
     }
 
     /**<b>Do NOT call before all mods have registered all their blocks.</b>*/
     public Block getBaseBlock() {
-        return block.baseBlock();
+        if(baseBlock == null) {
+            baseBlock = ForgeRegistries.BLOCKS.getValue(baseBlockLoc);
+        }
+        return baseBlock;
     }
 
     public int getMinRolls() {
@@ -78,16 +77,35 @@ public class CompactOre {
         return spawnProbability;
     }
 
-    public ResourceLocation getRegistryName() {
-        return registryName;
-    }
-
     public int getMaxOreLayerColorDiff() {
         return maxOreLayerColorDiff;
     }
 
     public boolean isLateGeneration() {
         return lateGeneration;
+    }
+
+    @Override
+    public int compareTo(CompactOre compactOre) {
+        ModList.get().getMods();
+        if(this.baseBlockLoc.getNamespace().equals(compactOre.baseBlockLoc.getNamespace())) {
+            return this.baseBlockLoc.getPath().compareTo(compactOre.baseBlockLoc.getPath());
+        } else {
+            List<ModInfo> modList = ModList.get().getMods();
+            int thisIndex = -1, otherIndex = -1;
+            for(int i = 0; i < modList.size(); i++) {
+                String modId = modList.get(i).getModId();
+                if(this.baseBlockLoc.getNamespace().equals(modId)) thisIndex = i;
+                else if(compactOre.baseBlockLoc.getNamespace().equals(modId)) otherIndex = i;
+                if(thisIndex != -1 && otherIndex != -1) break;
+            }
+            return thisIndex - otherIndex;
+        }
+    }
+
+    @Override
+    public String getName() {
+        return resourceName;
     }
 
 }
