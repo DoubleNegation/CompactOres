@@ -13,10 +13,12 @@ import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -53,23 +55,29 @@ public class CompactOres
 
     private static List<CompactOre> compactOres;
     private static CompactOresResourcePack resourcePack;
+    private static boolean configurationLoaded = false;
 
     public CompactOres() {
-        // Register the setup method for modloading
+        // Register all event listeners
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onModConfigLoading);
+        MinecraftForge.EVENT_BUS.addListener(this::startServer);
+        MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
 
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
+        // Prepare all config file hacks (because I don't like ForgeConfigSpec)
+        CompactOresConfig.prepareConfigFiles();
 
-        // Load the ores from the config
-        List<CompactOre> compactOres = new ArrayList<>();
-        for(CompactOre ore : CompactOresConfig.loadConfigs()) {
-            compactOres.add(ore);
-            LOGGER.info("Loaded compact ore variant for " + ore.getBaseBlockRegistryName() + " from configuration!");
-        }
-        compactOres.sort(CompactOre::compareTo);
-        CompactOres.compactOres = Collections.unmodifiableList(compactOres);
+        // Register the config
+        //ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CompactOresConfig.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CompactOresConfig.SPEC, CompactOresConfig.ACTIVE_CONFIG_FILE_NAME);
 
+        // Ensure there's always at least two ores in the compact ore list
+        List<CompactOre> dummyOres = new ArrayList<>();
+        dummyOres.add(CompactOre.DUMMY0);
+        dummyOres.add(CompactOre.DUMMY1);
+        compactOres = Collections.unmodifiableList(dummyOres);
+
+        // Register the DeferredRegisters to the event bus to handle the registry events
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
         TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -124,14 +132,12 @@ public class CompactOres
         return itemGroup;
     }
 
-    @SubscribeEvent
     public void startServer(final FMLServerAboutToStartEvent event) {
         LOGGER.info("Attaching CompactOre resources to the Minecraft server");
         event.getServer().getResourcePacks().addPackFinder(resourcePack);
     }
 
     // global block break listener that fires multiple events for the base block when a compact ore is broken
-    @SubscribeEvent
     public void onBlockBroken(final BlockEvent.BreakEvent breakEvent) {
         BlockState state = breakEvent.getState();
         if(!state.getBlock().equals(COMPACT_ORE.get())) return;
@@ -145,4 +151,31 @@ public class CompactOres
                     breakEvent.getPlayer()));
         }
     }
+
+    public void onModConfigLoading(final ModConfig.Loading configEvent) {
+        if(configurationLoaded) {
+            LOGGER.warn("The Compact Ores configuration was just reloaded. The new configuration will be IGNORED, " +
+                    "as changing the configuration while the game is running is currently not supported. If you have " +
+                    "made any changes to your Compact Ores configuration that you are wishing to apply, please " +
+                    "restart the game.");
+            configEvent.setResult(Event.Result.DENY);
+            return;
+        }
+        configurationLoaded = true;
+        List<CompactOre> ores = CompactOresConfig.CONFIG.bake();
+        // Ensure there's always at least two entries (because block state property needs at least two valid values)
+        if(ores.size() < 2) {
+            ores.add(CompactOre.DUMMY0);
+            if(ores.size() < 2) {
+                ores.add(CompactOre.DUMMY1);
+            }
+        }
+        // Apply the new configuration
+        compactOres = Collections.unmodifiableList(ores);
+        if(COMPACT_ORE.isPresent()) {
+            COMPACT_ORE.get().renewStateContainer();
+        }
+        resourcePack.regeneratePack();
+    }
+
 }

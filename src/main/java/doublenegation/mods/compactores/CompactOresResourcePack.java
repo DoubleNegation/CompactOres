@@ -25,6 +25,7 @@ public class CompactOresResourcePack implements IPackFinder {
     private static final String PACK_NAME = "CompactOres dynamic resources";
 
     private Supplier<List<CompactOre>> oreListSupplier;
+    private Map<String, Supplier<byte[]>> packData;
     private InMemoryResourcePack pack;
 
     public CompactOresResourcePack(Supplier<List<CompactOre>> oreListSupplier) {
@@ -33,47 +34,9 @@ public class CompactOresResourcePack implements IPackFinder {
 
     private synchronized InMemoryResourcePack getPack() {
         if(pack == null) {
-            List<CompactOre> ores = oreListSupplier.get();
-            CompactOres.LOGGER.info("Generating CompactOre resources for " + ores.size() + " compact ore blocks");
-            Map<String, Supplier<byte[]>> resPack = new HashMap<>();
-            // pack.mcmeta start
-            JsonObject packmcmeta = new JsonObject();
-            JsonObject packmcmetapack = new JsonObject();
-            packmcmetapack.addProperty("pack_format", 4);
-            packmcmetapack.addProperty("description", PACK_NAME);
-            packmcmeta.add("pack", packmcmetapack);
-            final byte[] packmcmetaBytes = packmcmeta.toString().getBytes(StandardCharsets.UTF_8);
-            resPack.put("pack.mcmeta", () -> packmcmetaBytes);
-            // pack.mcmeta end
-            // pack.png start - to prevent crash on opening resource packs menu
-            BufferedImage packpng = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
-            Graphics2D packpngg = packpng.createGraphics();
-            packpngg.setColor(Color.BLACK);
-            packpngg.fillRect(0, 0, 16, 16);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                ImageIO.write(packpng, "PNG", baos);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            final byte[] packpngBytes = baos.toByteArray();
-            resPack.put("pack.png", () -> packpngBytes);
-            // pack.png end
-            if(CompactOres.COMPACT_ORE.isPresent()) {
-                // If this condition fails, some mod probably crashed during CONSTRUCT, causing resource loading
-                // without registry initialization. Don't attempt to create this resource pack, because this would
-                // crash the game. Without this resource pack, the game will make it to the forge error screen and
-                // display the actual error. See #3
-                makeTags(resPack);
-                makeLootTable(resPack, ores);
-                makeBlockstate(resPack, ores);
-                makeItemModel(resPack, ores);
-                for (CompactOre ore : ores) {
-                    makeBlockModel(resPack, ore);
-                    makeBlockTexture(resPack, ore);
-                }
-            }
-            pack = new InMemoryResourcePack(PACK_NAME, resPack, path -> {
+            packData = new HashMap<>();
+            generatePack(packData);
+            pack = new InMemoryResourcePack(PACK_NAME, packData, path -> {
                 if(!path.endsWith(".mcmeta")) return true;
                 return DistExecutor.runForDist(() -> () -> {
                     // Client only, server is always false
@@ -92,6 +55,48 @@ public class CompactOresResourcePack implements IPackFinder {
             });
         }
         return pack;
+    }
+
+    private void generatePack(Map<String, Supplier<byte[]>> resPack) {
+        List<CompactOre> ores = oreListSupplier.get();
+        CompactOres.LOGGER.info("Generating CompactOre resources for " + ores.size() + " compact ore blocks");
+        // pack.mcmeta start
+        JsonObject packmcmeta = new JsonObject();
+        JsonObject packmcmetapack = new JsonObject();
+        packmcmetapack.addProperty("pack_format", 4);
+        packmcmetapack.addProperty("description", PACK_NAME);
+        packmcmeta.add("pack", packmcmetapack);
+        final byte[] packmcmetaBytes = packmcmeta.toString().getBytes(StandardCharsets.UTF_8);
+        resPack.put("pack.mcmeta", () -> packmcmetaBytes);
+        // pack.mcmeta end
+        // pack.png start - to prevent crash on opening resource packs menu
+        BufferedImage packpng = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+        Graphics2D packpngg = packpng.createGraphics();
+        packpngg.setColor(Color.BLACK);
+        packpngg.fillRect(0, 0, 16, 16);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(packpng, "PNG", baos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        final byte[] packpngBytes = baos.toByteArray();
+        resPack.put("pack.png", () -> packpngBytes);
+        // pack.png end
+        if(CompactOres.COMPACT_ORE.isPresent()) {
+            // If this condition fails, some mod probably crashed during CONSTRUCT, causing resource loading
+            // without registry initialization. Don't attempt to create this resource pack, because this would
+            // crash the game. Without this resource pack, the game will make it to the forge error screen and
+            // display the actual error. See #3
+            makeTags(resPack);
+            makeLootTable(resPack, ores);
+            makeBlockstate(resPack, ores);
+            makeItemModel(resPack, ores);
+            for (CompactOre ore : ores) {
+                makeBlockModel(resPack, ore);
+                makeBlockTexture(resPack, ore);
+            }
+        }
     }
 
     private void makeTags(Map<String, Supplier<byte[]>> resourcePack) {
@@ -237,6 +242,12 @@ public class CompactOresResourcePack implements IPackFinder {
         do {
             CompactOres.LOGGER.error("   Caused by " + th.getClass().getName() + ": " + th.getMessage());
         } while((th = th.getCause()) != null);
+    }
+
+    public void regeneratePack() {
+        if(pack == null) return;
+        packData.clear();
+        generatePack(packData);
     }
 
     @Override

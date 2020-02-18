@@ -1,571 +1,79 @@
 # The global configuration applies to all compact ores which don't overrule it
 [global]
-# The chance for an ore block to be a compact ore
-# Default = 0.1
-compactOreProbability=0.1
-# The minimum drop multiplier to apply when breaking a compact ore
-# Default = 3
-minRolls=3
-# The maximum drop multiplier to apply when breaking a compact ore
-# Default = 5
-maxRolls=5
-# Specifies whether the base block texture from the ore texture should be re-drawn when generating textures.
-# If this is false, the rock behind an ore will look like the normal rock block does
-# If this is true, the rock behind an ore will look like it does on the normal ore block
-# Default = false
-redrawOreBase=false
+    # The chance for an ore block to be a compact ore
+    # Default: 0.1
+	# Range: 0.0 ~ 1.0
+	compactOreProbability = 0.1
+	# Specifies whether the base block texture from the ore texture should be re-drawn when generating textures.
+    # If this is false, the rock behind an ore will look like the normal rock block does
+    # If this is true, the rock behind an ore will look like it does on the normal ore block
+    # Default: false
+	redrawOreBase = false
+	# The maximum drop multiplier to apply when breaking a compact ore
+    # Default: 5
+	# Range: > 0
+	maxRolls = 5
+	# The minimum drop multiplier to apply when breaking a compact ore
+    # Default: 3
+	# Range: > 0
+	minRolls = 3
 
 # The following entries define seperate compact ores.
 
-# The name of the block is the base ore which should be compacted.
-# If the namespace (in this case minecraft) does not exist (i.e. the mod is not present), the ore is ignored.
-["minecraft:coal_ore"]
-# The texture of the ore block
-oreTexture="minecraft:block/coal_ore"
-# A texture which represents the texture "behind" the ore texture
-rockTexture="minecraft:block/stone"
-# Optionally, a spawn probability can be specified which will overrule the global configuration
-#compactOreProbability=0.2
-# Optionally, a minimum drop multiplier can be specified which will overrule the global configuration
-#minRolls=2
-# Optionally, a maximum drop multiplier can be specified which will overrule the global configuration
-#maxRolls=4
-# By enabling this option, a different (depreacted) method of obtaining a block's drops is used.
-# This may be required for some modded ores to work, but it should not be used if not needed. Default: false
-#useGetDrops=true
-# This value is related to the way textures are generated since 1.1.0. The higher this value is, the larger the
-# range of pixels that will be considered part of the rock. Setting this value to a negative number will entirely
-# disable the new texture generator and fall back to the 1.0.0 version. Default: 50
-#maxOreLayerColorDiff=20
-# This option will cause compact ores to generate during a later phase of world generation than usual.
-# This can be necessary for some compact ores to generate at all, but it also means that the compact ore will not
-# be able to generate in certain circumstances. This should be false whenever possible. Default: false
-#lateGeneration=true
-
-["minecraft:iron_ore"]
-oreTexture="minecraft:block/iron_ore"
-rockTexture="minecraft:block/stone"
-
-["minecraft:gold_ore"]
-oreTexture="minecraft:block/gold_ore"
-rockTexture="minecraft:block/stone"
-
-["minecraft:redstone_ore"]
-oreTexture="minecraft:block/redstone_ore"
-rockTexture="minecraft:block/stone"
-
-["minecraft:diamond_ore"]
-oreTexture="minecraft:block/diamond_ore"
-rockTexture="minecraft:block/stone"
-
-["minecraft:lapis_ore"]
-oreTexture="minecraft:block/lapis_ore"
-rockTexture="minecraft:block/stone"
-
-["minecraft:emerald_ore"]
-oreTexture="minecraft:block/emerald_ore"
-rockTexture="minecraft:block/stone"
-
-["minecraft:nether_quartz_ore"]
-oreTexture="minecraft:block/nether_quartz_ore"
-rockTexture="minecraft:block/netherrack"
-
-##################################
-# MOD SUPPORT: BASIC NETHER ORES #
-##################################
-
-["bno:netherlapis_ore"]
-oreTexture="bno:block/netherlapis_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:netheruranium_ore"]
-oreTexture="bno:block/netheruranium_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:nethersilver_ore"]
-oreTexture="bno:block/nethersilver_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:netheriron_ore"]
-oreTexture="bno:block/netheriron_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:netherdiamond_ore"]
-oreTexture="bno:block/netherdiamond_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:netherlead_ore"]
-oreTexture="bno:block/netherlead_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:nethercoal_ore"]
-oreTexture="bno:block/nethercoal_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:nethercopper_ore"]
-oreTexture="bno:block/nethercopper_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:netherredstone_ore"]
-oreTexture="bno:block/netherredstone_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:nethertin_ore"]
-oreTexture="bno:block/nethertin_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:netheremerald_ore"]
-oreTexture="bno:block/netheremerald_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:netheraluminum_ore"]
-oreTexture="bno:block/netheraluminum_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:nethergold_ore"]
-oreTexture="bno:block/nethergold_ore"
-rockTexture="minecraft:block/netherrack"
-
-["bno:nethernickel_ore"]
-oreTexture="bno:block/nethernickel_ore"
-rockTexture="minecraft:block/netherrack"
-
-###########################
-# MOD SUPPORT: BLUE POWER #
-###########################
-
-["bluepower:teslatite_ore"]
-oreTexture="bluepower:blocks/teslatite_ore"
-rockTexture="minecraft:block/stone"
-
-["bluepower:ruby_ore"]
-oreTexture="bluepower:blocks/ruby_ore"
-rockTexture="minecraft:block/stone"
-
-["bluepower:sapphire_ore"]
-oreTexture="bluepower:blocks/sapphire_ore"
-rockTexture="minecraft:block/stone"
-
-["bluepower:amethyst_ore"]
-oreTexture="bluepower:blocks/amethyst_ore"
-rockTexture="minecraft:block/stone"
-
-["bluepower:malachite_ore"]
-oreTexture="bluepower:blocks/malachite_ore"
-rockTexture="minecraft:block/stone"
-
-["bluepower:copper_ore"]
-oreTexture="bluepower:blocks/copper_ore"
-rockTexture="minecraft:block/stone"
-useGetDrops=true
-
-["bluepower:silver_ore"]
-oreTexture="bluepower:blocks/silver_ore"
-rockTexture="minecraft:block/stone"
-useGetDrops=true
-
-["bluepower:zinc_ore"]
-oreTexture="bluepower:blocks/zinc_ore"
-rockTexture="minecraft:block/stone"
-useGetDrops=true
-
-["bluepower:tungsten_ore"]
-oreTexture="bluepower:blocks/tungsten_ore"
-rockTexture="minecraft:block/stone"
-useGetDrops=true
-
-###########################
-# MOD SUPPORT: DRUIDCRAFT #
-###########################
-
-["druidcraft:amber_ore"]
-oreTexture="druidcraft:block/amber_ore"
-rockTexture="minecraft:block/stone"
-
-["druidcraft:moonstone_ore"]
-oreTexture="druidcraft:block/moonstone_ore"
-rockTexture="minecraft:block/stone"
-
-["druidcraft:fiery_glass_ore"]
-oreTexture="druidcraft:block/fiery_glass_ore"
-rockTexture="minecraft:block/stone"
-
-["druidcraft:rockroot_ore"]
-oreTexture="druidcraft:block/rockroot_ore"
-rockTexture="minecraft:block/stone"
-
-#####################################
-# MOD SUPPORT: MYSTICAL AGRICULTURE #
-#####################################
-
-["mysticalagriculture:prosperity_ore"]
-oreTexture="mysticalagriculture:block/prosperity_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=30
-
-["mysticalagriculture:inferium_ore"]
-oreTexture="mysticalagriculture:block/inferium_ore"
-rockTexture="minecraft:block/stone"
-
-["mysticalagriculture:soulium_ore"]
-oreTexture="mysticalagriculture:block/soulium_ore"
-rockTexture="mysticalagriculture:block/soulstone"
-maxOreLayerColorDiff=20
-
-############################
-# MOD SUPPORT: POLY'S ORES #
-############################
-
-["polyores:blazing_ore"]
-oreTexture="polyores:block/blazing_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=105
-lateGeneration=true
-
-["polyores:frosted_ore"]
-oreTexture="polyores:block/frosted_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=105
-lateGeneration=true
-
-["polyores:toxic_ore"]
-oreTexture="polyores:block/toxic_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=105
-lateGeneration=true
-
-["polyores:gravite_ore"]
-oreTexture="polyores:block/gravite_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=105
-lateGeneration=true
-
-["polyores:levite_ore"]
-oreTexture="polyores:block/levite_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=105
-lateGeneration=true
-
-["polyores:holy_ore"]
-oreTexture="polyores:block/holy_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=105
-lateGeneration=true
-
-["polyores:obscure_ore"]
-oreTexture="polyores:block/obscure_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=105
-lateGeneration=true
-
-############################
-# MOD SUPPORT: SILENT GEAR #
-############################
-
-["silentgear:crimson_iron_ore"]
-oreTexture="silentgear:block/crimson_iron_ore"
-rockTexture="minecraft:block/netherrack"
-maxOreLayerColorDiff=50
-
-##############################
-# MOD SUPPORT: SILENT'S GEMS #
-##############################
-
-["silentgems:ruby_ore"]
-oreTexture="silentgems:block/ore/gem/ruby"
-rockTexture="minecraft:block/stone"
-
-["silentgems:garnet_ore"]
-oreTexture="silentgems:block/ore/gem/garnet"
-rockTexture="minecraft:block/stone"
-
-["silentgems:topaz_ore"]
-oreTexture="silentgems:block/ore/gem/topaz"
-rockTexture="minecraft:block/stone"
-
-["silentgems:amber_ore"]
-oreTexture="silentgems:block/ore/gem/amber"
-rockTexture="minecraft:block/stone"
-
-["silentgems:heliodor_ore"]
-oreTexture="silentgems:block/ore/gem/heliodor"
-rockTexture="minecraft:block/stone"
-
-["silentgems:peridot_ore"]
-oreTexture="silentgems:block/ore/gem/peridot"
-rockTexture="minecraft:block/stone"
-
-["silentgems:green_sapphire_ore"]
-oreTexture="silentgems:block/ore/gem/green_sapphire"
-rockTexture="minecraft:block/stone"
-
-["silentgems:phosphophyllite_ore"]
-oreTexture="silentgems:block/ore/gem/phosphophyllite"
-rockTexture="minecraft:block/stone"
-
-["silentgems:aquamarine_ore"]
-oreTexture="silentgems:block/ore/gem/aquamarine"
-rockTexture="minecraft:block/stone"
-
-["silentgems:sapphire_ore"]
-oreTexture="silentgems:block/ore/gem/sapphire"
-rockTexture="minecraft:block/stone"
-
-["silentgems:tanzanite_ore"]
-oreTexture="silentgems:block/ore/gem/tanzanite"
-rockTexture="minecraft:block/stone"
-
-["silentgems:amethyst_ore"]
-oreTexture="silentgems:block/ore/gem/amethyst"
-rockTexture="minecraft:block/stone"
-
-["silentgems:agate_ore"]
-oreTexture="silentgems:block/ore/gem/agate"
-rockTexture="minecraft:block/stone"
-
-["silentgems:morganite_ore"]
-oreTexture="silentgems:block/ore/gem/morganite"
-rockTexture="minecraft:block/stone"
-
-["silentgems:onyx_ore"]
-oreTexture="silentgems:block/ore/gem/onyx"
-rockTexture="minecraft:block/stone"
-
-["silentgems:opal_ore"]
-oreTexture="silentgems:block/ore/gem/opal"
-rockTexture="minecraft:block/stone"
-
-["silentgems:carnelian_ore"]
-oreTexture="silentgems:block/ore/gem/carnelian"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:spinel_ore"]
-oreTexture="silentgems:block/ore/gem/spinel"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:citrine_ore"]
-oreTexture="silentgems:block/ore/gem/citrine"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:jasper_ore"]
-oreTexture="silentgems:block/ore/gem/jasper"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:zircon_ore"]
-oreTexture="silentgems:block/ore/gem/zircon"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:moldavite_ore"]
-oreTexture="silentgems:block/ore/gem/moldavite"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:malachite_ore"]
-oreTexture="silentgems:block/ore/gem/malachite"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:turquoise_ore"]
-oreTexture="silentgems:block/ore/gem/turquoise"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:euclase_ore"]
-oreTexture="silentgems:block/ore/gem/euclase"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:benitoite_ore"]
-oreTexture="silentgems:block/ore/gem/benitoite"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:iolite_ore"]
-oreTexture="silentgems:block/ore/gem/iolite"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:alexandrite_ore"]
-oreTexture="silentgems:block/ore/gem/alexandrite"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:lepidolite_ore"]
-oreTexture="silentgems:block/ore/gem/lepidolite"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:ametrine_ore"]
-oreTexture="silentgems:block/ore/gem/ametrine"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:black_diamond_ore"]
-oreTexture="silentgems:block/ore/gem/black_diamond"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:moonstone_ore"]
-oreTexture="silentgems:block/ore/gem/moonstone"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:pyrope_ore"]
-oreTexture="silentgems:block/ore/gem/pyrope"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:coral_ore"]
-oreTexture="silentgems:block/ore/gem/coral"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:sunstone_ore"]
-oreTexture="silentgems:block/ore/gem/sunstone"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:cats_eye_ore"]
-oreTexture="silentgems:block/ore/gem/cats_eye"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:yellow_diamond_ore"]
-oreTexture="silentgems:block/ore/gem/yellow_diamond"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:jade_ore"]
-oreTexture="silentgems:block/ore/gem/jade"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:chrysoprase_ore"]
-oreTexture="silentgems:block/ore/gem/chrysoprase"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:apatite_ore"]
-oreTexture="silentgems:block/ore/gem/apatite"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:fluorite_ore"]
-oreTexture="silentgems:block/ore/gem/fluorite"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:kyanite_ore"]
-oreTexture="silentgems:block/ore/gem/kyanite"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:sodalite_ore"]
-oreTexture="silentgems:block/ore/gem/sodalite"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:ammolite_ore"]
-oreTexture="silentgems:block/ore/gem/ammolite"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:kunzite_ore"]
-oreTexture="silentgems:block/ore/gem/kunzite"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:rose_quartz_ore"]
-oreTexture="silentgems:block/ore/gem/rose_quartz"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:tektite_ore"]
-oreTexture="silentgems:block/ore/gem/tektite"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:pearl_ore"]
-oreTexture="silentgems:block/ore/gem/pearl"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:multi_ore_classic"]
-oreTexture="silentgems:block/ore/multi_classic"
-rockTexture="minecraft:block/stone"
-
-["silentgems:multi_ore_dark"]
-oreTexture="silentgems:block/ore/multi_dark"
-rockTexture="minecraft:block/netherrack"
-
-["silentgems:multi_ore_light"]
-oreTexture="silentgems:block/ore/multi_light"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:chaos_ore"]
-oreTexture="silentgems:block/ore/chaos_ore"
-rockTexture="minecraft:block/stone"
-
-["silentgems:ender_ore"]
-oreTexture="silentgems:block/ore/ender_ore"
-rockTexture="minecraft:block/end_stone"
-
-["silentgems:silver_ore"]
-oreTexture="silentgems:block/silver_ore"
-rockTexture="minecraft:block/stone"
-
-####################################
-# MOD SUPPORT: SILENT'S MECHANISMS #
-####################################
-
-["silents_mechanisms:copper_ore"]
-oreTexture="silents_mechanisms:block/copper_ore"
-rockTexture="minecraft:block/stone"
-
-["silents_mechanisms:tin_ore"]
-oreTexture="silents_mechanisms:block/tin_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=30
-
-["silents_mechanisms:silver_ore"]
-oreTexture="silents_mechanisms:block/silver_ore"
-rockTexture="minecraft:block/stone"
-
-["silents_mechanisms:lead_ore"]
-oreTexture="silents_mechanisms:block/lead_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=30
-
-["silents_mechanisms:nickel_ore"]
-oreTexture="silents_mechanisms:block/nickel_ore"
-rockTexture="minecraft:block/stone"
-
-["silents_mechanisms:platinum_ore"]
-oreTexture="silents_mechanisms:block/platinum_ore"
-rockTexture="minecraft:block/stone"
-
-["silents_mechanisms:zinc_ore"]
-oreTexture="silents_mechanisms:block/zinc_ore"
-rockTexture="minecraft:block/stone"
-maxOreLayerColorDiff=30
-
-["silents_mechanisms:bismuth_ore"]
-oreTexture="silents_mechanisms:block/bismuth_ore"
-rockTexture="minecraft:block/stone"
-
-["silents_mechanisms:bauxite_ore"]
-oreTexture="silents_mechanisms:block/bauxite_ore"
-rockTexture="minecraft:block/stone"
-
-["silents_mechanisms:uranium_ore"]
-oreTexture="silents_mechanisms:block/uranium_ore"
-rockTexture="minecraft:block/stone"
-
-############################
-# MOD SUPPORT: SIMPLE ORES #
-############################
-
-["simpleores:copper_ore"]
-oreTexture="simpleores:block/copper_ore"
-rockTexture="minecraft:block/stone"
-
-["simpleores:tin_ore"]
-oreTexture="simpleores:block/tin_ore"
-rockTexture="minecraft:block/stone"
-
-["simpleores:adamantium_ore"]
-oreTexture="simpleores:block/adamantium_ore"
-rockTexture="minecraft:block/stone"
-
-["simpleores:mythril_ore"]
-oreTexture="simpleores:block/mythril_ore"
-rockTexture="minecraft:block/stone"
-
-["simpleores:onyx_ore"]
-oreTexture="simpleores:block/onyx_ore"
-rockTexture="minecraft:block/netherrack"
-
-###################################
-# MOD SUPPORT: TINKERS' MECHWORKS #
-###################################
-
-["tmechworks:aluminum_ore"]
-oreTexture="tmechworks:block/aluminum_ore"
-rockTexture="minecraft:block/stone"
-
-["tmechworks:copper_ore"]
-oreTexture="tmechworks:block/copper_ore"
-rockTexture="minecraft:block/stone"
+[[ore]]
+	# The name of the block is the base ore which should be compacted. (required)
+    # If the namespace (in this case minecraft) does not exist (i.e. the mod is not present), the ore is ignored.
+	oreBlock = "minecraft:coal_ore"
+    # The texture of the ore block (required)
+	oreTexture = "minecraft:block/coal_ore"
+	# A texture which represents the texture "behind" the ore texture (required)
+	rockTexture = "minecraft:block/stone"
+	# Optionally, a spawn probability can be specified which will overrule the global configuration
+    #compactOreProbability=0.2
+    # Optionally, a minimum drop multiplier can be specified which will overrule the global configuration
+    #minRolls=2
+    # Optionally, a maximum drop multiplier can be specified which will overrule the global configuration
+    #maxRolls=4
+    # This value is related to the way textures are generated since 1.1.0. The higher this value is, the larger the
+    # range of pixels that will be considered part of the rock. Setting this value to a negative number will entirely
+    # disable the new texture generator and fall back to the 1.0.0 version. Default: 50
+    #maxOreLayerColorDiff=20
+    # This option will cause compact ores to generate during a later phase of world generation than usual.
+    # This can be necessary for some compact ores to generate at all, but it also means that the compact ore will not
+    # be able to generate in certain circumstances. This should be false whenever possible. Default: false
+    #lateGeneration=true
+
+[[ore]]
+	oreBlock = "minecraft:iron_ore"
+	oreTexture = "minecraft:block/iron_ore"
+	rockTexture = "minecraft:block/stone"
+
+[[ore]]
+	oreBlock = "minecraft:gold_ore"
+	oreTexture = "minecraft:block/gold_ore"
+	rockTexture = "minecraft:block/stone"
+
+[[ore]]
+	oreBlock = "minecraft:redstone_ore"
+	oreTexture = "minecraft:block/redstone_ore"
+	rockTexture = "minecraft:block/stone"
+
+[[ore]]
+	oreBlock = "minecraft:diamond_ore"
+	oreTexture = "minecraft:block/diamond_ore"
+	rockTexture = "minecraft:block/stone"
+
+[[ore]]
+	oreBlock = "minecraft:lapis_ore"
+	oreTexture = "minecraft:block/lapis_ore"
+	rockTexture = "minecraft:block/stone"
+
+[[ore]]
+	oreBlock = "minecraft:emerald_ore"
+	oreTexture = "minecraft:block/emerald_ore"
+	rockTexture = "minecraft:block/stone"
+
+[[ore]]
+	oreBlock = "minecraft:nether_quartz_ore"
+	oreTexture = "minecraft:block/nether_quartz_ore"
+	rockTexture = "minecraft:block/netherrack"

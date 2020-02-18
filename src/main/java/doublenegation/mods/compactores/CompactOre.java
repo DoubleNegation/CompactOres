@@ -15,6 +15,28 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     private static Set<String> usedResourceNames = new HashSet<>();
 
+    public static final CompactOre DUMMY0, DUMMY1;
+    static {
+        DUMMY0 = new CompactOre(
+                new ResourceLocation("minecraft:stone"),
+                1,
+                1,
+                new ResourceLocation("minecraft:block/stone"),
+                new ResourceLocation("minecraft:block/stone"),
+                0,
+                -1,
+                false);
+        DUMMY1 = new CompactOre(
+                new ResourceLocation("minecraft:stone"),
+                1,
+                1,
+                new ResourceLocation("minecraft:block/stone"),
+                new ResourceLocation("minecraft:block/stone"),
+                0,
+                -1,
+                false);
+    }
+
     private String resourceName;
     private ResourceLocation baseBlockLoc;
     private Block baseBlock;
