@@ -83,7 +83,13 @@ public class CompactOresResourcePack implements IPackFinder {
         final byte[] packpngBytes = baos.toByteArray();
         resPack.put("pack.png", () -> packpngBytes);
         // pack.png end
-        if(CompactOres.COMPACT_ORE.isPresent()) {
+        boolean continueLoading;
+        try {
+            continueLoading = CompactOres.COMPACT_ORE.isPresent();
+        } catch(NullPointerException e) {
+            continueLoading = false;
+        }
+        if(continueLoading) {
             // If this condition fails, some mod probably crashed during CONSTRUCT, causing resource loading
             // without registry initialization. Don't attempt to create this resource pack, because this would
             // crash the game. Without this resource pack, the game will make it to the forge error screen and
