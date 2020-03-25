@@ -29,12 +29,9 @@ public class CompactOreBlock extends Block {
 
     public static IProperty<CompactOre> ORE_PROPERTY = new CompactOreProperty<>("ore", CompactOre.class, CompactOres.compactOres());
 
-    private StateContainer<Block, BlockState> myStateContainer;
-
     public CompactOreBlock() {
         super(Properties.create(Material.ROCK).sound(SoundType.STONE));
         this.setDefaultState(this.stateContainer.getBaseState().with(ORE_PROPERTY, CompactOres.compactOres().get(0)));
-        myStateContainer = stateContainer;
     }
 
     Block baseBlock(BlockState state) {
@@ -61,19 +58,6 @@ public class CompactOreBlock extends Block {
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
         CompactOre ore = state.get(ORE_PROPERTY);
         return CompactOres.COMPACT_ORE_ITEM.get().getStackOfOre(ore, 1);
-    }
-
-    @Override
-    public StateContainer<Block, BlockState> getStateContainer() {
-        return myStateContainer;
-    }
-
-    public void renewStateContainer() {
-        ORE_PROPERTY = new CompactOreProperty<>("ore", CompactOre.class, CompactOres.compactOres());
-        StateContainer.Builder<Block, BlockState> builder = new StateContainer.Builder<>(this);
-        fillStateContainer(builder);
-        myStateContainer = builder.create(BlockState::new);
-        this.setDefaultState(myStateContainer.getBaseState().with(ORE_PROPERTY, CompactOres.compactOres().get(0)));
     }
 
     @Override
