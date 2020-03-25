@@ -198,37 +198,41 @@ public class CompactOresResourcePack implements IPackFinder {
     }
 
     private void makeBlockTexture(Map<String, Supplier<byte[]>> resourcePack, final CompactOre ore) {
-        resourcePack.put("assets/" + CompactOres.COMPACT_ORE.getId().getNamespace() + "/textures/" +
-                CompactOreBlock.ORE_PROPERTY.getName(ore) + ".png", () -> {
-            try {
-                CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
-                        ore.getBaseBlockRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
-                BufferedImage img = info.generateImage();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(img, "PNG", baos);
-                if("true".equals(System.getProperty("compactores.dumpTextures"))) {
-                    TextureDumper.dump(ore, baos.toByteArray());
-                }
-                return baos.toByteArray();
-            } catch(Exception e) {
-                CompactOres.LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
-                logExceptionCauseList(e);
-                e.printStackTrace();
-                // missing texture
-                BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
-                Graphics2D g = img.createGraphics();
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, 16, 16);
-                g.setColor(Color.MAGENTA);
-                g.fillRect(0, 8, 8, 8);
-                g.fillRect(8, 0, 8, 8);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        if(ore.isGenerateTexture()) {
+            resourcePack.put("assets/" + CompactOres.COMPACT_ORE.getId().getNamespace() + "/textures/" +
+                    CompactOreBlock.ORE_PROPERTY.getName(ore) + ".png", () -> {
                 try {
+                    CompactOreTexture.TextureInfo info = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
+                            ore.getBaseBlockRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
+                    BufferedImage img = info.generateImage();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(img, "PNG", baos);
-                } catch(Exception exc) {exc.printStackTrace();}
-                return baos.toByteArray();
-            }
-        });
+                    if ("true".equals(System.getProperty("compactores.dumpTextures"))) {
+                        TextureDumper.dump(ore, baos.toByteArray());
+                    }
+                    return baos.toByteArray();
+                } catch (Exception e) {
+                    CompactOres.LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
+                    logExceptionCauseList(e);
+                    e.printStackTrace();
+                    // missing texture
+                    BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g = img.createGraphics();
+                    g.setColor(Color.BLACK);
+                    g.fillRect(0, 0, 16, 16);
+                    g.setColor(Color.MAGENTA);
+                    g.fillRect(0, 8, 8, 8);
+                    g.fillRect(8, 0, 8, 8);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        ImageIO.write(img, "PNG", baos);
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
+                    }
+                    return baos.toByteArray();
+                }
+            });
+        }
         resourcePack.put("assets/" + CompactOres.COMPACT_ORE.getId().getNamespace() + "/textures/" +
                 CompactOreBlock.ORE_PROPERTY.getName(ore) + ".png.mcmeta", () -> {
             try {

@@ -100,7 +100,7 @@ public class ConfigLoader {
             Optional.ofNullable(globalCustomization.getGlobalConfigValue("maxRolls"))
                     .filter(v -> v instanceof Integer).ifPresent(v -> OreBuilder.setGlobalMaxRolls((int) v));
             Optional.ofNullable(globalCustomization.getGlobalConfigValue("spawnProbability"))
-                    .filter(v -> v instanceof Number).ifPresent(v -> OreBuilder.setGlobalSpawnProbability((float) v));
+                    .filter(v -> v instanceof Number).ifPresent(v -> OreBuilder.setGlobalSpawnProbability((float) (double) v));
         }
 
         OreBuilderFactoryProvider obfp = new OreBuilderFactoryProvider();
@@ -118,6 +118,7 @@ public class ConfigLoader {
                 ores.add(och.buildOre());
             } catch(RuntimeException ex) {
                 LOGGER.warn("Failed to load ore " + orename + ": " + ex.getClass().getName() + ": " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
 
@@ -135,8 +136,8 @@ public class ConfigLoader {
         }
 
         LOGGER.info("Successfully loaded " + ores.size() + " compact ores for a total of " + (activeOreMods.size() + inactiveOreMods.size()) + " mods.");
-        LOGGER.info("\t" + enabledOres.size() + " ores for " + activeOreMods.size() + " are active.");
-        LOGGER.info("\t" + (ores.size() - enabledOres.size()) + " ores for " + inactiveOreMods.size() + " will not be enabled because their mod is not loaded.");
+        LOGGER.info("\t" + enabledOres.size() + " ores for " + activeOreMods.size() + " mods are active.");
+        LOGGER.info("\t" + (ores.size() - enabledOres.size()) + " ores for " + inactiveOreMods.size() + " mods will not be enabled because their mod is not loaded.");
 
         enabledOres.sort(CompactOre::compareTo);
         enabledOres.forEach(o -> LOGGER.debug(o.getBaseBlockRegistryName()));

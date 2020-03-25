@@ -12,6 +12,7 @@ public class Utils {
     }
 
     public static ResourceLocation parseResourceLocationExtra(String str, String context) {
+        if(str == null) return null;
         if(!str.contains(":")) return new ResourceLocation("minecraft", str);
         String namespace = str.split(":") [0];
         String path = str.substring(namespace.length() + 1);

@@ -15,28 +15,6 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     private static Set<String> usedResourceNames = new HashSet<>();
 
-    public static final CompactOre DUMMY0, DUMMY1;
-    static {
-        DUMMY0 = new CompactOre(
-                new ResourceLocation("minecraft:stone"),
-                1,
-                1,
-                new ResourceLocation("minecraft:block/stone"),
-                new ResourceLocation("minecraft:block/stone"),
-                0,
-                -1,
-                false);
-        DUMMY1 = new CompactOre(
-                new ResourceLocation("minecraft:stone"),
-                1,
-                1,
-                new ResourceLocation("minecraft:block/stone"),
-                new ResourceLocation("minecraft:block/stone"),
-                0,
-                -1,
-                false);
-    }
-
     private String resourceName;
     private ResourceLocation baseBlockLoc;
     private Block baseBlock;
@@ -47,10 +25,11 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
     private float spawnProbability;
     private int maxOreLayerColorDiff;
     private boolean lateGeneration;
+    private boolean generateTexture;
 
     public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
                       ResourceLocation baseUnderlyingTexture, float spawnProbability, int maxOreLayerColorDiff,
-                      boolean lateGeneration) {
+                      boolean lateGeneration, boolean generateTexture) {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
@@ -59,6 +38,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
         this.spawnProbability = spawnProbability;
         this.maxOreLayerColorDiff = maxOreLayerColorDiff;
         this.lateGeneration = lateGeneration;
+        this.generateTexture = generateTexture;
         String resourceName = baseBlockLoc.toString().replace(":", "__");
         while(usedResourceNames.contains(resourceName)) {
             resourceName += "_";
@@ -105,6 +85,10 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     public boolean isLateGeneration() {
         return lateGeneration;
+    }
+
+    public boolean isGenerateTexture() {
+        return generateTexture;
     }
 
     @Override

@@ -138,8 +138,8 @@ public class OreBuilder {
         int actualMinRolls = minRolls != null ? minRolls : L_MINROLLS != null ? L_MINROLLS : G_MINROLLS;
         int actualMaxRolls = maxRolls != null ? maxRolls : L_MAXROLLS != null ? L_MAXROLLS : G_MAXROLLS;
         float actualSpawnProbability = spawnProbability != null ? spawnProbability : L_SPAWNPROBABILITY != null ? L_SPAWNPROBABILITY : G_SPAWNPROBABILITY;
-        // TODO: create and return a CompactOre here
-        return null;
+        return new CompactOre(baseBlock, actualMinRolls, actualMaxRolls, actualOreTexture, actualRockTexture,
+                actualSpawnProbability, actualMaxOreLayerColorDiff, actualLateGeneration, actualGenerateTexture);
     }
 
     public static class Factory {
@@ -182,8 +182,10 @@ public class OreBuilder {
             return this;
         }
 
-        public Factory lateGeneration(boolean lateGeneration) {
-            this.lateGeneration = lateGeneration;
+        public Factory lateGeneration(Boolean lateGeneration) {
+            if(lateGeneration != null) {
+                this.lateGeneration = lateGeneration;
+            }
             return this;
         }
 

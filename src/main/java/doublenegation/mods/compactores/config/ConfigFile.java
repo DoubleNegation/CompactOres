@@ -25,7 +25,7 @@ public class ConfigFile {
     public ConfigFile(FileConfig config, Type type) {
         this.type = type;
         String filename = config.getFile().getName();
-        filenameNamespace = filename.substring(filename.length() - ".toml".length());
+        filenameNamespace = filename.substring(0, filename.length() - ".toml".length());
         for(String key : config.valueMap().keySet()) {
             Object o = config.get(key);
             if(!(o instanceof Config)) {

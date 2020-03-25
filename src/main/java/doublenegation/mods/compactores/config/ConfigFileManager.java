@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
@@ -94,7 +95,8 @@ public class ConfigFileManager {
 
     private boolean loadVersionConfig(Path loc) {
         // load and validate the config file
-        configVersionConfig = CommentedFileConfig.builder(loc).autosave().build();
+        configVersionConfig = CommentedFileConfig.of(loc);
+        configVersionConfig.load();
         if(!configVersionConfig.contains("versions") || !(configVersionConfig.get("versions") instanceof Config)) {
             return false;
         }
@@ -147,8 +149,8 @@ public class ConfigFileManager {
         String version = getOwnVersion();
         versionCfg.add("created", version);
         versionCfg.add("updated", version);
-        configVersionConfig.add("version", versionCfg);
-        configVersionConfig.setComment("version", getConfigReadme());
+        configVersionConfig.add("versions", versionCfg);
+        configVersionConfig.setComment("versions", getConfigReadme());
         configVersionConfig.save();
     }
 
@@ -200,8 +202,12 @@ public class ConfigFileManager {
         try {
             Files.list(sourceDir)
                     .filter(p -> Files.isRegularFile(p))
-                    .filter(p -> p.endsWith(".toml"))
-                    .forEach(p -> destination.add(FileConfig.of(p)));
+                    .filter(p -> p.toString().toLowerCase(Locale.ROOT).endsWith(".toml"))
+                    .forEach(p -> {
+                        FileConfig cfg = FileConfig.of(p);
+                        cfg.load();
+                        destination.add(cfg);
+                    });
         } catch(IOException e) {
             throw new RuntimeException("Unable to load compactores config: " + e.getClass().getName() + ": " + e.getMessage());
         }

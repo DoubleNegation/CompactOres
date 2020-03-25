@@ -1,5 +1,6 @@
 package doublenegation.mods.compactores;
 
+import doublenegation.mods.compactores.config.ConfigLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -13,12 +14,9 @@ import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -27,8 +25,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Mod(CompactOres.MODID)
@@ -60,22 +56,12 @@ public class CompactOres
     public CompactOres() {
         // Register all event listeners
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onModConfigLoading);
+        //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onModConfigLoading);
         MinecraftForge.EVENT_BUS.addListener(this::startServer);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
 
-        // Prepare all config file hacks (because I don't like ForgeConfigSpec)
-        CompactOresConfig.prepareConfigFiles();
-
-        // Register the config
-        //ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CompactOresConfig.SPEC);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CompactOresConfig.SPEC, CompactOresConfig.ACTIVE_CONFIG_FILE_NAME);
-
-        // Ensure there's always at least two ores in the compact ore list
-        List<CompactOre> dummyOres = new ArrayList<>();
-        dummyOres.add(CompactOre.DUMMY0);
-        dummyOres.add(CompactOre.DUMMY1);
-        compactOres = Collections.unmodifiableList(dummyOres);
+        // Load the config
+        compactOres = ConfigLoader.loadOres();
 
         // Register the DeferredRegisters to the event bus to handle the registry events
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -150,32 +136,6 @@ public class CompactOres
                     ore.getBaseBlock().getDefaultState(),
                     breakEvent.getPlayer()));
         }
-    }
-
-    public void onModConfigLoading(final ModConfig.Loading configEvent) {
-        if(configurationLoaded) {
-            LOGGER.warn("The Compact Ores configuration was just reloaded. The new configuration will be IGNORED, " +
-                    "as changing the configuration while the game is running is currently not supported. If you have " +
-                    "made any changes to your Compact Ores configuration that you are wishing to apply, please " +
-                    "restart the game.");
-            configEvent.setResult(Event.Result.DENY);
-            return;
-        }
-        configurationLoaded = true;
-        List<CompactOre> ores = CompactOresConfig.CONFIG.bake();
-        // Ensure there's always at least two entries (because block state property needs at least two valid values)
-        if(ores.size() < 2) {
-            ores.add(CompactOre.DUMMY0);
-            if(ores.size() < 2) {
-                ores.add(CompactOre.DUMMY1);
-            }
-        }
-        // Apply the new configuration
-        compactOres = Collections.unmodifiableList(ores);
-        if(COMPACT_ORE.isPresent()) {
-            COMPACT_ORE.get().renewStateContainer();
-        }
-        resourcePack.regeneratePack();
     }
 
 }
