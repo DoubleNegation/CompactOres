@@ -1,0 +1,27 @@
+["!local"]
+rockTexture = ":block/stone"
+
+[":coal_ore"]
+oreTexture = ":block/coal_ore"
+
+[":iron_ore"]
+oreTexture = ":block/iron_ore"
+
+[":gold_ore"]
+oreTexture = ":block/gold_ore"
+
+[":redstone_ore"]
+oreTexture = ":block/redstone_ore"
+
+[":diamond_ore"]
+oreTexture = ":block/diamond_ore"
+
+[":lapis_ore"]
+oreTexture = ":block/lapis_ore"
+
+[":emerald_ore"]
+oreTexture = ":block/emerald_ore"
+
+[":nether_quartz_ore"]
+oreTexture = ":block/nether_quartz_ore"
+rockTexture = ":block/netherrack"

@@ -1,0 +1,6 @@
+# If any of the global options are completely undefined, their defaults will be used
+["!global"]
+# Default = true
+generateTexture = true
+# Default = 50
+maxOreLayerColorDiff = 50
