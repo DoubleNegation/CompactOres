@@ -6,6 +6,9 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.google.common.collect.ImmutableMap;
 import doublenegation.mods.compactores.CompactOres;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.MainMenuScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -26,6 +29,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ConfigFileManager {
 
@@ -34,7 +39,6 @@ public class ConfigFileManager {
     private CommentedFileConfig configVersionConfig;
     private Set<FileConfig> definitionConfigs = new HashSet<>();
     private Set<FileConfig> customizationConfigs = new HashSet<>();
-    private boolean askForUpdate = false;
 
     public ConfigFileManager() {
         // prepare directory structure
@@ -53,7 +57,7 @@ public class ConfigFileManager {
             throw new RuntimeException("Unable to initialize compactores config: Version config (.minecraft/config/compactores/README.toml) is invalid!");
         }
         if(!generateNewConfig) {
-            generateNewConfig = !loadVersionConfig(versionConfig);
+            generateNewConfig = !loadVersionConfig(versionConfig, definitionConfigDir, customizationConfigDir);
             if(generateNewConfig) configVersionConfig.close();
         }
         if(generateNewConfig) {
@@ -93,7 +97,7 @@ public class ConfigFileManager {
         }
     }
 
-    private boolean loadVersionConfig(Path loc) {
+    private boolean loadVersionConfig(Path loc, Path defDir, Path custDir) {
         // load and validate the config file
         configVersionConfig = CommentedFileConfig.of(loc);
         configVersionConfig.load();
@@ -112,8 +116,44 @@ public class ConfigFileManager {
         // compare the loaded version numbers to the active one
         String active = getOwnVersion();
         if(!active.equals(created) && !active.equals(updated)) {
-            // TODO: actually implement this version asking thing
-            askForUpdate = true;
+            LOGGER.warn("WARNING");
+            LOGGER.warn("~~~~~~~");
+            LOGGER.warn("Your current Compact Ores configuration is based on an outdated version of");
+            LOGGER.warn("the Compact Ores default config. Please consider generating a new version");
+            LOGGER.warn("of the default config by deleting the .minecraft/config/compactores directory");
+            LOGGER.warn("config version: " + created + "      mod version: " + active);
+            Timer t = new Timer();
+            t.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    if(Minecraft.getInstance().currentScreen instanceof MainMenuScreen) {
+                        LOGGER.info("Main menu entered - switching to config update confirmation screen");
+                        Minecraft.getInstance().enqueue(() -> {
+                            Screen mainMenuScreen = Minecraft.getInstance().currentScreen;
+                            Minecraft.getInstance().displayGuiScreen(new ConfigUpdateConfirmScreen(created, active, btn -> {
+                                // update confirmed
+                                cleanOldConfigs(defDir);
+                                cleanOldConfigs(custDir);
+                                exportDefaultConfig(ImmutableMap.of("definitions", defDir, "customizations", custDir));
+                                // write new version config
+                                configVersionConfig.close();
+                                writeVersionConfig(loc);
+                                configVersionConfig = CommentedFileConfig.of(loc);
+                                configVersionConfig.load();
+                                // quit the game
+                                Minecraft.getInstance().shutdown();
+                            }, btn -> {
+                                // update denied
+                                // update "updated" field in version config (so we don't ask again until next update)
+                                versions.set("updated", active);
+                                configVersionConfig.save();
+                                Minecraft.getInstance().displayGuiScreen(mainMenuScreen);
+                            }));
+                        });
+                        t.cancel();
+                    }
+                }
+            }, 100, 100);
         }
         return true;
     }
@@ -130,7 +170,7 @@ public class ConfigFileManager {
         try {
             Files.list(directory)
                     .filter(p -> Files.isRegularFile(p))
-                    .filter(p -> p.endsWith(".toml"))
+                    .filter(p -> p.toString().toLowerCase(Locale.ROOT).endsWith(".toml"))
                     .forEach(p -> {
                         try {
                             Files.delete(p);
