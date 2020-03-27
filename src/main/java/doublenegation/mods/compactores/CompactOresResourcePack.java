@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.DistExecutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -22,6 +24,7 @@ import java.util.function.Supplier;
 
 public class CompactOresResourcePack implements IPackFinder {
 
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final String PACK_NAME = "CompactOres dynamic resources";
 
     private Supplier<List<CompactOre>> oreListSupplier;
@@ -59,7 +62,7 @@ public class CompactOresResourcePack implements IPackFinder {
 
     private void generatePack(Map<String, Supplier<byte[]>> resPack) {
         List<CompactOre> ores = oreListSupplier.get();
-        CompactOres.LOGGER.info("Generating CompactOre resources for " + ores.size() + " compact ore blocks");
+        LOGGER.info("Generating CompactOre resources for " + ores.size() + " compact ore blocks");
         // pack.mcmeta start
         JsonObject packmcmeta = new JsonObject();
         JsonObject packmcmetapack = new JsonObject();
@@ -212,7 +215,7 @@ public class CompactOresResourcePack implements IPackFinder {
                     }
                     return baos.toByteArray();
                 } catch (Exception e) {
-                    CompactOres.LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
+                    LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
                     logExceptionCauseList(e);
                     e.printStackTrace();
                     // missing texture
@@ -240,7 +243,7 @@ public class CompactOresResourcePack implements IPackFinder {
                         ore.getBaseBlockRegistryName(), ore.getBaseOreTexture(), ore.getMaxOreLayerColorDiff());
                 return info.generateMeta().toString().getBytes(StandardCharsets.UTF_8);
             } catch(Exception e) {
-                CompactOres.LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
+                LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
                 logExceptionCauseList(e);
                 e.printStackTrace();
                 throw e;
@@ -250,14 +253,8 @@ public class CompactOresResourcePack implements IPackFinder {
 
     private void logExceptionCauseList(Throwable th) {
         do {
-            CompactOres.LOGGER.error("   Caused by " + th.getClass().getName() + ": " + th.getMessage());
+            LOGGER.error("   Caused by " + th.getClass().getName() + ": " + th.getMessage());
         } while((th = th.getCause()) != null);
-    }
-
-    public void regeneratePack() {
-        if(pack == null) return;
-        packData.clear();
-        generatePack(packData);
     }
 
     @Override

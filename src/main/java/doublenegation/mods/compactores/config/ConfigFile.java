@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class ConfigFile {
 
-    private static final Logger LOGGER = LogManager.getLogger("Configuration File Loader");
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Type type;
     private Config globalConfig;

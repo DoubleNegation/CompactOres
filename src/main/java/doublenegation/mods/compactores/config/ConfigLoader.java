@@ -20,7 +20,7 @@ import java.util.function.BiFunction;
 
 public class ConfigLoader {
 
-    private static final Logger LOGGER = LogManager.getLogger("Configuration Loader");
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static List<CompactOre> loadOres() {
 

@@ -34,7 +34,7 @@ import java.util.TimerTask;
 
 public class ConfigFileManager {
 
-    private static final Logger LOGGER = LogManager.getLogger("Configuration File Manager");
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private CommentedFileConfig configVersionConfig;
     private Set<FileConfig> definitionConfigs = new HashSet<>();
