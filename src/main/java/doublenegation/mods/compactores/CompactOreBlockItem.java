@@ -28,6 +28,7 @@ public class CompactOreBlockItem extends BlockItem {
     public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
         if(isInGroup(group)) {
             for(CompactOre ore : CompactOres.compactOres()) {
+                if(!ore.isReal()) continue;
                 items.add(getStackOfOre(ore, 1));
             }
         }
@@ -67,6 +68,9 @@ public class CompactOreBlockItem extends BlockItem {
     @Override
     public ITextComponent getDisplayName(ItemStack stack) {
         CompactOre ore = findOreForStack(stack);
+        if(!ore.isReal()) {
+            return new TranslationTextComponent("block." + CompactOres.MODID + ".missing_ore");
+        }
         ResourceLocation bln = CompactOres.COMPACT_ORE.getId();
         Map<Block, Item> blockItemMap = GameData.getBlockItemMap();
         ITextComponent baseName = blockItemMap.get(ore.getBaseBlock()).getDisplayName(stack);

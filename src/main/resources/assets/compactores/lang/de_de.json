@@ -1,5 +1,6 @@
 {
   "block.compactores.compact_ore": "Kompaktes %s",
+  "block.compactores.missing_ore": "Fehlendes Erz - nicht passende Konfiguration!",
   "itemGroup.compactores": "Kompakte Erze",
 
   "gui.compactores.configupdate.title": "Compact Ores Konfigurationsupdate",

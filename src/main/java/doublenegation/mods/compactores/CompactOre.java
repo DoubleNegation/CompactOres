@@ -15,6 +15,8 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     private static Set<String> usedResourceNames = new HashSet<>();
 
+    private boolean isReal = true;
+
     private String resourceName;
     private ResourceLocation baseBlockLoc;
     private Block baseBlock;
@@ -45,6 +47,16 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
         }
         this.resourceName = resourceName;
         usedResourceNames.add(resourceName);
+    }
+
+    CompactOre() {
+        // construct the "missing" ore
+        this(new ResourceLocation("stone"), 0, 0, null, null, 0, -1, false, false);
+        // actually use a different resource name
+        usedResourceNames.remove(resourceName);
+        resourceName = "missing";
+        usedResourceNames.add(resourceName);
+        isReal = false;
     }
 
     public ResourceLocation getBaseBlockRegistryName() {
@@ -89,6 +101,10 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     public boolean isGenerateTexture() {
         return generateTexture;
+    }
+
+    public boolean isReal() {
+        return isReal;
     }
 
     @Override

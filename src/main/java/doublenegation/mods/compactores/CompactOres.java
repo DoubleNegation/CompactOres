@@ -69,6 +69,9 @@ public class CompactOres
         // Load the config
         compactOres = ConfigLoader.loadOres();
 
+        // Prepare the "missing" ore
+        compactOres.add(0, new CompactOre());
+
         // Register the DeferredRegisters to the event bus to handle the registry events
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -110,7 +113,7 @@ public class CompactOres
 
     private static ItemGroup itemGroup = new ItemGroup(CompactOres.MODID) {
         @Override public ItemStack createIcon() {
-            return new ItemStack(COMPACT_ORE_ITEM.get(), 1);
+            return COMPACT_ORE_ITEM.get().getStackOfOre(compactOres.get(1), 1);
         }
     };
 

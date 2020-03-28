@@ -1,5 +1,6 @@
 {
   "block.compactores.compact_ore": "Compact %s",
+  "block.compactores.missing_ore": "Missing Ore - configuration mismatch!",
   "itemGroup.compactores": "Compact Ores",
 
   "gui.compactores.configupdate.title": "Compact Ores config update",
