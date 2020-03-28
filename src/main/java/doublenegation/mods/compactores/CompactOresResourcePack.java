@@ -50,6 +50,7 @@ public class CompactOresResourcePack implements IPackFinder {
                     if(ore == null) return false;
                     ResourceLocation baseTexture = ore.getBaseUnderlyingTexture();
                     ResourceLocation oreTexture = ore.getBaseOreTexture();
+                    if(!ore.isGenerateTexture() || baseTexture == null || oreTexture == null) return false;
                     ResourceLocation baseMeta = new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + ".mcmeta");
                     ResourceLocation oreMeta = new ResourceLocation(oreTexture.getNamespace(), oreTexture.getPath() + ".mcmeta");
                     IResourceManager rm = Minecraft.getInstance().getResourceManager();

@@ -33,8 +33,8 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
-        this.baseOreTexture = new ResourceLocation(baseOreTexture.getNamespace(), "textures/" + baseOreTexture.getPath() + ".png");
-        this.baseUnderlyingTexture = new ResourceLocation(baseUnderlyingTexture.getNamespace(), "textures/" + baseUnderlyingTexture.getPath() + ".png");
+        this.baseOreTexture = baseOreTexture == null ? null : new ResourceLocation(baseOreTexture.getNamespace(), "textures/" + baseOreTexture.getPath() + ".png");
+        this.baseUnderlyingTexture = baseUnderlyingTexture == null ? null : new ResourceLocation(baseUnderlyingTexture.getNamespace(), "textures/" + baseUnderlyingTexture.getPath() + ".png");
         this.spawnProbability = spawnProbability;
         this.maxOreLayerColorDiff = maxOreLayerColorDiff;
         this.lateGeneration = lateGeneration;
