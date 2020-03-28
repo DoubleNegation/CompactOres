@@ -1,6 +1,8 @@
 package doublenegation.mods.compactores;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 
 public class Utils {
 
@@ -18,6 +20,25 @@ public class Utils {
         String path = str.substring(namespace.length() + 1);
         if(namespace.length() == 0) return new ResourceLocation(context, path);
         return new ResourceLocation(namespace, path);
+    }
+
+    public static class ReturningScreen extends Screen {
+
+        private Screen returnTarget;
+
+        protected ReturningScreen(ITextComponent titleIn) {
+            super(titleIn);
+        }
+
+        public void setReturnTarget(Screen target) {
+            this.returnTarget = target;
+        }
+
+        public void returnToPreviousScreen() {
+            if(minecraft != null)
+                minecraft.displayGuiScreen(returnTarget);
+        }
+
     }
 
 }

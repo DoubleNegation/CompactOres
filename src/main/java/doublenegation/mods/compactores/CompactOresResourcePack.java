@@ -217,7 +217,6 @@ public class CompactOresResourcePack implements IPackFinder {
                 } catch (Exception e) {
                     LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
                     logExceptionCauseList(e);
-                    e.printStackTrace();
                     // missing texture
                     BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
                     Graphics2D g = img.createGraphics();
@@ -245,7 +244,6 @@ public class CompactOresResourcePack implements IPackFinder {
             } catch(Exception e) {
                 LOGGER.error("Failed to generate compact ore texture for " + CompactOreBlock.ORE_PROPERTY.getName(ore) + ", using missing texture instead.");
                 logExceptionCauseList(e);
-                e.printStackTrace();
                 throw e;
             }
         });

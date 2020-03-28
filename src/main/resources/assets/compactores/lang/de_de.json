@@ -5,5 +5,10 @@
   "gui.compactores.configupdate.title": "Compact Ores Konfigurationsupdate",
   "gui.compactores.configupdate.message": "Compact Ores wurde erfolgreich auf version %s geupdated!\n\nJedoch wurde die aktive Konfiguration in version %s erstellt. Das bedeuted, dass sich die Konfiguration aufgrund von Änderungen in der Mod möglicherwise nicht richtig verhält. Falls du die Standardkonfiguration verwendest, ist es empfohlen, die Auto-Update Funktion zu verwenden. Falls du eine eigene Konfiguration verwendest, bitte update sie, falls nötig, selbst.\n\nACHTUNG: Wenn du die Auto-Update Funktion verwendest, gehen alle Änderungen, die an der Konfiguration vorgenommen wurden, VERLOREN.\n\nWillst du deine Compact Ores Konfiguration updaten (erfordert Spielneustart)?",
   "gui.compactores.configupdate.confirm": "Updaten und Spiel beenden",
-  "gui.compactores.configupdate.deny": "Alte Version behalten"
+  "gui.compactores.configupdate.deny": "Alte Version behalten",
+
+  "gui.compactores.configloadfailure.title": "Compact Ores Konfigurationsladefehler",
+  "gui.compactores.configloadfailure.message": "Compact Ores konnte nicht richtig geladen werden, da beim laden der Konfiguration folgender Fehler aufgetreten ist:\n\n%s\n\nBitte behebe den Fehler um Compact Ores zu verwenden. Du kannst auch versuchen die Standardkonfiguration wiederherzustellen um den Fehler zu vermeiden, dabei gehen aber ALLE Änderungen die an der Konfiguration vorgenommen wurden VERLOREN.",
+  "gui.compactores.configloadfailure.deny": "Spiel beenden",
+  "gui.compactores.configloadfailure.confirm": "Konfiguration zurücksetzen und Spiel beenden"
 }

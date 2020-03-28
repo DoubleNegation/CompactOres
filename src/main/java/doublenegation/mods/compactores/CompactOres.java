@@ -4,6 +4,8 @@ import doublenegation.mods.compactores.config.ConfigLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.MainMenuScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -26,6 +28,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Mod(CompactOres.MODID)
 public class CompactOres
@@ -51,7 +55,9 @@ public class CompactOres
 
     private static List<CompactOre> compactOres;
     private static CompactOresResourcePack resourcePack;
-    private static boolean configurationLoaded = false;
+
+    private static Utils.ReturningScreen loadFinishScreen;
+    private static Timer loadFinishTimer;
 
     public CompactOres() {
         // Register all event listeners
@@ -135,6 +141,31 @@ public class CompactOres
                     breakEvent.getPos(),
                     ore.getBaseBlock().getDefaultState(),
                     breakEvent.getPlayer()));
+        }
+    }
+
+    // The parameter type can not be Utils.ReturningScreen
+    // because the JVM would then try to load that class,
+    // so it would also have to load Screen, and that crashes on the dedicated server.
+    // Supplier<Utils.ReturningScreen> or even Supplier<Supplier<Utils.ReturningScreen>> also don't seem to work.
+    public static void setLoadFinishScreen(Object screen) {
+        if(!(screen instanceof Utils.ReturningScreen)) return;
+        loadFinishScreen = (Utils.ReturningScreen) screen;
+        if(loadFinishTimer == null) {
+            loadFinishTimer = new Timer();
+            loadFinishTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override public void run() {
+                    if(Minecraft.getInstance().currentScreen instanceof MainMenuScreen) {
+                        LOGGER.info("Main menu entered - switching to Compact Ores config notification screen");
+                        loadFinishTimer.cancel();
+                        Minecraft.getInstance().enqueue(() -> {
+                            Screen returnScreen = Minecraft.getInstance().currentScreen;
+                            loadFinishScreen.setReturnTarget(returnScreen);
+                            Minecraft.getInstance().displayGuiScreen(loadFinishScreen);
+                        });
+                    }
+                }
+            }, 100, 100);
         }
     }
 

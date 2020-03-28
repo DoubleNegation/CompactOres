@@ -1,7 +1,7 @@
 package doublenegation.mods.compactores.config;
 
 import doublenegation.mods.compactores.CompactOres;
-import net.minecraft.client.gui.screen.Screen;
+import doublenegation.mods.compactores.Utils;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -9,7 +9,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfigUpdateConfirmScreen extends Screen {
+public class ConfigUpdateConfirmScreen extends Utils.ReturningScreen {
 
     private static final String I18N_KEY_BASE = "gui." + CompactOres.MODID + ".configupdate.";
 

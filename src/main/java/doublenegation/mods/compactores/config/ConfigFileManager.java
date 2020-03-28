@@ -7,8 +7,8 @@ import com.electronwill.nightconfig.core.file.FileConfig;
 import com.google.common.collect.ImmutableMap;
 import doublenegation.mods.compactores.CompactOres;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.MainMenuScreen;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -29,12 +29,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ConfigFileManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private Path configDir;
+    private Path definitionConfigDir;
+    private Path customizationConfigDir;
+    private Path versionConfig;
 
     private CommentedFileConfig configVersionConfig;
     private Set<FileConfig> definitionConfigs = new HashSet<>();
@@ -43,21 +46,24 @@ public class ConfigFileManager {
     public ConfigFileManager() {
         // prepare directory structure
         Path forgeConfigDir = FMLPaths.CONFIGDIR.get();
-        Path configDir = forgeConfigDir.resolve("compactores");
-        Path definitionConfigDir = configDir.resolve("definitions");
-        Path customizationConfigDir = configDir.resolve("customizations");
+        configDir = forgeConfigDir.resolve("compactores");
+        definitionConfigDir = configDir.resolve("definitions");
+        customizationConfigDir = configDir.resolve("customizations");
+        versionConfig = configDir.resolve("README.toml");
+    }
+
+    public void load() {
         requireDirectory(configDir);
         requireDirectory(definitionConfigDir);
         requireDirectory(customizationConfigDir);
 
         // do config version check
-        Path versionConfig = configDir.resolve("README.toml");
         boolean generateNewConfig = !Files.exists(versionConfig);
         if(!generateNewConfig/* = Files.exists(versionConfig) */ && (!Files.isRegularFile(versionConfig) || !Files.isReadable(versionConfig))) {
             throw new RuntimeException("Unable to initialize compactores config: Version config (.minecraft/config/compactores/README.toml) is invalid!");
         }
         if(!generateNewConfig) {
-            generateNewConfig = !loadVersionConfig(versionConfig, definitionConfigDir, customizationConfigDir);
+            generateNewConfig = !loadVersionConfig(versionConfig);
             if(generateNewConfig) configVersionConfig.close();
         }
         if(generateNewConfig) {
@@ -97,7 +103,7 @@ public class ConfigFileManager {
         }
     }
 
-    private boolean loadVersionConfig(Path loc, Path defDir, Path custDir) {
+    private boolean loadVersionConfig(Path loc) {
         // load and validate the config file
         configVersionConfig = CommentedFileConfig.of(loc);
         configVersionConfig.load();
@@ -122,38 +128,32 @@ public class ConfigFileManager {
             LOGGER.warn("the Compact Ores default config. Please consider generating a new version");
             LOGGER.warn("of the default config by deleting the .minecraft/config/compactores directory");
             LOGGER.warn("config version: " + created + "      mod version: " + active);
-            Timer t = new Timer();
-            t.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    if(Minecraft.getInstance().currentScreen instanceof MainMenuScreen) {
-                        LOGGER.info("Main menu entered - switching to config update confirmation screen");
-                        Minecraft.getInstance().enqueue(() -> {
-                            Screen mainMenuScreen = Minecraft.getInstance().currentScreen;
-                            Minecraft.getInstance().displayGuiScreen(new ConfigUpdateConfirmScreen(created, active, btn -> {
-                                // update confirmed
-                                cleanOldConfigs(defDir);
-                                cleanOldConfigs(custDir);
-                                exportDefaultConfig(ImmutableMap.of("definitions", defDir, "customizations", custDir));
-                                // write new version config
-                                configVersionConfig.close();
-                                writeVersionConfig(loc);
-                                configVersionConfig = CommentedFileConfig.of(loc);
-                                configVersionConfig.load();
-                                // quit the game
-                                Minecraft.getInstance().shutdown();
-                            }, btn -> {
-                                // update denied
-                                // update "updated" field in version config (so we don't ask again until next update)
-                                versions.set("updated", active);
-                                configVersionConfig.save();
-                                Minecraft.getInstance().displayGuiScreen(mainMenuScreen);
-                            }));
-                        });
-                        t.cancel();
+            DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+                CompactOres.setLoadFinishScreen(new ConfigUpdateConfirmScreen(created, active, btn -> {
+                    // update confirmed
+                    LOGGER.info("Updating configuration...");
+                    cleanOldConfigs(definitionConfigDir);
+                    cleanOldConfigs(customizationConfigDir);
+                    exportDefaultConfig(ImmutableMap.of("definitions", definitionConfigDir, "customizations", customizationConfigDir));
+                    // write new version config
+                    configVersionConfig.close();
+                    writeVersionConfig(versionConfig);
+                    configVersionConfig = CommentedFileConfig.of(versionConfig);
+                    configVersionConfig.load();
+                    // quit the game
+                    Minecraft.getInstance().shutdown();
+                }, btn -> {
+                    // update denied
+                    LOGGER.info("Not updating configuration - writing new version to version config...");
+                    // update "updated" field in version config (so we don't ask again until next update)
+                    versions.set("updated", active);
+                    configVersionConfig.save();
+                    if(Minecraft.getInstance().currentScreen != null) {
+                        ((ConfigUpdateConfirmScreen) Minecraft.getInstance().currentScreen).returnToPreviousScreen();
                     }
-                }
-            }, 100, 100);
+                }));
+            });
+
         }
         return true;
     }
@@ -259,6 +259,30 @@ public class ConfigFileManager {
 
     public Set<FileConfig> getCustomizationConfigs() {
         return Collections.unmodifiableSet(customizationConfigs);
+    }
+
+    public void handleConfigLoadingFailed(Exception e) {
+        String msg = e.getClass().getName() + ": " + e.getMessage();
+        LOGGER.error("Config loading failed: " + msg);
+        DistExecutor.runForDist(() -> () -> {
+            // client
+            CompactOres.setLoadFinishScreen(new ConfigLoadingFailedScreen(msg, btn -> {
+                Minecraft.getInstance().shutdown();
+            }, btn -> {
+                LOGGER.info("Resetting configuration...");
+                cleanOldConfigs(definitionConfigDir);
+                cleanOldConfigs(customizationConfigDir);
+                exportDefaultConfig(ImmutableMap.of("definitions", definitionConfigDir, "customizations", customizationConfigDir));
+                configVersionConfig.close();
+                writeVersionConfig(versionConfig);
+                Minecraft.getInstance().shutdown();
+            }));
+            return null;
+        }, () -> () -> {
+            // server
+            LOGGER.error(e);
+            throw new IllegalStateException("Failed to load Compact Ores config. See log for stack trace. Error: " + msg);
+        });
     }
 
 }
