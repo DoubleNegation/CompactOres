@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,6 +42,7 @@ public class CompactOres
     private static final DeferredRegister<Item> ITEMS  = new DeferredRegister<>(ForgeRegistries.ITEMS, MODID);
     private static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = new DeferredRegister<>(ForgeRegistries.TILE_ENTITIES, MODID);
     private static final DeferredRegister<Placement<?>> DECORATORS = new DeferredRegister<>(ForgeRegistries.DECORATORS, MODID);
+    private static final DeferredRegister<Feature<?>> FEATURES = new DeferredRegister<>(ForgeRegistries.FEATURES, MODID);
 
     public static final RegistryObject<CompactOreBlock> COMPACT_ORE = BLOCKS.register("compact_ore", CompactOreBlock::new);
 
@@ -52,6 +54,9 @@ public class CompactOres
 
     public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
             "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig::deserialize));
+
+    public static final RegistryObject<CompactOreWorldGen.MultiReplaceBlockFeature> MULTI_REPLACE_BLOCK = FEATURES.register(
+            "multi_replace_block", () -> new CompactOreWorldGen.MultiReplaceBlockFeature(CompactOreWorldGen.MultiReplaceBlockConfig::deserialize));
 
     private static List<CompactOre> compactOres;
     private static CompactOresResourcePack resourcePack;
@@ -77,6 +82,7 @@ public class CompactOres
         ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
         TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         DECORATORS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        FEATURES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         // create the resource pack finder as early as possible, and register it to the client immediately
         // the resource pack will be created only when the game attempts to load it for the first time

@@ -3,38 +3,79 @@ package doublenegation.mods.compactores;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.types.DynamicOps;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.ReplaceBlockConfig;
+import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.placement.ConfiguredPlacement;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.SimplePlacement;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CompactOreWorldGen {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static void init(List<CompactOre> ores) {
-        for(Biome biome : ForgeRegistries.BIOMES) {
-            for(CompactOre ore : ores) {
-                biome.addFeature(ore.isLateGeneration() ? GenerationStage.Decoration.UNDERGROUND_DECORATION : GenerationStage.Decoration.UNDERGROUND_ORES,
-                        new ConfiguredFeature<>(
-                                Feature.EMERALD_ORE,
-                                new ReplaceBlockConfig(ore.getBaseBlock().getDefaultState(),
-                                        CompactOres.COMPACT_ORE.get().getDefaultState().with(CompactOreBlock.ORE_PROPERTY, ore))
-                        ).func_227228_a_(new ConfiguredPlacement<>(
-                                CompactOres.ALL_WITH_PROBABILITY.get(),
-                                new ProbabilityConfig(ore.getSpawnProbability())
-                        )));
+        Map<Float, Set<CompactOre>> normalGeneratingOresByProbability = new HashMap<>();
+        Map<Float, Set<CompactOre>> lateGeneratingOresByProbability = new HashMap<>();
+        for(CompactOre ore : ores) {
+            if(!ore.isReal()) continue; // prevent feature for dummy ore with 0% chance
+            Map<Float, Set<CompactOre>> m = ore.isLateGeneration() ? lateGeneratingOresByProbability : normalGeneratingOresByProbability;
+            if(!m.containsKey(ore.getSpawnProbability())) {
+                m.put(ore.getSpawnProbability(), new HashSet<>());
             }
+            m.get(ore.getSpawnProbability()).add(ore);
         }
+        Set<ConfiguredFeature<?, ?>> normalGeneratingConfiguredFeatures =
+                normalGeneratingOresByProbability.keySet().stream()
+                        .map(prob -> make(prob, normalGeneratingOresByProbability.get(prob)))
+                        .collect(Collectors.toSet());
+        Set<ConfiguredFeature<?, ?>> lateGeneratingConfiguredFeatures =
+                lateGeneratingOresByProbability.keySet().stream()
+                        .map(prob -> make(prob, lateGeneratingOresByProbability.get(prob)))
+                        .collect(Collectors.toSet());
+        LOGGER.info("Registering " + (normalGeneratingConfiguredFeatures.size() + lateGeneratingConfiguredFeatures.size()) +
+                " world generation features (" + normalGeneratingConfiguredFeatures.size() + " normal, " +
+                lateGeneratingConfiguredFeatures.size() + " late)");
+        for(Biome biome : ForgeRegistries.BIOMES) {
+            normalGeneratingConfiguredFeatures.forEach(
+                    feature -> biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature));
+            lateGeneratingConfiguredFeatures.forEach(
+                    feature -> biome.addFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, feature));
+        }
+    }
+
+    private static ConfiguredFeature<?, ?> make(float prob, Set<CompactOre> ores) {
+        return new ConfiguredFeature<>(
+                CompactOres.MULTI_REPLACE_BLOCK.get(),
+                new MultiReplaceBlockConfig(
+                        ores.stream().collect(Collectors.toMap(
+                                ore -> ore.getBaseBlock().getDefaultState(),
+                                ore -> CompactOres.COMPACT_ORE.get().getDefaultState().with(CompactOreBlock.ORE_PROPERTY, ore))))
+        ).func_227228_a_(new ConfiguredPlacement<>(
+                CompactOres.ALL_WITH_PROBABILITY.get(),
+                new ProbabilityConfig(prob)
+        ));
     }
 
     public static class ProbabilityConfig implements IPlacementConfig {
@@ -68,6 +109,36 @@ public class CompactOreWorldGen {
                 }
             }
             return builder.build();
+        }
+    }
+
+    public static class MultiReplaceBlockConfig implements IFeatureConfig {
+        public final Map<BlockState, BlockState> replacementMap;
+        public MultiReplaceBlockConfig(Map<BlockState, BlockState> replacementMap) {
+            this.replacementMap = Collections.unmodifiableMap(replacementMap);
+        }
+        public <T> Dynamic<T> serialize(DynamicOps<T> ops) {
+            Map<T, T> serMap = new HashMap<>();
+            for(BlockState key : replacementMap.keySet()) {
+                serMap.put(BlockState.serialize(ops, key).getValue(), BlockState.serialize(ops, replacementMap.get(key)).getValue());
+            }
+            return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(ops.createString("replacements"), ops.createMap(serMap))));
+        }
+        public static <T> MultiReplaceBlockConfig deserialize(Dynamic<T> d) {
+            return new MultiReplaceBlockConfig(d.get("replacements").asMap(BlockState::deserialize, BlockState::deserialize));
+        }
+    }
+
+    public static class MultiReplaceBlockFeature extends Feature<MultiReplaceBlockConfig> {
+        public MultiReplaceBlockFeature(Function<Dynamic<?>, ? extends MultiReplaceBlockConfig> arg0) {
+            super(arg0);
+        }
+        @Override
+        public boolean place(IWorld worldIn, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, MultiReplaceBlockConfig config) {
+            if(config.replacementMap.containsKey(worldIn.getBlockState(pos))) {
+                worldIn.setBlockState(pos, config.replacementMap.get(worldIn.getBlockState(pos)), 2);
+            }
+            return true;
         }
     }
 
