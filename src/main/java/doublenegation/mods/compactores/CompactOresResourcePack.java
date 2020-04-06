@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CompactOresResourcePack implements IPackFinder {
@@ -98,7 +97,6 @@ public class CompactOresResourcePack implements IPackFinder {
             // without registry initialization. Don't attempt to create this resource pack, because this would
             // crash the game. Without this resource pack, the game will make it to the forge error screen and
             // display the actual error. See #3
-            makeTags(resPack);
             makeLootTable(resPack, ores);
             makeBlockstate(resPack, ores);
             makeItemModel(resPack, ores);
@@ -107,17 +105,6 @@ public class CompactOresResourcePack implements IPackFinder {
                 makeBlockTexture(resPack, ore);
             }
         }
-    }
-
-    private void makeTags(Map<String, Supplier<byte[]>> resourcePack) {
-        JsonObject tag = new JsonObject();
-        tag.addProperty("replace", false);
-        JsonArray values = new JsonArray();
-        Optional.ofNullable(CompactOres.COMPACT_ORE.get().getRegistryName()).map(ResourceLocation::toString).ifPresent(values::add);
-        tag.add("values", values);
-        final byte[] bytes = tag.toString().getBytes(StandardCharsets.UTF_8);
-        resourcePack.put("data/forge/tags/blocks/ores.json", () -> bytes);
-        resourcePack.put("data/forge/tags/items/ores.json", () -> bytes);
     }
 
     private void makeLootTable(Map<String, Supplier<byte[]>> resourcePack, List<CompactOre> ores) {
