@@ -367,7 +367,7 @@ public class CompactOreTexture {
             ResourceLocation metaLocation = new ResourceLocation(texture.getNamespace(), texture.getPath() + ".mcmeta");
             IResourceManager rm = Minecraft.getInstance().getResourceManager();
             IResource texRes = rm.getResource(texture);
-            BufferedImage tex = ImageIO.read(texRes.getInputStream());
+            BufferedImage tex = Utils.loadImage(texRes.getInputStream());
             ArrayList<BufferedImage> textures = new ArrayList<>(1);
             textures.add(tex);
             ArrayList<Integer> frametimes = new ArrayList<>(1);
