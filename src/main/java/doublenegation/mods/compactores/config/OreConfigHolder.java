@@ -66,7 +66,7 @@ public class OreConfigHolder {
                 // customization
                 .minRolls((Integer) Optional.ofNullable(customizationConfig).map(c -> c.getOreConfigValue(oreName, "minRolls")).orElse(null))
                 .maxRolls((Integer) Optional.ofNullable(customizationConfig).map(c -> c.getOreConfigValue(oreName, "maxRolls")).orElse(null))
-                .spawnProbability((Float) Optional.ofNullable(customizationConfig).map(c -> c.getOreConfigValue(oreName, "spawnProbability")).orElse(null))
+                .spawnProbability(Optional.ofNullable(customizationConfig).map(c -> c.getOreConfigValue(oreName, "spawnProbability")).map(v -> (float)(double)v).orElse(null))
                 // others
                 .baseBlock(oreName)
                 // build
