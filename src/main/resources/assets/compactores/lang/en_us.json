@@ -11,5 +11,7 @@
   "gui.compactores.configloadfailure.title": "Compact Ores config loading error",
   "gui.compactores.configloadfailure.message": "Compact Ores could not load properly because the following error occurred while loading the configuration:\n\n%s\n\nPlease fix the error to use Compact Ores. You can also reset your config to the default config to attempt avoiding the error, but this will DELETE ALL CHANGES that you have made to the configuration.",
   "gui.compactores.configloadfailure.deny": "Quit game",
-  "gui.compactores.configloadfailure.confirm": "Reset config and quit game"
+  "gui.compactores.configloadfailure.confirm": "Reset config and quit game",
+
+  "chat.compactores.desync_warning": "§4§kiI|!'§r §6COMPACT ORES WARNING:§r The compact ores configuration of this server does not match your client-side configuration. This will lead to strange behavior and various problems. Please synchronize your compact ores config with that of the server for the best experience. §4§kiI|!'§r"
 }

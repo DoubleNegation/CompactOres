@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -16,6 +17,7 @@ import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.RegistryObject;
@@ -70,6 +72,9 @@ public class CompactOres
         //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onModConfigLoading);
         MinecraftForge.EVENT_BUS.addListener(this::startServer);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
+        DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
+            MinecraftForge.EVENT_BUS.addListener(this::onPlayerJoin);
+        });
 
         // Load the config
         compactOres = ConfigLoader.loadOres();
@@ -93,6 +98,9 @@ public class CompactOres
             Minecraft.getInstance().getResourcePackList().addPackFinder(resourcePack);
             CompactOreTexture.registerCacheInvalidator();
         });
+
+        // I have no idea when network code should be initialized, so I'll just do it here
+        OreListSync.init();
     }
 
     public static List<CompactOre> compactOres() {
@@ -150,6 +158,12 @@ public class CompactOres
                     breakEvent.getPos(),
                     ore.getBaseBlock().getDefaultState(),
                     breakEvent.getPlayer()));
+        }
+    }
+
+    public void onPlayerJoin(final EntityJoinWorldEvent ev) {
+        if(ev.getEntity() instanceof ServerPlayerEntity) {
+            OreListSync.sendListToClient((ServerPlayerEntity) ev.getEntity(), compactOres());
         }
     }
 
