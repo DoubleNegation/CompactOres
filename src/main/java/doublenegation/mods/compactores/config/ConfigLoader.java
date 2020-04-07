@@ -155,8 +155,9 @@ public class ConfigLoader {
             // return two dummy ores
             // at least two ores are required for anything to function (block states require it)
             final ResourceLocation stone = new ResourceLocation("minecraft", "stone");
+            final ResourceLocation dirt = new ResourceLocation("minecraft", "dirt");
             final ResourceLocation stoneTex = new ResourceLocation("minecraft", "block/stone");
-            return ImmutableList.of(
+            return new ArrayList<>(ImmutableList.of(
                     new CompactOre(
                             /*          baseBlockLoc */ stone,
                             /*              minRolls */ 1,
@@ -168,7 +169,7 @@ public class ConfigLoader {
                             /*        lateGeneration */ false,
                             /*       generateTexture */ true),
                     new CompactOre(
-                            /*          baseBlockLoc */ stone,
+                            /*          baseBlockLoc */ dirt,  // can't be the same block or world gen will crash
                             /*              minRolls */ 1,
                             /*              maxRolls */ 1,
                             /*        baseOreTexture */ stoneTex,
@@ -176,7 +177,7 @@ public class ConfigLoader {
                             /*      spawnProbability */ 0,
                             /*  maxOreLayerColorDiff */ -1,
                             /*        lateGeneration */ false,
-                            /*       generateTexture */ true));
+                            /*       generateTexture */ true)));
 
         }
 
