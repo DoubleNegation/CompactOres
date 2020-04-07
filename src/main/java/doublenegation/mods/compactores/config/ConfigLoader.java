@@ -211,7 +211,7 @@ public class ConfigLoader {
                         .rockTexture(Utils.parseResourceLocationExtra(definitionConfig.getLocalConfigValue("rockTexture"), definitionConfig.getFilenameNamespace()))
                         .lateGeneration(definitionConfig.getLocalConfigValue("lateGeneration"));
             }
-            if(customizationConfig.hasLocalConfig()) {
+            if(customizationConfig != null && customizationConfig.hasLocalConfig()) {
                 fact.minRolls(customizationConfig.getLocalConfigValue("minRolls"))
                         .maxRolls(customizationConfig.getLocalConfigValue("maxRolls"))
                         .spawnProbability(customizationConfig.getLocalConfigValue("spawnProbability"));

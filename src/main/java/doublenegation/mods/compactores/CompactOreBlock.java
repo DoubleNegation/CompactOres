@@ -2,6 +2,7 @@ package doublenegation.mods.compactores;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -35,7 +36,9 @@ public class CompactOreBlock extends Block {
     }
 
     Block baseBlock(BlockState state) {
-        return state.get(ORE_PROPERTY).getBaseBlock();
+        // the base block is null if a block name which does not exist was specified in the config
+        // convert the null to stone here so that the game doesn't crash (but block will behave like stone)
+        return Optional.ofNullable(state.get(ORE_PROPERTY).getBaseBlock()).orElse(Blocks.STONE);
     }
 
     @Override

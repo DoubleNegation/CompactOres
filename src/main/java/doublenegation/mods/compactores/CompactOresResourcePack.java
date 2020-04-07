@@ -112,6 +112,8 @@ public class CompactOresResourcePack implements IPackFinder {
         table.addProperty("type", "block");
         JsonArray pools = new JsonArray();
         for(CompactOre ore : ores) {
+            // if the base block doesn't exist we don't know what loot table to wrap, so skip this ore
+            if(ore.getBaseBlock() == null) continue;
             JsonObject pool = new JsonObject();
             JsonArray conditions = new JsonArray();
             JsonObject condition = new JsonObject();

@@ -1,17 +1,22 @@
 package doublenegation.mods.compactores;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static Set<String> usedResourceNames = new HashSet<>();
 
@@ -67,6 +72,10 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
     public Block getBaseBlock() {
         if(baseBlock == null) {
             baseBlock = ForgeRegistries.BLOCKS.getValue(baseBlockLoc);
+            if(baseBlock == Blocks.AIR) {
+                LOGGER.error("Block " + baseBlockLoc + " does not exist - failed to create compact ore");
+                baseBlock = null;
+            }
         }
         return baseBlock;
     }

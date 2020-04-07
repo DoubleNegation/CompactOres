@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.registries.GameData;
 
@@ -73,7 +74,9 @@ public class CompactOreBlockItem extends BlockItem {
         }
         ResourceLocation bln = CompactOres.COMPACT_ORE.getId();
         Map<Block, Item> blockItemMap = GameData.getBlockItemMap();
-        ITextComponent baseName = blockItemMap.get(ore.getBaseBlock()).getDisplayName(stack);
+        ITextComponent baseName = ore.getBaseBlock() != null && blockItemMap.containsKey(ore.getBaseBlock())
+                ? blockItemMap.get(ore.getBaseBlock()).getDisplayName(stack)
+                : new StringTextComponent("<unknown>");
         return new TranslationTextComponent("block." + bln.getNamespace() + "." + bln.getPath(), baseName);
     }
 

@@ -40,6 +40,7 @@ public class CompactOreWorldGen {
         Map<Float, Set<CompactOre>> lateGeneratingOresByProbability = new HashMap<>();
         for(CompactOre ore : ores) {
             if(!ore.isReal()) continue; // prevent feature for dummy ore with 0% chance
+            if(ore.getBaseBlock() == null) continue; // invalid block specified - can not generate that
             Map<Float, Set<CompactOre>> m = ore.isLateGeneration() ? lateGeneratingOresByProbability : normalGeneratingOresByProbability;
             if(!m.containsKey(ore.getSpawnProbability())) {
                 m.put(ore.getSpawnProbability(), new HashSet<>());
