@@ -20,9 +20,11 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -131,6 +133,25 @@ public class CompactOreBlock extends Block {
     @Override
     public SoundType getSoundType(BlockState state) {
         return baseBlock(state).getSoundType(state);
+    }
+
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+        CompactOre ore = state.get(ORE_PROPERTY);
+        if(ore.isUseGetDrops()) {
+            List<ItemStack> parentList = super.getDrops(state, builder);
+            List<ItemStack> oreList = ore.getBaseBlock().getDrops(state, builder);
+            Random rand = builder.getWorld().getRandom();
+            int r = ore.getMinRolls() + rand.nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
+            for(int i = 0; i < r; i++) {
+                for(ItemStack stack : oreList) {
+                    parentList.add(new ItemStack(stack.getItem(), stack.getCount(), stack.getTag()));
+                }
+            }
+            return parentList;
+        } else {
+            return super.getDrops(state, builder);
+        }
     }
 
 }

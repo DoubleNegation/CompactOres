@@ -167,7 +167,8 @@ public class ConfigLoader {
                             /*      spawnProbability */ 0,
                             /*  maxOreLayerColorDiff */ -1,
                             /*        lateGeneration */ false,
-                            /*       generateTexture */ true),
+                            /*       generateTexture */ true,
+                            /*           useGetDrops */ false),
                     new CompactOre(
                             /*          baseBlockLoc */ dirt,  // can't be the same block or world gen will crash
                             /*              minRolls */ 1,
@@ -177,7 +178,8 @@ public class ConfigLoader {
                             /*      spawnProbability */ 0,
                             /*  maxOreLayerColorDiff */ -1,
                             /*        lateGeneration */ false,
-                            /*       generateTexture */ true)));
+                            /*       generateTexture */ true,
+                            /*           useGetDrops */ false)));
 
         }
 
@@ -209,7 +211,8 @@ public class ConfigLoader {
                         .maxOreLayerColorDiff(definitionConfig.getLocalConfigValue("maxOreLayerColorDiff"))
                         .oreTexture(Utils.parseResourceLocationExtra(definitionConfig.getLocalConfigValue("oreTexture"), definitionConfig.getFilenameNamespace()))
                         .rockTexture(Utils.parseResourceLocationExtra(definitionConfig.getLocalConfigValue("rockTexture"), definitionConfig.getFilenameNamespace()))
-                        .lateGeneration(definitionConfig.getLocalConfigValue("lateGeneration"));
+                        .lateGeneration(definitionConfig.getLocalConfigValue("lateGeneration"))
+                        .useGetDrops(definitionConfig.getLocalConfigValue("useGetDrops"));
             }
             if(customizationConfig != null && customizationConfig.hasLocalConfig()) {
                 fact.minRolls(customizationConfig.getLocalConfigValue("minRolls"))

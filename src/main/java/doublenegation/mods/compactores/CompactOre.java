@@ -33,10 +33,11 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
     private int maxOreLayerColorDiff;
     private boolean lateGeneration;
     private boolean generateTexture;
+    private boolean useGetDrops;
 
     public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
                       ResourceLocation baseUnderlyingTexture, float spawnProbability, int maxOreLayerColorDiff,
-                      boolean lateGeneration, boolean generateTexture) {
+                      boolean lateGeneration, boolean generateTexture, boolean useGetDrops) {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
@@ -46,6 +47,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
         this.maxOreLayerColorDiff = maxOreLayerColorDiff;
         this.lateGeneration = lateGeneration;
         this.generateTexture = generateTexture;
+        this.useGetDrops = useGetDrops;
         String resourceName = baseBlockLoc.toString().replace(":", "__");
         while(usedResourceNames.contains(resourceName)) {
             resourceName += "_";
@@ -56,7 +58,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     CompactOre() {
         // construct the "missing" ore
-        this(new ResourceLocation("stone"), 0, 0, null, null, 0, -1, false, false);
+        this(new ResourceLocation("stone"), 0, 0, null, null, 0, -1, false, false, false);
         // actually use a different resource name
         usedResourceNames.remove(resourceName);
         resourceName = "missing";
@@ -110,6 +112,10 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     public boolean isGenerateTexture() {
         return generateTexture;
+    }
+
+    public boolean isUseGetDrops() {
+        return useGetDrops;
     }
 
     public boolean isReal() {

@@ -20,6 +20,7 @@ public class OreBuilder {
     private ResourceLocation L_ORETEXTURE;
     private ResourceLocation L_ROCKTEXTURE;
     private boolean L_LATEGENRATION; /* default value = false, defined in Factory */
+    private boolean L_USEGETDROPS; /* default value = false, defined in Factory */
 
     // LOCAL CUSTOMIZATION DEFAULTS
     private Integer L_MINROLLS;
@@ -32,6 +33,7 @@ public class OreBuilder {
     private ResourceLocation oreTexture;
     private ResourceLocation rockTexture;
     private Boolean lateGeneration;
+    private Boolean useGetDrops;
 
     // private customization values
     private Integer minRolls;
@@ -66,6 +68,7 @@ public class OreBuilder {
                        ResourceLocation localOreTexture,
                        ResourceLocation localRockTexture,
                        Boolean localLateGeneration,
+                       Boolean localUseGetDrops,
                        Integer localMinRolls,
                        Integer localMaxRolls,
                        Float localSpawnProbability) {
@@ -74,6 +77,7 @@ public class OreBuilder {
         L_ORETEXTURE = localOreTexture;
         L_ROCKTEXTURE = localRockTexture;
         L_LATEGENRATION = localLateGeneration;
+        L_USEGETDROPS = localUseGetDrops;
         L_MINROLLS = localMinRolls;
         L_MAXROLLS = localMaxRolls;
         L_SPAWNPROBABILITY = localSpawnProbability;
@@ -101,6 +105,11 @@ public class OreBuilder {
 
     public OreBuilder lateGeneration(Boolean lateGeneration) {
         this.lateGeneration = lateGeneration;
+        return this;
+    }
+
+    public OreBuilder useGetDrops(Boolean useGetDrops) {
+        this.useGetDrops = useGetDrops;
         return this;
     }
 
@@ -134,12 +143,13 @@ public class OreBuilder {
         ResourceLocation actualOreTexture = oreTexture != null ? oreTexture : L_ORETEXTURE;
         ResourceLocation actualRockTexture = rockTexture != null ? rockTexture : L_ROCKTEXTURE;
         boolean actualLateGeneration = lateGeneration != null ? lateGeneration : L_LATEGENRATION;
+        boolean actualUseGetDrops = useGetDrops != null ? useGetDrops : L_USEGETDROPS;
         // customization
         int actualMinRolls = minRolls != null ? minRolls : L_MINROLLS != null ? L_MINROLLS : G_MINROLLS;
         int actualMaxRolls = maxRolls != null ? maxRolls : L_MAXROLLS != null ? L_MAXROLLS : G_MAXROLLS;
         float actualSpawnProbability = spawnProbability != null ? spawnProbability : L_SPAWNPROBABILITY != null ? L_SPAWNPROBABILITY : G_SPAWNPROBABILITY;
         return new CompactOre(baseBlock, actualMinRolls, actualMaxRolls, actualOreTexture, actualRockTexture,
-                actualSpawnProbability, actualMaxOreLayerColorDiff, actualLateGeneration, actualGenerateTexture);
+                actualSpawnProbability, actualMaxOreLayerColorDiff, actualLateGeneration, actualGenerateTexture, actualUseGetDrops);
     }
 
     public static class Factory {
@@ -150,6 +160,7 @@ public class OreBuilder {
         private ResourceLocation oreTexture;
         private ResourceLocation rockTexture;
         private boolean lateGeneration = false;
+        private boolean useGetDrops = false;
 
         // customization
         private Integer minRolls;
@@ -189,6 +200,13 @@ public class OreBuilder {
             return this;
         }
 
+        public Factory useGetDrops(Boolean useGetDrops) {
+            if(useGetDrops != null) {
+                this.useGetDrops = useGetDrops;
+            }
+            return this;
+        }
+
         public Factory minRolls(Integer minRolls) {
             this.minRolls = minRolls;
             return this;
@@ -210,6 +228,7 @@ public class OreBuilder {
                     oreTexture,
                     rockTexture,
                     lateGeneration,
+                    useGetDrops,
                     minRolls,
                     maxRolls,
                     spawnProbability);

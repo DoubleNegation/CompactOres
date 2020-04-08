@@ -108,6 +108,13 @@ Defining Ores / Changing Ore Definitions:
                      than usual. This can be required for some compact ores to generate at all.
                      However, it should be enabled with caution, as it causes the compact ore to not generate at all
                      in certain circumstances (like a mining dimension)
+     - useGetDrops
+           Type: boolean
+           Required: no
+           Default: false
+           Allowed scopes: local, ore
+           Function: When enabled, changes how compact ore drops are generated. Enable this only if a compact ore
+                     does not produce any drops without this option.
 
 
 Happy configuring!
