@@ -1,0 +1,115 @@
+["!local"]
+rockTexture = "minecraft:block/stone"
+
+[":netheroreagate"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlayagate"
+
+[":netheroreamethyst"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlayamethyst"
+
+[":netherorechrysocolla"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlaychrysocolla"
+
+[":netherorecitrine"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlaycitrine"
+
+[":netheroregarnet"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlaygarnet"
+
+[":netherorejade"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlayjade"
+
+[":netherorejasper"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlayjasper"
+
+[":netheroremalachite"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlaymalachite"
+
+[":netheroreonyx"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlayonyx"
+
+[":netherorephoenixite"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlayphoenixite"
+
+[":netheroreruby"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlayruby"
+
+[":netheroresapphire"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlaysapphire"
+
+[":netherorespinel"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlayspinel"
+
+[":netheroresugilite"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlaysugilite"
+
+[":netheroretopaz"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlaytopaz"
+
+[":netheroretourmaline"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/oreoverlaytourmaline"
+
+[":oreagate"]
+oreTexture = ":blocks/oreoverlayagate"
+
+[":oreamethyst"]
+oreTexture = ":blocks/oreoverlayamethyst"
+
+[":orechrysocolla"]
+oreTexture = ":blocks/oreoverlaychrysocolla"
+
+[":orecitrine"]
+oreTexture = ":blocks/oreoverlaycitrine"
+
+[":oregarnet"]
+oreTexture = ":blocks/oreoverlaygarnet"
+
+[":orejade"]
+oreTexture = ":blocks/oreoverlayjade"
+
+[":orejasper"]
+oreTexture = ":blocks/oreoverlayjasper"
+
+[":oremalachite"]
+oreTexture = ":blocks/oreoverlaymalachite"
+
+[":oreonyx"]
+oreTexture = ":blocks/oreoverlayonyx"
+
+[":orephoenixite"]
+oreTexture = ":blocks/oreoverlayphoenixite"
+
+[":oreruby"]
+oreTexture = ":blocks/oreoverlayruby"
+
+[":oresapphire"]
+oreTexture = ":blocks/oreoverlaysapphire"
+
+[":orespinel"]
+oreTexture = ":blocks/oreoverlayspinel"
+
+[":oresugilite"]
+oreTexture = ":blocks/oreoverlaysugilite"
+
+[":oretopaz"]
+oreTexture = ":blocks/oreoverlaytopaz"
+
+[":oretourmaline"]
+oreTexture = ":blocks/oreoverlaytourmaline"
+

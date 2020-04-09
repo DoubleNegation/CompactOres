@@ -1,0 +1,4 @@
+[":block_exp_ore"]
+rockTexture = "minecraft:block/stone"
+oreTexture = ":block/block_exp_ore"
+

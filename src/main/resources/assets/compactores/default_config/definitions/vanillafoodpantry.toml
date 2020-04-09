@@ -1,0 +1,12 @@
+["!local"]
+rockTexture = "minecraft:block/stone"
+
+[":natron_ore"]
+oreTexture = ":blocks/natron_ore"
+
+[":rock_salt_ore"]
+oreTexture = ":blocks/rock_salt_ore"
+
+[":trona_ore"]
+oreTexture = ":blocks/trona_ore"
+

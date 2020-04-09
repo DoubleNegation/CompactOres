@@ -1,0 +1,14 @@
+["!local"]
+rockTexture = "minecraft:block/stone"
+
+[":arcane_crystal_ore"]
+oreTexture = ":block/arcane_crystal_ore/arcane_crystal_ore_layer"
+
+[":dark_runestone"]
+rockTexture = ":block/dark_stone"
+oreTexture = ":block/runestone/cutout"
+maxOreLayerColorDiff = 2
+
+[":runestone"]
+oreTexture = ":block/runestone/cutout"
+

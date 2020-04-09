@@ -1,0 +1,14 @@
+["!local"]
+rockTexture = "minecraft:block/stone"
+
+[":inferium_ore"]
+oreTexture = ":block/inferium_ore"
+
+[":prosperity_ore"]
+oreTexture = ":block/prosperity_ore"
+
+[":soulium_ore"]
+rockTexture = ":block/soulstone"
+oreTexture = ":block/soulium_ore"
+maxOreLayerColorDiff = 20
+

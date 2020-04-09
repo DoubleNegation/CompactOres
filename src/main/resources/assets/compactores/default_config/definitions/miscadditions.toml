@@ -1,0 +1,17 @@
+["!local"]
+rockTexture = "minecraft:block/stone"
+
+[":cobalt_ore"]
+oreTexture = ":block/cobalt_ore"
+
+[":fossil_ore_dirt"]
+rockTexture = "minecraft:block/dirt"
+oreTexture = ":block/overlay_fossil_dirt"
+
+[":fossil_ore_gravel"]
+rockTexture = "minecraft:block/gravel"
+oreTexture = ":block/overlay_fossil_gravel"
+
+[":fossil_ore_stone"]
+oreTexture = ":block/overlay_fossil_stone"
+

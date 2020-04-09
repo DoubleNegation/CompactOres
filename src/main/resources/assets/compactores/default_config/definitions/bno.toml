@@ -1,0 +1,45 @@
+["!local"]
+rockTexture = "minecraft:block/netherrack"
+
+[":netheraluminum_ore"]
+oreTexture = ":block/netheraluminum_ore"
+
+[":nethercoal_ore"]
+oreTexture = ":block/nethercoal_ore"
+
+[":nethercopper_ore"]
+oreTexture = ":block/nethercopper_ore"
+
+[":netherdiamond_ore"]
+oreTexture = ":block/netherdiamond_ore"
+
+[":netheremerald_ore"]
+oreTexture = ":block/netheremerald_ore"
+
+[":nethergold_ore"]
+oreTexture = ":block/nethergold_ore"
+
+[":netheriron_ore"]
+oreTexture = ":block/netheriron_ore"
+
+[":netherlapis_ore"]
+oreTexture = ":block/netherlapis_ore"
+
+[":netherlead_ore"]
+oreTexture = ":block/netherlead_ore"
+
+[":nethernickel_ore"]
+oreTexture = ":block/nethernickel_ore"
+
+[":netherredstone_ore"]
+oreTexture = ":block/netherredstone_ore"
+
+[":nethersilver_ore"]
+oreTexture = ":block/nethersilver_ore"
+
+[":nethertin_ore"]
+oreTexture = ":block/nethertin_ore"
+
+[":netheruranium_ore"]
+oreTexture = ":block/netheruranium_ore"
+

@@ -1,0 +1,28 @@
+["!local"]
+rockTexture = "minecraft:block/stone"
+
+[":end_exp_ore"]
+rockTexture = "minecraft:block/end_stone"
+oreTexture = ":blocks/end_exp_ore"
+
+[":nether_exp_ore"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/nether_exp_ore"
+
+[":overworld_exp_ore"]
+oreTexture = ":blocks/overworld_exp_ore"
+
+[":ruby_ore"]
+oreTexture = ":blocks/ruby_ore"
+
+[":sapphire_ore"]
+oreTexture = ":blocks/sapphire_ore"
+
+[":topaz_ore"]
+rockTexture = "minecraft:block/netherrack"
+oreTexture = ":blocks/topaz_ore"
+
+[":amethyst_ore"]
+rockTexture = "minecraft:block/end_stone"
+oreTexture = ":blocks/amethyst_ore"
+

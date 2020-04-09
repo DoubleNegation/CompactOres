@@ -1,0 +1,30 @@
+["!local"]
+rockTexture = ":block/delusion_stone"
+
+[":candy_ore"]
+oreTexture = ":block/ore/candy_ore"
+
+[":coal_ore"]
+oreTexture = ":block/ore/coal_ore"
+
+[":lapis_ore"]
+oreTexture = ":block/ore/lapis_ore"
+
+[":necrum_ore"]
+rockTexture = "minecraft:block/stone"
+oreTexture = ":block/ore/necrum_ore"
+
+[":negatite_ore"]
+rockTexture = "minecraft:block/stone"
+oreTexture = ":block/ore/negatite_ore"
+
+[":positite_ore"]
+oreTexture = ":block/ore/positite_ore"
+
+[":rainbow_ore"]
+oreTexture = ":block/ore/rainbow_ore"
+
+[":zitrite_ore"]
+rockTexture = "minecraft:block/stone"
+oreTexture = ":block/ore/zitrite_ore"
+

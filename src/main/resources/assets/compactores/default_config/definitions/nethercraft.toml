@@ -1,0 +1,18 @@
+["!local"]
+rockTexture = "minecraft:block/netherrack"
+
+[":foulite_ore"]
+oreTexture = ":block/foulite_ore"
+
+[":linium_ore"]
+oreTexture = ":block/linium_ore"
+
+[":neridium_ore"]
+oreTexture = ":block/neridium_ore"
+
+[":pyridium_ore"]
+oreTexture = ":block/pyridium_ore"
+
+[":w_ore"]
+oreTexture = ":block/w_ore"
+

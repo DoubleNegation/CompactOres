@@ -1,0 +1,12 @@
+["!local"]
+rockTexture = "minecraft:block/stone"
+
+[":uraninite_ore"]
+oreTexture = ":block/uraninite_ore"
+
+[":uraninite_ore_dense"]
+oreTexture = ":block/uraninite_ore_dense"
+
+[":uraninite_ore_poor"]
+oreTexture = ":block/uraninite_ore_poor"
+
