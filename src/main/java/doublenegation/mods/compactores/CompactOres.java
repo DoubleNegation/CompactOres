@@ -20,6 +20,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -101,6 +102,16 @@ public class CompactOres
 
         // I have no idea when network code should be initialized, so I'll just do it here
         OreListSync.init();
+
+        // Initialize ore excavation integration without risking classloading if ore excavation is not present
+        if(ModList.get().isLoaded("oreexcavation")) {
+            try {
+                Class<?> clazz = Class.forName("doublenegation.mods.compactores.compat.OreExcavationIntegration");
+                clazz.getDeclaredMethod("init").invoke(null);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static List<CompactOre> compactOres() {
