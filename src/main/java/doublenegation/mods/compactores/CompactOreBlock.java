@@ -40,7 +40,11 @@ public class CompactOreBlock extends Block {
     Block baseBlock(BlockState state) {
         // the base block is null if a block name which does not exist was specified in the config
         // convert the null to stone here so that the game doesn't crash (but block will behave like stone)
-        return Optional.ofNullable(state.get(ORE_PROPERTY).getBaseBlock()).orElse(Blocks.STONE);
+        return Optional.ofNullable(state).filter(st -> st.getBlock() == this).map(st -> st.get(ORE_PROPERTY).getBaseBlock()).orElse(Blocks.STONE);
+    }
+
+    CompactOre ore(BlockState state, boolean defaultToMissing) {
+        return Optional.ofNullable(state).filter(st -> st.getBlock() == this).map(st -> st.get(ORE_PROPERTY)).orElse(CompactOres.compactOres().get(defaultToMissing ? 0 : 1));
     }
 
     @Override
@@ -61,7 +65,7 @@ public class CompactOreBlock extends Block {
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        CompactOre ore = state.get(ORE_PROPERTY);
+        CompactOre ore = ore(state, false);
         return CompactOres.COMPACT_ORE_ITEM.get().getStackOfOre(ore, 1);
     }
 
@@ -73,7 +77,7 @@ public class CompactOreBlock extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new CompactOreTileEntity(state.get(ORE_PROPERTY));
+        return new CompactOreTileEntity(ore(state, true));
     }
 
     @Override
@@ -84,7 +88,7 @@ public class CompactOreBlock extends Block {
     @Override
     public int getExpDrop(BlockState state, IWorldReader world, BlockPos pos, int fortune, int silktouch) {
         Random rand = Optional.of(world.getChunk(pos)).map(IChunk::getWorldForge).map(IWorld::getRandom).orElse(new Random());
-        CompactOre ore = state.get(ORE_PROPERTY);
+        CompactOre ore = ore(state, true);
         int r = ore.getMinRolls() + rand.nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
         return baseBlock(state).getExpDrop(state, world, pos, fortune, silktouch) * r;
     }
@@ -137,7 +141,7 @@ public class CompactOreBlock extends Block {
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        CompactOre ore = state.get(ORE_PROPERTY);
+        CompactOre ore = ore(state, true);
         if(ore.isUseGetDrops()) {
             List<ItemStack> parentList = super.getDrops(state, builder);
             List<ItemStack> oreList = ore.getBaseBlock().getDrops(state, builder);
