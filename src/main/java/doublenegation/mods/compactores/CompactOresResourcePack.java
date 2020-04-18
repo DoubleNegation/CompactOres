@@ -74,9 +74,6 @@ public class CompactOresResourcePack implements IPackFinder {
         // pack.mcmeta end
         // pack.png start - to prevent crash on opening resource packs menu
         BufferedImage packpng = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
-        Graphics2D packpngg = packpng.createGraphics();
-        packpngg.setColor(Color.BLACK);
-        packpngg.fillRect(0, 0, 16, 16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             ImageIO.write(packpng, "PNG", baos);
