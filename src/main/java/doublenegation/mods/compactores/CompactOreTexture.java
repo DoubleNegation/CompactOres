@@ -12,7 +12,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
 
-import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -392,16 +391,17 @@ public class CompactOreTexture {
                 }
                 if(animation.has("frametime") && animation.get("frametime").isJsonPrimitive() &&
                         animation.get("frametime").getAsJsonPrimitive().isNumber()) {
+                    frametimes.remove(0);
                     frametime = animation.get("frametime").getAsInt();
+                    frametimes.add(frametime);
                 }
                 if(animation.has("frames") && animation.get("frames").isJsonArray()) {
                     JsonArray frames;
-                    BufferedImage originalImage;
                     int frameWidth, frameHeight;
                     frames = animation.getAsJsonArray("frames");
-                    originalImage = textures.remove(0);
+                    textures.clear();
                     frametimes.remove(0);
-                    frameWidth = originalImage.getWidth();
+                    frameWidth = tex.getWidth();
                     frameHeight = (int) Math.round(frameWidth * height.doubleValue() / width.doubleValue());
                     for(JsonElement entry : frames) {
                         int index = 0, time = frametime;
@@ -420,7 +420,16 @@ public class CompactOreTexture {
                         }
                         frametimes.add(time);
                         int y = index * frameHeight;
-                        textures.add(originalImage.getSubimage(0, y, frameWidth, frameHeight));
+                        textures.add(tex.getSubimage(0, y, frameWidth, frameHeight));
+                    }
+                } else {
+                    textures.clear();
+                    frametimes.clear();
+                    int frameWidth = tex.getWidth();
+                    int frameHeight = (int) Math.round(frameWidth * height.doubleValue() / width.doubleValue());
+                    for(int i = 0; i * frameHeight < tex.getHeight(); i++) {
+                        textures.add(tex.getSubimage(0, i * frameHeight, frameWidth, frameHeight));
+                        frametimes.add(frametime);
                     }
                 }
                 return new TextureInfo(textureOwner, textures, frametimes, interpolate);

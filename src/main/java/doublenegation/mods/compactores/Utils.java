@@ -5,11 +5,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
 import javax.imageio.ImageIO;
+import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
 import java.awt.color.ICC_ProfileGray;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -53,6 +55,13 @@ public class Utils {
                 }
                 return corr;
             }
+        }
+        // An IndexColorModel also causes problems (at least sometimes), re-draw the image if one is used
+        if(img.getColorModel() instanceof IndexColorModel) {
+            BufferedImage corr = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D gr = corr.createGraphics();
+            gr.drawImage(img, 0, 0, null);
+            return corr;
         }
         return img;
     }
