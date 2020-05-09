@@ -1,0 +1,10 @@
+["!local"]
+rockTexture="minecraft:block/stone"
+useGetDrops=true
+
+[":citrineore"]
+oreTexture=":blocks/citrine_ore"
+
+[":pinkdiamondore"]
+oreTexture=":blocks/pink_diamond_ore"
+

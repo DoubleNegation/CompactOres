@@ -1,0 +1,9 @@
+["!local"]
+rockTexture="minecraft:block/stone"
+
+[":aluminum_ore"]
+oreTexture=":block/aluminum_ore"
+
+[":copper_ore"]
+oreTexture=":block/copper_ore"
+
