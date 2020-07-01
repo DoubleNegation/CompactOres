@@ -1,6 +1,6 @@
 package doublenegation.mods.compactores.compat;
 
-import doublenegation.mods.compactores.CompactOre;
+/*import doublenegation.mods.compactores.CompactOre;
 import doublenegation.mods.compactores.CompactOreBlock;
 import doublenegation.mods.compactores.CompactOres;
 import net.minecraft.block.BlockState;
@@ -11,11 +11,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.List;*/
 
 public class OreExcavationIntegration {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    /*private static final Logger LOGGER = LogManager.getLogger();
 
     public static void init() {
         MinecraftForge.EVENT_BUS.addListener(OreExcavationIntegration::onExcavate);
@@ -52,6 +52,6 @@ public class OreExcavationIntegration {
         public boolean checkMatch(BlockState blockState) {
             return this.state.equals(blockState);
         }
-    }
+    }*/
 
 }

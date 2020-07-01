@@ -103,7 +103,7 @@ public class CompactOres
         // I have no idea when network code should be initialized, so I'll just do it here
         OreListSync.init();
 
-        // Initialize ore excavation integration without risking classloading if ore excavation is not present
+        /*// Initialize ore excavation integration without risking classloading if ore excavation is not present
         if(ModList.get().isLoaded("oreexcavation")) {
             try {
                 Class<?> clazz = Class.forName("doublenegation.mods.compactores.compat.OreExcavationIntegration");
@@ -111,7 +111,7 @@ public class CompactOres
             } catch(Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     public static List<CompactOre> compactOres() {

@@ -96,10 +96,10 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
-    maven {
+    /*maven {
         name = "CurseForge"
         url = "https://minecraft.curseforge.com/api/maven/"
-    }
+    }*/
 }
 
 dependencies {
@@ -131,8 +131,8 @@ dependencies {
     // at runtime, use the full JEI jar
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.3")
 
-    // from CurseForge maven
-    compile fg.deobf('ore-excavation:OreExcavation:1.7.151')
+    /*// from CurseForge maven
+    compile fg.deobf('ore-excavation:OreExcavation:1.7.151')*/
 
 }
 
