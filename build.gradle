@@ -127,9 +127,9 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.3:api")
     // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.3")
 
     // from CurseForge maven
     compile fg.deobf('ore-excavation:OreExcavation:1.7.151')
