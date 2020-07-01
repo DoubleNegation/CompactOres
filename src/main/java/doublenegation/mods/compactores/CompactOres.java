@@ -20,7 +20,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -41,11 +40,11 @@ public class CompactOres
     public static final String MODID = "compactores";
     public static final Logger LOGGER = LogManager.getLogger();
 
-    private static final DeferredRegister<Block> BLOCKS = new DeferredRegister<>(ForgeRegistries.BLOCKS, MODID);
-    private static final DeferredRegister<Item> ITEMS  = new DeferredRegister<>(ForgeRegistries.ITEMS, MODID);
-    private static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = new DeferredRegister<>(ForgeRegistries.TILE_ENTITIES, MODID);
-    private static final DeferredRegister<Placement<?>> DECORATORS = new DeferredRegister<>(ForgeRegistries.DECORATORS, MODID);
-    private static final DeferredRegister<Feature<?>> FEATURES = new DeferredRegister<>(ForgeRegistries.FEATURES, MODID);
+    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+    private static final DeferredRegister<Item> ITEMS  = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    private static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
+    private static final DeferredRegister<Placement<?>> DECORATORS = DeferredRegister.create(ForgeRegistries.DECORATORS, MODID);
+    private static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, MODID);
 
     public static final RegistryObject<CompactOreBlock> COMPACT_ORE = BLOCKS.register("compact_ore", CompactOreBlock::new);
 
@@ -56,10 +55,10 @@ public class CompactOres
             "compact_ore", () -> TileEntityType.Builder.create(CompactOreTileEntity::new).build(null));
 
     public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
-            "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig::deserialize));
+            "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig.codec));
 
     public static final RegistryObject<CompactOreWorldGen.MultiReplaceBlockFeature> MULTI_REPLACE_BLOCK = FEATURES.register(
-            "multi_replace_block", () -> new CompactOreWorldGen.MultiReplaceBlockFeature(CompactOreWorldGen.MultiReplaceBlockConfig::deserialize));
+            "multi_replace_block", () -> new CompactOreWorldGen.MultiReplaceBlockFeature(CompactOreWorldGen.MultiReplaceBlockConfig.codec));
 
     private static List<CompactOre> compactOres;
     private static CompactOresResourcePack resourcePack;
@@ -129,7 +128,7 @@ public class CompactOres
 
     public static CompactOre getForResourceName(String resourceName) {
         for(CompactOre ore : compactOres) {
-            if(ore.getName().equals(resourceName)) {
+            if(ore.func_176610_l().equals(resourceName)) {
                 return ore;
             }
         }

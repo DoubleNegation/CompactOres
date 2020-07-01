@@ -11,7 +11,7 @@ public class TextureDumper {
         try {
             File dir = new File(Minecraft.getInstance().gameDir, "compactores_texture_dumps");
             if(!dir.exists()) dir.mkdir();
-            File fname = new File(dir, ore.getName() + "_" + System.currentTimeMillis() + ".png");
+            File fname = new File(dir, ore.func_176610_l() + "_" + System.currentTimeMillis() + ".png");
             try(FileOutputStream fos = new FileOutputStream(fname)) {
                 fos.write(texture);
             }

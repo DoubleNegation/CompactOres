@@ -1,6 +1,7 @@
 package doublenegation.mods.compactores;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -48,8 +49,8 @@ public class CompactOreTileEntity extends TileEntity {
     }
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(readDataFromNBT(compound));
+    public void func_230337_a_(BlockState state, CompoundNBT compound) {
+        super.func_230337_a_(state, readDataFromNBT(compound));
     }
 
     @Override
@@ -57,9 +58,10 @@ public class CompactOreTileEntity extends TileEntity {
         return writeDataToNBT(super.getUpdateTag());
     }
 
+    /* TODO: this method seems to have gone static (func_235657_b_), find out what to do now (if anything)
     @Override
     public void handleUpdateTag(CompoundNBT tag) {
         super.handleUpdateTag(readDataFromNBT(tag));
-    }
+    }*/
 
 }

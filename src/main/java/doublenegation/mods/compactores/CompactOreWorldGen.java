@@ -1,18 +1,16 @@
 package doublenegation.mods.compactores;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.placement.ConfiguredPlacement;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.SimplePlacement;
@@ -27,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -73,28 +70,23 @@ public class CompactOreWorldGen {
                         ores.stream().collect(Collectors.toMap(
                                 ore -> ore.getBaseBlock().getDefaultState(),
                                 ore -> CompactOres.COMPACT_ORE.get().getDefaultState().with(CompactOreBlock.ORE_PROPERTY, ore))))
-        ).func_227228_a_(new ConfiguredPlacement<>(
+        ).withPlacement(new ConfiguredPlacement<>(
                 CompactOres.ALL_WITH_PROBABILITY.get(),
                 new ProbabilityConfig(prob)
         ));
     }
 
     public static class ProbabilityConfig implements IPlacementConfig {
+        public static final Codec<ProbabilityConfig> codec = Codec.FLOAT.fieldOf("probability")
+                .xmap(ProbabilityConfig::new, config -> config.probability).codec();
         public final float probability;
         public ProbabilityConfig(float probability) {
             this.probability = probability;
         }
-        @Override
-        public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-            return new Dynamic<>(dynamicOps, dynamicOps.createMap(ImmutableMap.of(dynamicOps.createString("probability"), dynamicOps.createFloat(probability))));
-        }
-        public static ProbabilityConfig deserialize(Dynamic<?> dynamic) {
-            return new ProbabilityConfig(dynamic.get("probability").asFloat(.1f));
-        }
     }
 
     public static class AllWithProbability extends SimplePlacement<ProbabilityConfig> {
-        public AllWithProbability(Function<Dynamic<?>, ? extends ProbabilityConfig> p_i51362_1_) {
+        public AllWithProbability(Codec<ProbabilityConfig> p_i51362_1_) {
             super(p_i51362_1_);
         }
         @Override
@@ -114,28 +106,21 @@ public class CompactOreWorldGen {
     }
 
     public static class MultiReplaceBlockConfig implements IFeatureConfig {
+        public static final Codec<MultiReplaceBlockConfig> codec =
+                Codec.unboundedMap(BlockState.field_235877_b_, BlockState.field_235877_b_).fieldOf("replacementMap")
+                        .xmap(MultiReplaceBlockConfig::new, config -> config.replacementMap).codec();
         public final Map<BlockState, BlockState> replacementMap;
         public MultiReplaceBlockConfig(Map<BlockState, BlockState> replacementMap) {
             this.replacementMap = Collections.unmodifiableMap(replacementMap);
         }
-        public <T> Dynamic<T> serialize(DynamicOps<T> ops) {
-            Map<T, T> serMap = new HashMap<>();
-            for(BlockState key : replacementMap.keySet()) {
-                serMap.put(BlockState.serialize(ops, key).getValue(), BlockState.serialize(ops, replacementMap.get(key)).getValue());
-            }
-            return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(ops.createString("replacements"), ops.createMap(serMap))));
-        }
-        public static <T> MultiReplaceBlockConfig deserialize(Dynamic<T> d) {
-            return new MultiReplaceBlockConfig(d.get("replacements").asMap(BlockState::deserialize, BlockState::deserialize));
-        }
     }
 
     public static class MultiReplaceBlockFeature extends Feature<MultiReplaceBlockConfig> {
-        public MultiReplaceBlockFeature(Function<Dynamic<?>, ? extends MultiReplaceBlockConfig> arg0) {
+        public MultiReplaceBlockFeature(Codec<MultiReplaceBlockConfig> arg0) {
             super(arg0);
         }
         @Override
-        public boolean place(IWorld worldIn, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, MultiReplaceBlockConfig config) {
+        public boolean func_230362_a_(ISeedReader worldIn, StructureManager structureManagerIn, ChunkGenerator generator, Random rand, BlockPos pos, MultiReplaceBlockConfig config) {
             if(config.replacementMap.containsKey(worldIn.getBlockState(pos))) {
                 worldIn.setBlockState(pos, config.replacementMap.get(worldIn.getBlockState(pos)), 2);
             }

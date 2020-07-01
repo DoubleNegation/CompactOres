@@ -42,7 +42,7 @@ public class OreListSync {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             ctx.get().enqueueWork(() -> {
                 if(!msg.matchesLocalList()) {
-                    Minecraft.getInstance().player.sendMessage(new TranslationTextComponent("chat." + CompactOres.MODID + ".desync_warning"));
+                    Minecraft.getInstance().player.sendMessage(new TranslationTextComponent("chat." + CompactOres.MODID + ".desync_warning"), null);
                 }
             });
             ctx.get().setPacketHandled(true);

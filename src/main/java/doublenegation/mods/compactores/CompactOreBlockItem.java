@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
@@ -19,7 +20,7 @@ public class CompactOreBlockItem extends BlockItem {
 
     public CompactOreBlockItem(Block blockIn) {
         super(blockIn, new Item.Properties().group(CompactOres.getItemGroup()));
-        addPropertyOverride(new ResourceLocation(CompactOres.MODID, "ore"), (stack, world, holder) -> {
+        ItemModelsProperties.func_239418_a_(this, new ResourceLocation(CompactOres.MODID, "ore"), (stack, world, holder) -> {
             CompactOre ore = findOreForStack(stack);
             return CompactOres.compactOres().indexOf(ore);
         });

@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class CompactOresResourcePack implements IPackFinder {
@@ -243,9 +244,9 @@ public class CompactOresResourcePack implements IPackFinder {
     }
 
     @Override
-    public <T extends ResourcePackInfo> void addPackInfosToMap(Map<String, T> map, ResourcePackInfo.IFactory<T> iFactory) {
-        map.put(PACK_NAME, ResourcePackInfo.createResourcePack(PACK_NAME,
-                true/*isAlwaysEnabled*/, this::getPack, iFactory, ResourcePackInfo.Priority.BOTTOM));
+    public <T extends ResourcePackInfo> void func_230230_a_(Consumer<T> packConsumer, ResourcePackInfo.IFactory<T> iFactory) {
+        packConsumer.accept(ResourcePackInfo.createResourcePack(PACK_NAME, true/*isAlwaysEnabled*/,
+                this::getPack, iFactory, ResourcePackInfo.Priority.BOTTOM, IPackNameDecorator.field_232626_b_));
     }
 
 }

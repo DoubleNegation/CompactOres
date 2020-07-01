@@ -5,22 +5,20 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.IProperty;
+import net.minecraft.loot.LootContext;
+import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
@@ -30,7 +28,7 @@ import java.util.Random;
 
 public class CompactOreBlock extends Block {
 
-    public static IProperty<CompactOre> ORE_PROPERTY = new CompactOreProperty<>("ore", CompactOre.class, CompactOres.compactOres());
+    public static Property<CompactOre> ORE_PROPERTY = new CompactOreProperty<>("ore", CompactOre.class, CompactOres.compactOres());
 
     public CompactOreBlock() {
         super(Properties.create(Material.ROCK).sound(SoundType.STONE));
@@ -84,10 +82,11 @@ public class CompactOreBlock extends Block {
         return new CompactOreTileEntity(ore(state, true));
     }
 
+    /* TODO: find out where the "more sensitive version" (with the parameters) went
     @Override
     public float getExplosionResistance(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity exploder, Explosion explosion) {
         return baseBlock(state).getExplosionResistance(baseState(state), world, pos, exploder, explosion);
-    }
+    }*/
 
     @Override
     public int getExpDrop(BlockState state, IWorldReader world, BlockPos pos, int fortune, int silktouch) {
@@ -108,6 +107,7 @@ public class CompactOreBlock extends Block {
         return baseBlock(state).getHarvestTool(baseState(state));
     }
 
+    /* TODO: these three methods disappeared from block, values exist in BlockState. find out what's up there.
     @Override
     public float getBlockHardness(BlockState state, IBlockReader p_176195_2_, BlockPos pos) {
         return baseBlock(state).getBlockHardness(baseState(state), p_176195_2_, pos);
@@ -118,10 +118,12 @@ public class CompactOreBlock extends Block {
         return baseBlock(state).getMaterial(baseState(state));
     }
 
+    // func_235697_s_ ?
     @Override
     public MaterialColor getMaterialColor(BlockState state, IBlockReader p_180659_2_, BlockPos pos) {
         return baseBlock(state).getMaterialColor(baseState(state), p_180659_2_, pos);
     }
+    */
 
     @Override
     public boolean canHarvestBlock(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
