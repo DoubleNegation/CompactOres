@@ -43,6 +43,10 @@ public class CompactOreBlock extends Block {
         return Optional.ofNullable(state).filter(st -> st.getBlock() == this).map(st -> st.get(ORE_PROPERTY).getBaseBlock()).orElse(Blocks.STONE);
     }
 
+    BlockState baseState(BlockState state) {
+        return baseBlock(state).getDefaultState();
+    }
+
     CompactOre ore(BlockState state, boolean defaultToMissing) {
         return Optional.ofNullable(state).filter(st -> st.getBlock() == this).map(st -> st.get(ORE_PROPERTY)).orElse(CompactOres.compactOres().get(defaultToMissing ? 0 : 1));
     }
@@ -82,7 +86,7 @@ public class CompactOreBlock extends Block {
 
     @Override
     public float getExplosionResistance(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity exploder, Explosion explosion) {
-        return baseBlock(state).getExplosionResistance(state, world, pos, exploder, explosion);
+        return baseBlock(state).getExplosionResistance(baseState(state), world, pos, exploder, explosion);
     }
 
     @Override
@@ -90,53 +94,53 @@ public class CompactOreBlock extends Block {
         Random rand = Optional.of(world.getChunk(pos)).map(IChunk::getWorldForge).map(IWorld::getRandom).orElse(new Random());
         CompactOre ore = ore(state, true);
         int r = ore.getMinRolls() + rand.nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
-        return baseBlock(state).getExpDrop(state, world, pos, fortune, silktouch) * r;
+        return baseBlock(state).getExpDrop(baseState(state), world, pos, fortune, silktouch) * r;
     }
 
     @Override
     public int getHarvestLevel(BlockState state) {
-        return baseBlock(state).getHarvestLevel(state);
+        return baseBlock(state).getHarvestLevel(baseState(state));
     }
 
     @Nullable
     @Override
     public ToolType getHarvestTool(BlockState state) {
-        return baseBlock(state).getHarvestTool(state);
+        return baseBlock(state).getHarvestTool(baseState(state));
     }
 
     @Override
     public float getBlockHardness(BlockState state, IBlockReader p_176195_2_, BlockPos pos) {
-        return baseBlock(state).getBlockHardness(state, p_176195_2_, pos);
+        return baseBlock(state).getBlockHardness(baseState(state), p_176195_2_, pos);
     }
 
     @Override
     public Material getMaterial(BlockState state) {
-        return baseBlock(state).getMaterial(state);
+        return baseBlock(state).getMaterial(baseState(state));
     }
 
     @Override
     public MaterialColor getMaterialColor(BlockState state, IBlockReader p_180659_2_, BlockPos pos) {
-        return baseBlock(state).getMaterialColor(state, p_180659_2_, pos);
+        return baseBlock(state).getMaterialColor(baseState(state), p_180659_2_, pos);
     }
 
     @Override
     public boolean canHarvestBlock(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return baseBlock(state).canHarvestBlock(state, world, pos, player);
+        return baseBlock(state).canHarvestBlock(baseState(state), world, pos, player);
     }
 
     @Override
     public boolean isToolEffective(BlockState state, ToolType tool) {
-        return baseBlock(state).isToolEffective(state, tool);
+        return baseBlock(state).isToolEffective(baseState(state), tool);
     }
 
     @Override
     public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return baseBlock(state).getSoundType(state, world, pos, entity);
+        return baseBlock(state).getSoundType(baseState(state), world, pos, entity);
     }
 
     @Override
     public SoundType getSoundType(BlockState state) {
-        return baseBlock(state).getSoundType(state);
+        return baseBlock(state).getSoundType(baseState(state));
     }
 
     @Override
@@ -144,7 +148,7 @@ public class CompactOreBlock extends Block {
         CompactOre ore = ore(state, true);
         if(ore.isUseGetDrops()) {
             List<ItemStack> parentList = super.getDrops(state, builder);
-            List<ItemStack> oreList = ore.getBaseBlock().getDrops(state, builder);
+            List<ItemStack> oreList = ore.getBaseBlock().getDrops(baseState(state), builder);
             Random rand = builder.getWorld().getRandom();
             int r = ore.getMinRolls() + rand.nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
             for(int i = 0; i < r; i++) {
