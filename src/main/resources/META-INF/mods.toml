@@ -32,6 +32,9 @@ description='''
 This mod generates dense ores in the world.
 
 Dense Ores are created from config files and resources of other mods, making virtually all modded ores compatible!
+
+Translation credits:
+Russian: NeverMall
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.compactores]] #optional
