@@ -12,6 +12,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.GameData;
 
 import java.util.Map;
@@ -20,9 +22,11 @@ public class CompactOreBlockItem extends BlockItem {
 
     public CompactOreBlockItem(Block blockIn) {
         super(blockIn, new Item.Properties().group(CompactOres.getItemGroup()));
-        ItemModelsProperties.func_239418_a_(this, new ResourceLocation(CompactOres.MODID, "ore"), (stack, world, holder) -> {
-            CompactOre ore = findOreForStack(stack);
-            return CompactOres.compactOres().indexOf(ore);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            ItemModelsProperties.func_239418_a_(this, new ResourceLocation(CompactOres.MODID, "ore"), (stack, world, holder) -> {
+                CompactOre ore = findOreForStack(stack);
+                return CompactOres.compactOres().indexOf(ore);
+            });
         });
     }
 
