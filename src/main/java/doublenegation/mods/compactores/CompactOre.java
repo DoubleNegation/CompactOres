@@ -141,7 +141,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
     }
 
     @Override
-    public String func_176610_l() {
+    public String getString() {
         return resourceName;
     }
 

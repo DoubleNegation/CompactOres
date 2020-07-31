@@ -19,7 +19,7 @@ public class CompactOreProperty<T extends Comparable<T> & IStringSerializable> e
         this.allowedValues = ImmutableSet.copyOf(allowedValues);
 
         for(T t : allowedValues) {
-            String s = ((IStringSerializable)t).func_176610_l();
+            String s = ((IStringSerializable)t).getString();
             if (this.nameToValue.containsKey(s)) {
                 throw new IllegalArgumentException("Multiple values have the same name '" + s + "'");
             }
@@ -38,7 +38,7 @@ public class CompactOreProperty<T extends Comparable<T> & IStringSerializable> e
     }
 
     public String getName(T value) {
-        return ((IStringSerializable)value).func_176610_l();
+        return ((IStringSerializable)value).getString();
     }
 
     public boolean equals(Object p_equals_1_) {

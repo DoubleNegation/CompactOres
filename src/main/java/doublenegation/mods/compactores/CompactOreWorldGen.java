@@ -107,7 +107,7 @@ public class CompactOreWorldGen {
 
     public static class MultiReplaceBlockConfig implements IFeatureConfig {
         public static final Codec<MultiReplaceBlockConfig> codec =
-                Codec.unboundedMap(BlockState.field_235877_b_, BlockState.field_235877_b_).fieldOf("replacementMap")
+                Codec.unboundedMap(BlockState.BLOCKSTATE_CODEC, BlockState.BLOCKSTATE_CODEC).fieldOf("replacementMap")
                         .xmap(MultiReplaceBlockConfig::new, config -> config.replacementMap).codec();
         public final Map<BlockState, BlockState> replacementMap;
         public MultiReplaceBlockConfig(Map<BlockState, BlockState> replacementMap) {

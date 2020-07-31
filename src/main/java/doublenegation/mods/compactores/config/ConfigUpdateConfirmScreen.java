@@ -33,29 +33,29 @@ public class ConfigUpdateConfirmScreen extends Utils.ReturningScreen {
     }
 
     @Override
-    protected void func_231160_c_() {
-        super.func_231160_c_();
+    protected void init() {
+        super.init();
         wrappedMessage.clear();
-        wrappedMessage.addAll(this.field_230712_o_.func_238425_b_(message, this.field_230708_k_ - 50));
+        wrappedMessage.addAll(this.font.func_238425_b_(message, this.width - 50));
         int i = (wrappedMessage.size() + 1) * 9 - 80;
-        this.func_230480_a_(new Button(this.field_230708_k_ / 2 - 150, i + 100, 300, 20, buttonTextYes, onConfirm));
-        this.func_230480_a_(new Button(this.field_230708_k_ / 2 - 150, i + 124, 300, 20, buttonTextNo, onDeny));
+        this.addButton(new Button(this.width / 2 - 150, i + 100, 300, 20, buttonTextYes, onConfirm));
+        this.addButton(new Button(this.width / 2 - 150, i + 124, 300, 20, buttonTextNo, onDeny));
     }
 
     @Override
-    public void func_230430_a_(MatrixStack p_230430_1_, int p_render_1_, int p_render_2_, float p_render_3_) {
-        this.func_230446_a_(p_230430_1_);
-        this.func_238472_a_(p_230430_1_, this.field_230712_o_, this.field_230704_d_, this.field_230708_k_ / 2, 9, 0xFFFFFF);
+    public void render(MatrixStack p_230430_1_, int p_render_1_, int p_render_2_, float p_render_3_) {
+        this.renderBackground(p_230430_1_);
+        this.drawCenteredString(p_230430_1_, this.font, this.title, this.width / 2, 9, 0xFFFFFF);
         int y = 3 * 9;
         for(ITextProperties s : wrappedMessage) {
-            this.func_238472_a_(p_230430_1_, this.field_230712_o_, s, this.field_230708_k_ / 2, y, 0xFFFFFF);
+            this.drawCenteredString(p_230430_1_, this.font, s, this.width / 2, y, 0xFFFFFF);
             y += 9;
         }
-        super.func_230430_a_(p_230430_1_, p_render_1_, p_render_2_, p_render_3_);
+        super.render(p_230430_1_, p_render_1_, p_render_2_, p_render_3_);
     }
 
     @Override
-    public boolean func_231178_ax__() {
+    public boolean shouldCloseOnEsc() {
         return false;
     }
 

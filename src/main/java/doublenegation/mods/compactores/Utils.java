@@ -79,8 +79,8 @@ public class Utils {
         }
 
         public void returnToPreviousScreen() {
-            if(field_230706_i_ != null)
-                field_230706_i_.displayGuiScreen(returnTarget);
+            if(minecraft != null)
+                minecraft.displayGuiScreen(returnTarget);
         }
 
     }

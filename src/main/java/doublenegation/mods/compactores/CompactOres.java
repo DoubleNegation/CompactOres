@@ -128,7 +128,7 @@ public class CompactOres
 
     public static CompactOre getForResourceName(String resourceName) {
         for(CompactOre ore : compactOres) {
-            if(ore.func_176610_l().equals(resourceName)) {
+            if(ore.getString().equals(resourceName)) {
                 return ore;
             }
         }
