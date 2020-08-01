@@ -1,6 +1,5 @@
 {
   "block.compactores.compact_ore": "Kompaktes %s",
-  "block.compactores.missing_ore": "Fehlendes Erz - nicht passende Konfiguration!",
   "itemGroup.compactores": "Kompakte Erze",
 
   "gui.compactores.configupdate.title": "Compact Ores Konfigurationsupdate",
@@ -11,7 +10,5 @@
   "gui.compactores.configloadfailure.title": "Compact Ores Konfigurationsladefehler",
   "gui.compactores.configloadfailure.message": "Compact Ores konnte nicht richtig geladen werden, da beim laden der Konfiguration folgender Fehler aufgetreten ist:\n\n%s\n\nBitte behebe den Fehler um Compact Ores zu verwenden. Du kannst auch versuchen die Standardkonfiguration wiederherzustellen um den Fehler zu vermeiden, dabei gehen aber ALLE Änderungen die an der Konfiguration vorgenommen wurden VERLOREN.",
   "gui.compactores.configloadfailure.deny": "Spiel beenden",
-  "gui.compactores.configloadfailure.confirm": "Konfiguration zurücksetzen und Spiel beenden",
-
-  "chat.compactores.desync_warning": "§4§kiI|!'§r §6COMPACT ORES WARNUNG:§r Die Compact Ores Konfiguration auf diesem Server stimmt nicht mit der Client-Konfiguration überein. Dies kann zu ungewöhnlichem Verhalten und verschiedenen Problemen führen. Für die beste Spielerfahrung, passe deine Konfigurtion so an, dass sie mit der Serverkonfiguration übereinstimmt. §4§kiI|!'§r"
+  "gui.compactores.configloadfailure.confirm": "Konfiguration zurücksetzen und Spiel beenden"
 }

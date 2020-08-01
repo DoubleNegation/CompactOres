@@ -1,6 +1,5 @@
 {
   "block.compactores.compact_ore": "Компактный %s",
-  "block.compactores.missing_ore": "Пропущенная руда - конфигурация не совпадает!",
   "itemGroup.compactores": "Compact Ores",
 
   "gui.compactores.configupdate.title": "Обновление конфига Compact Ores",
@@ -11,7 +10,5 @@
   "gui.compactores.configloadfailure.title": "Ошибка загрузки конфигурации Compact Ores",
   "gui.compactores.configloadfailure.message": "Compact Ores не удалось правильно загрузить, так как при загрузке конфигурации произошла следующая ошибка:\n\n%s\n\nПожалуйста, исправьте ошибку для использования Compact Ores. Вы также можете сбросить конфигурацию до конфигурации по умолчанию, чтобы попытаться избежать ошибки, но это приведет к УДАЛЕНИЮ ВСЕХ ИЗМЕНЕНИЙ, внесенных в конфигурацию.",
   "gui.compactores.configloadfailure.deny": "Выйти из игры",
-  "gui.compactores.configloadfailure.confirm": "Сбросить конфигурацию и выйти из игры",
-  
-  "chat.compactores.desync_warning": "§4§kiI|!'§r §6ПРЕДУПРЕЖДЕНИЕ COMPACT ORES:§r The compact ores конфигурация этого сервера не соответствует конфигурации на стороне клиента. Compact ores конфигурация этого сервера не соответствует конфигурации на стороне клиента. Это приведет к странному поведению и различным проблемам. Пожалуйста, синхронизируйте свою Compact ores конфигурацию с конфигурацией сервера для получения наилучшего опыта. §4§kiI|!'§r"
+  "gui.compactores.configloadfailure.confirm": "Сбросить конфигурацию и выйти из игры"
 }
