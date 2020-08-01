@@ -86,16 +86,6 @@ minecraft {
 }
 
 repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
-    }
     /*maven {
         name = "CurseForge"
         url = "https://minecraft.curseforge.com/api/maven/"
@@ -125,11 +115,6 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
-    // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.3:api")
-    // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.3")
 
     /*// from CurseForge maven
     compile fg.deobf('ore-excavation:OreExcavation:1.7.151')*/
