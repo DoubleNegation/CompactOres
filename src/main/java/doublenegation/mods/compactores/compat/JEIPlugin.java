@@ -24,7 +24,7 @@ public class JEIPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        registration.useNbtForSubtypes(CompactOres.COMPACT_ORE_ITEM.get());
+        //registration.useNbtForSubtypes(CompactOres.COMPACT_ORE_ITEM.get());
     }
 
 }

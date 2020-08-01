@@ -1,23 +1,18 @@
 package doublenegation.mods.compactores;
 
 import doublenegation.mods.compactores.config.ConfigLoader;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.RegistryObject;
@@ -40,19 +35,8 @@ public class CompactOres
     public static final String MODID = "compactores";
     public static final Logger LOGGER = LogManager.getLogger();
 
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    private static final DeferredRegister<Item> ITEMS  = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    private static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, MODID);
     private static final DeferredRegister<Placement<?>> DECORATORS = DeferredRegister.create(ForgeRegistries.DECORATORS, MODID);
     private static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, MODID);
-
-    public static final RegistryObject<CompactOreBlock> COMPACT_ORE = BLOCKS.register("compact_ore", CompactOreBlock::new);
-
-    public static final RegistryObject<CompactOreBlockItem> COMPACT_ORE_ITEM = ITEMS.register(
-            "compact_ore", () -> new CompactOreBlockItem(COMPACT_ORE.get()));
-
-    public static final RegistryObject<TileEntityType<CompactOreTileEntity>> COMPACT_ORE_TE = TILE_ENTITIES.register(
-            "compact_ore", () -> TileEntityType.Builder.create(CompactOreTileEntity::new).build(null));
 
     public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
             "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig.codec));
@@ -69,23 +53,13 @@ public class CompactOres
     public CompactOres() {
         // Register all event listeners
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
-        //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onModConfigLoading);
         MinecraftForge.EVENT_BUS.addListener(this::startServer);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
-        DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
-            MinecraftForge.EVENT_BUS.addListener(this::onPlayerJoin);
-        });
 
         // Load the config
         compactOres = ConfigLoader.loadOres();
 
-        // Prepare the "missing" ore
-        compactOres.add(0, new CompactOre());
-
         // Register the DeferredRegisters to the event bus to handle the registry events
-        BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         DECORATORS.register(FMLJavaModLoadingContext.get().getModEventBus());
         FEATURES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
@@ -99,18 +73,6 @@ public class CompactOres
             CompactOreTexture.registerCacheInvalidator();
         });
 
-        // I have no idea when network code should be initialized, so I'll just do it here
-        OreListSync.init();
-
-        /*// Initialize ore excavation integration without risking classloading if ore excavation is not present
-        if(ModList.get().isLoaded("oreexcavation")) {
-            try {
-                Class<?> clazz = Class.forName("doublenegation.mods.compactores.compat.OreExcavationIntegration");
-                clazz.getDeclaredMethod("init").invoke(null);
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }*/
     }
 
     public static List<CompactOre> compactOres() {
@@ -137,7 +99,7 @@ public class CompactOres
 
     private static ItemGroup itemGroup = new ItemGroup(CompactOres.MODID) {
         @Override public ItemStack createIcon() {
-            return COMPACT_ORE_ITEM.get().getStackOfOre(compactOres.get(1), 1);
+            return new ItemStack(compactOres.size() > 0 ? compactOres.get(0).getCompactOreBlockItem() : Items.STONE, 1);
         }
     };
 
@@ -158,9 +120,8 @@ public class CompactOres
 
     // global block break listener that fires multiple events for the base block when a compact ore is broken
     public void onBlockBroken(final BlockEvent.BreakEvent breakEvent) {
-        BlockState state = breakEvent.getState();
-        if(!state.getBlock().equals(COMPACT_ORE.get())) return;
-        CompactOre ore = state.get(CompactOreBlock.ORE_PROPERTY);
+        if(!(breakEvent.getState().getBlock() instanceof CompactOreBlock)) return;
+        CompactOre ore = ((CompactOreBlock)breakEvent.getState().getBlock()).getOre();
         int numEvents = ore.getMinRolls() + breakEvent.getWorld().getRandom().nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
         for(int i = 0; i < numEvents; i++) {
             MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(
@@ -168,12 +129,6 @@ public class CompactOres
                     breakEvent.getPos(),
                     ore.getBaseBlock().getDefaultState(),
                     breakEvent.getPlayer()));
-        }
-    }
-
-    public void onPlayerJoin(final EntityJoinWorldEvent ev) {
-        if(ev.getEntity() instanceof ServerPlayerEntity) {
-            OreListSync.sendListToClient((ServerPlayerEntity) ev.getEntity(), compactOres());
         }
     }
 

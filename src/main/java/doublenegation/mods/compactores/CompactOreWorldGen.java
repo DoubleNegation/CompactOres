@@ -36,7 +36,6 @@ public class CompactOreWorldGen {
         Map<Float, Set<CompactOre>> normalGeneratingOresByProbability = new HashMap<>();
         Map<Float, Set<CompactOre>> lateGeneratingOresByProbability = new HashMap<>();
         for(CompactOre ore : ores) {
-            if(!ore.isReal()) continue; // prevent feature for dummy ore with 0% chance
             if(ore.getBaseBlock() == null) continue; // invalid block specified - can not generate that
             Map<Float, Set<CompactOre>> m = ore.isLateGeneration() ? lateGeneratingOresByProbability : normalGeneratingOresByProbability;
             if(!m.containsKey(ore.getSpawnProbability())) {
@@ -69,7 +68,7 @@ public class CompactOreWorldGen {
                 new MultiReplaceBlockConfig(
                         ores.stream().collect(Collectors.toMap(
                                 ore -> ore.getBaseBlock().getDefaultState(),
-                                ore -> CompactOres.COMPACT_ORE.get().getDefaultState().with(CompactOreBlock.ORE_PROPERTY, ore))))
+                                ore -> ore.getCompactOreBlock().getDefaultState())))
         ).withPlacement(new ConfiguredPlacement<>(
                 CompactOres.ALL_WITH_PROBABILITY.get(),
                 new ProbabilityConfig(prob)

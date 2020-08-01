@@ -109,7 +109,10 @@ public class ConfigLoader {
             }
 
             OreBuilderFactoryProvider obfp = new OreBuilderFactoryProvider();
-            List<CompactOre> ores = new ArrayList<>();
+            List<CompactOre> enabledOres = new ArrayList<>();
+            Set<String> activeOreMods = new HashSet<>(), inactiveOreMods = new HashSet<>();
+            int disabledOres = 0;
+            ModList modList = ModList.get();
             for (ResourceLocation orename : definitions.keySet()) {
                 OreConfigHolder och = new OreConfigHolder(orename, obfp);
                 och.setDefinitionConfig(definitions.get(orename));
@@ -119,30 +122,23 @@ public class ConfigLoader {
                     LOGGER.warn("No customization config specified for ore " + orename +
                             " - if you do not intend to customize the ore, it is recommended to specify an empty customization block anyways");
                 }
-                try {
-                    ores.add(och.buildOre());
-                } catch (RuntimeException ex) {
-                    LOGGER.warn("Failed to load ore " + orename + ": " + ex.getClass().getName() + ": " + ex.getMessage());
-                    ex.printStackTrace();
-                }
-            }
-
-            List<CompactOre> enabledOres = new ArrayList<>();
-            Set<String> activeOreMods = new HashSet<>(), inactiveOreMods = new HashSet<>();
-            ModList modList = ModList.get();
-            for (CompactOre ore : ores) {
-                String modid = ore.getBaseBlockRegistryName().getNamespace();
-                if (modList.isLoaded(modid)) {
-                    enabledOres.add(ore);
-                    activeOreMods.add(modid);
+                if(modList.isLoaded(orename.getNamespace())) {
+                    try {
+                        enabledOres.add(och.buildOre());
+                    } catch (RuntimeException ex) {
+                        LOGGER.warn("Failed to load ore " + orename + ": " + ex.getClass().getName() + ": " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                    activeOreMods.add(orename.getNamespace());
                 } else {
-                    inactiveOreMods.add(modid);
+                    disabledOres++;
+                    inactiveOreMods.add(orename.getNamespace());
                 }
             }
 
-            LOGGER.info("Successfully loaded " + ores.size() + " compact ores for a total of " + (activeOreMods.size() + inactiveOreMods.size()) + " mods.");
+            LOGGER.info("Successfully loaded " + (enabledOres.size() + disabledOres) + " compact ores for a total of " + (activeOreMods.size() + inactiveOreMods.size()) + " mods.");
             LOGGER.info("\t" + enabledOres.size() + " ores for " + activeOreMods.size() + " mods are active.");
-            LOGGER.info("\t" + (ores.size() - enabledOres.size()) + " ores for " + inactiveOreMods.size() + " mods will not be enabled because their mod is not loaded.");
+            LOGGER.info("\t" + disabledOres + " ores for " + inactiveOreMods.size() + " mods will not be enabled because their mod is not loaded.");
 
             enabledOres.sort(CompactOre::compareTo);
             enabledOres.forEach(o -> LOGGER.debug(o.getBaseBlockRegistryName()));
