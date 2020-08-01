@@ -1,7 +1,6 @@
 package doublenegation.mods.compactores.config;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
-import com.google.common.collect.ImmutableList;
 import doublenegation.mods.compactores.CompactOre;
 import doublenegation.mods.compactores.CompactOreTexture;
 import doublenegation.mods.compactores.Utils;
@@ -148,34 +147,7 @@ public class ConfigLoader {
         } catch(Exception e) {
 
             cfm.handleConfigLoadingFailed(e);
-            // return two dummy ores
-            // at least two ores are required for anything to function (block states require it)
-            final ResourceLocation stone = new ResourceLocation("minecraft", "stone");
-            final ResourceLocation dirt = new ResourceLocation("minecraft", "dirt");
-            final ResourceLocation stoneTex = new ResourceLocation("minecraft", "block/stone");
-            return new ArrayList<>(ImmutableList.of(
-                    new CompactOre(
-                            /*          baseBlockLoc */ stone,
-                            /*              minRolls */ 1,
-                            /*              maxRolls */ 1,
-                            /*        baseOreTexture */ stoneTex,
-                            /* baseUnderlyingTexture */ stoneTex,
-                            /*      spawnProbability */ 0,
-                            /*  maxOreLayerColorDiff */ -1,
-                            /*        lateGeneration */ false,
-                            /*       generateTexture */ true,
-                            /*           useGetDrops */ false),
-                    new CompactOre(
-                            /*          baseBlockLoc */ dirt,  // can't be the same block or world gen will crash
-                            /*              minRolls */ 1,
-                            /*              maxRolls */ 1,
-                            /*        baseOreTexture */ stoneTex,
-                            /* baseUnderlyingTexture */ stoneTex,
-                            /*      spawnProbability */ 0,
-                            /*  maxOreLayerColorDiff */ -1,
-                            /*        lateGeneration */ false,
-                            /*       generateTexture */ true,
-                            /*           useGetDrops */ false)));
+            return new ArrayList<>(0);
 
         }
 
