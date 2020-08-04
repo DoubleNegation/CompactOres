@@ -1,5 +1,0 @@
-[":platinum_ore"]
-rockTexture="minecraft:block/stone"
-oreTexture=":block/platinum_ore"
-lateGeneration=true
-

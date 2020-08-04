@@ -1,8 +1,0 @@
-[":block_ore_fluorite"]
-rockTexture = "minecraft:block/stone"
-oreTexture = ":block/block_ore_fluorite"
-
-[":block_ore_rhodonite"]
-rockTexture = "minecraft:block/end_stone"
-oreTexture = ":block/block_ore_rhodonite"
-

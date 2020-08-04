@@ -1,5 +1,0 @@
-[":crimson_iron_ore"]
-rockTexture = "minecraft:block/netherrack"
-oreTexture = ":block/crimson_iron_ore"
-maxOreLayerColorDiff = 30
-
