@@ -19,6 +19,7 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -54,6 +55,7 @@ public class CompactOres
         // Register all event listeners
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
         MinecraftForge.EVENT_BUS.addListener(this::startServer);
+        MinecraftForge.EVENT_BUS.addListener(this::onServerStaring);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
 
         // Load the config
@@ -116,6 +118,11 @@ public class CompactOres
     public void startServer(final FMLServerAboutToStartEvent event) {
         LOGGER.info("Attaching CompactOre resources to the Minecraft server");
         event.getServer().getResourcePacks().addPackFinder(resourcePack);
+    }
+
+    public void onServerStaring(final FMLServerStartingEvent event) {
+        // temporarily work around early datapack loading, TODO: use the hook from forge pr #6919 once it's merged
+        event.getServer().getCommandManager().handleCommand(event.getServer().getCommandSource(), "reload");
     }
 
     // global block break listener that fires multiple events for the base block when a compact ore is broken
