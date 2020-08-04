@@ -12,7 +12,7 @@ import net.minecraftforge.registries.GameData;
 
 public class CompactOreBlockItem extends BlockItem {
 
-    private CompactOre ore;
+    private final CompactOre ore;
 
     public CompactOreBlockItem(CompactOre ore) {
         super(ore.getCompactOreBlock(), new Item.Properties().group(CompactOres.getItemGroup()));
@@ -22,15 +22,17 @@ public class CompactOreBlockItem extends BlockItem {
     // make sure that there is an order to the ore list
     @Override
     public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        for(int i = 0; i < items.size(); i++) {
-            if(items.get(i).getItem() instanceof CompactOreBlockItem) {
-                if(ore.compareTo(((CompactOreBlockItem)items.get(i).getItem()).ore) < 0) {
-                    items.add(i, new ItemStack(this, 1));
-                    return;
+        if(isInGroup(group)) {
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getItem() instanceof CompactOreBlockItem) {
+                    if (ore.compareTo(((CompactOreBlockItem) items.get(i).getItem()).ore) < 0) {
+                        items.add(i, new ItemStack(this, 1));
+                        return;
+                    }
                 }
             }
+            items.add(new ItemStack(this, 1));
         }
-        items.add(new ItemStack(this, 1));
     }
 
     @Override
