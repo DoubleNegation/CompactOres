@@ -5,69 +5,49 @@ import doublenegation.mods.compactores.Utils;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class OreConfigHolder {
 
-    private ResourceLocation oreName;
-    private ConfigFile definitionConfig;
-    private ConfigFile customizationConfig;
-    private BiFunction<ConfigFile, ConfigFile, OreBuilder> oreBuilderProvider;
+    private final ResourceLocation oreName;
+    private ConfigFile config;
+    private final Function<ConfigFile, OreBuilder> oreBuilderProvider;
 
-    public OreConfigHolder(ResourceLocation oreName, BiFunction<ConfigFile, ConfigFile, OreBuilder> oreBuilderProvider) {
+    public OreConfigHolder(ResourceLocation oreName, Function<ConfigFile, OreBuilder> oreBuilderProvider) {
         this.oreName = oreName;
         this.oreBuilderProvider = oreBuilderProvider;
     }
 
-    public synchronized void setDefinitionConfig(ConfigFile definitionConfig) {
-        if(this.definitionConfig != null) {
-            throw new IllegalStateException("Definition config already set");
+    public synchronized void setConfig(ConfigFile config) {
+        if(this.config != null) {
+            throw new IllegalStateException("Config already set");
         }
-        if(definitionConfig == null) {
+        if(config == null) {
             throw new IllegalArgumentException("config is null!");
         }
-        if(definitionConfig.getType() != ConfigFile.Type.DEFINITION) {
-            throw new IllegalArgumentException("Config file is not a definition config");
-        }
-        if(!definitionConfig.containsOre(oreName)) {
+        if(!config.containsOre(oreName)) {
             throw new IllegalArgumentException("Config does not support ore (" + oreName + ")");
         }
-        this.definitionConfig = definitionConfig;
-    }
-
-    public synchronized void setCustomizationConfig(ConfigFile customizationConfig) {
-        if(this.customizationConfig != null) {
-            throw new IllegalStateException("Customization config already set");
-        }
-        if(customizationConfig == null) {
-            throw new IllegalArgumentException("config is null!");
-        }
-        if(customizationConfig.getType() != ConfigFile.Type.CUSTOMIZATION) {
-            throw new IllegalArgumentException("Config file is not a customization config");
-        }
-        if(!customizationConfig.containsOre(oreName)) {
-            throw new IllegalArgumentException("Config does not support ore (" + oreName + ")");
-        }
-        this.customizationConfig = customizationConfig;
+        this.config = config;
     }
 
     public CompactOre buildOre() {
-        if(definitionConfig == null) {
-            throw new IllegalStateException("Definition config is not set");
+        if(config == null) {
+            throw new IllegalStateException("Cconfig is not set");
         }
         // customization config has no required fields - can be null (global values will be inherited)
-        return oreBuilderProvider.apply(definitionConfig, customizationConfig)
+        return oreBuilderProvider.apply(config)
                 // definition
-                .generateTexture(definitionConfig.getOreConfigValue(oreName, "generateTexture"))
-                .maxOreLayerColorDiff(definitionConfig.getOreConfigValue(oreName, "maxOreLayerColorDiff"))
-                .oreTexture(Utils.parseResourceLocationExtra(definitionConfig.getOreConfigValue(oreName, "oreTexture"), definitionConfig.getFilenameNamespace()))
-                .rockTexture(Utils.parseResourceLocationExtra(definitionConfig.getOreConfigValue(oreName, "rockTexture"), definitionConfig.getFilenameNamespace()))
-                .lateGeneration(definitionConfig.getOreConfigValue(oreName, "lateGeneration"))
-                .useGetDrops(definitionConfig.getOreConfigValue(oreName, "useGetDrops"))
+                .generateTexture(config.getOreConfigValue(oreName, "generateTexture"))
+                .maxOreLayerColorDiff(config.getOreConfigValue(oreName, "maxOreLayerColorDiff"))
+                .oreTexture(Utils.parseResourceLocationExtra(config.getOreConfigValue(oreName, "oreTexture"), config.getFilenameNamespace()))
+                .rockTexture(Utils.parseResourceLocationExtra(config.getOreConfigValue(oreName, "rockTexture"), config.getFilenameNamespace()))
+                .lateGeneration(config.getOreConfigValue(oreName, "lateGeneration"))
+                .useGetDrops(config.getOreConfigValue(oreName, "useGetDrops"))
                 // customization
-                .minRolls((Integer) Optional.ofNullable(customizationConfig).map(c -> c.getOreConfigValue(oreName, "minRolls")).orElse(null))
-                .maxRolls((Integer) Optional.ofNullable(customizationConfig).map(c -> c.getOreConfigValue(oreName, "maxRolls")).orElse(null))
-                .spawnProbability(Optional.ofNullable(customizationConfig).map(c -> c.getOreConfigValue(oreName, "spawnProbability")).map(v -> (float)(double)v).orElse(null))
+                .minRolls((Integer) Optional.ofNullable(config).map(c -> c.getOreConfigValue(oreName, "minRolls")).orElse(null))
+                .maxRolls((Integer) Optional.ofNullable(config).map(c -> c.getOreConfigValue(oreName, "maxRolls")).orElse(null))
+                .spawnProbability(Optional.ofNullable(config).map(c -> c.getOreConfigValue(oreName, "spawnProbability")).map(v -> (float)(double)v).orElse(null))
                 // others
                 .baseBlock(oreName)
                 // build

@@ -4,3 +4,9 @@
 generateTexture = true
 # Default = 50
 maxOreLayerColorDiff = 50
+# Default = 3
+minRolls = 3
+# Default = 5
+maxRolls = 5
+# Default = 0.1
+spawnProbability = 0.1

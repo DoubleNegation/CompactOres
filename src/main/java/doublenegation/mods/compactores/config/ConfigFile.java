@@ -16,20 +16,18 @@ public class ConfigFile {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private Type type;
     private Config globalConfig;
     private Config localConfig;
-    private Map<ResourceLocation, Config> oreConfigs = new HashMap<>();
-    private String filenameNamespace;
+    private final Map<ResourceLocation, Config> oreConfigs = new HashMap<>();
+    private final String filenameNamespace;
 
-    public ConfigFile(FileConfig config, Type type) {
-        this.type = type;
+    public ConfigFile(FileConfig config) {
         String filename = config.getFile().getName();
         filenameNamespace = filename.substring(0, filename.length() - ".toml".length());
         for(String key : config.valueMap().keySet()) {
             Object o = config.get(key);
             if(!(o instanceof Config)) {
-                LOGGER.warn("Config file " + type.getDirname() + "/" + filename + " contains non-Config root key \"" + key + "\"");
+                LOGGER.warn("Config file " + filename + " contains non-Config root key \"" + key + "\"");
                 continue;
             }
             Config c = (Config)o;
@@ -42,14 +40,10 @@ public class ConfigFile {
                     ResourceLocation blockName = Utils.parseResourceLocationExtra(key, filenameNamespace);
                     oreConfigs.put(blockName, c);
                 } catch(ResourceLocationException e) {
-                    LOGGER.warn("Config file " + type.getDirname() + "/" + filename + " contains illegal resource name \"" + key + "\": " + e.getMessage());
+                    LOGGER.warn("Config file " + filename + " contains illegal resource name \"" + key + "\": " + e.getMessage());
                 }
             }
         }
-    }
-
-    public Type getType() {
-        return type;
     }
 
     public boolean hasGlobalConfig() {
@@ -82,17 +76,6 @@ public class ConfigFile {
 
     public String getFilenameNamespace() {
         return filenameNamespace;
-    }
-
-    public enum Type {
-        DEFINITION("definition"), CUSTOMIZATION("customization");
-        private final String dirname;
-        Type(String dirname) {
-            this.dirname = dirname;
-        }
-        public String getDirname() {
-            return dirname;
-        }
     }
 
 }

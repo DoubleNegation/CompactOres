@@ -1,8 +1,0 @@
-# If any of the global options are completely undefined, their defaults will be used
-["!global"]
-# Default = 3
-minRolls = 3
-# Default = 5
-maxRolls = 5
-# Default = 0.1
-spawnProbability = 0.1

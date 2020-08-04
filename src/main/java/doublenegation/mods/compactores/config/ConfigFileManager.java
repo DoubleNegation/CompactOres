@@ -4,7 +4,6 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
-import com.google.common.collect.ImmutableMap;
 import doublenegation.mods.compactores.CompactOres;
 import doublenegation.mods.compactores.SimpleChoiceMessageScreen;
 import net.minecraft.client.Minecraft;
@@ -26,7 +25,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
@@ -35,28 +33,21 @@ public class ConfigFileManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private Path configDir;
-    private Path definitionConfigDir;
-    private Path customizationConfigDir;
-    private Path versionConfig;
+    private final Path configDir;
+    private final Path versionConfig;
 
     private CommentedFileConfig configVersionConfig;
-    private Set<FileConfig> definitionConfigs = new HashSet<>();
-    private Set<FileConfig> customizationConfigs = new HashSet<>();
+    private final Set<FileConfig> configs = new HashSet<>();
 
     public ConfigFileManager() {
         // prepare directory structure
         Path forgeConfigDir = FMLPaths.CONFIGDIR.get();
         configDir = forgeConfigDir.resolve("compactores");
-        definitionConfigDir = configDir.resolve("definitions");
-        customizationConfigDir = configDir.resolve("customizations");
-        versionConfig = configDir.resolve("README.toml");
+        versionConfig = configDir.resolve("AAA_README.toml");
     }
 
     public void load() {
         requireDirectory(configDir);
-        requireDirectory(definitionConfigDir);
-        requireDirectory(customizationConfigDir);
 
         // do config version check
         boolean generateNewConfig = !Files.exists(versionConfig);
@@ -69,23 +60,20 @@ public class ConfigFileManager {
         }
         if(generateNewConfig) {
             LOGGER.info("No valid configuration was found - generating new default configuration...");
-            cleanOldConfigs(definitionConfigDir);
-            cleanOldConfigs(customizationConfigDir);
+            cleanOldConfigs(configDir);
             // note that the version config is written AFTER all other configs.
             // this means that if writing a config file fails, we won't have half of a
             // functional config that we'll load later.
             // this way we have either all or nothing.
-            exportDefaultConfig(ImmutableMap.of("definitions", definitionConfigDir, "customizations", customizationConfigDir));
+            exportDefaultConfig(configDir);
             writeVersionConfig(versionConfig);
             LOGGER.info("Configuration generated!");
         }
 
         // load configs
         LOGGER.info("Loading configuration files...");
-        loadConfigFiles(definitionConfigDir, definitionConfigs);
-        LOGGER.info("Loaded " + definitionConfigs.size() + " ore definition files");
-        loadConfigFiles(customizationConfigDir, customizationConfigs);
-        LOGGER.info("Loaded " + customizationConfigs.size() + " ore customization files");
+        loadConfigFiles(configDir, configs);
+        LOGGER.info("Loaded " + configs.size() + " ore customization files");
 
         LOGGER.info("Configuration files loaded successfully!");
     }
@@ -133,9 +121,8 @@ public class ConfigFileManager {
                 CompactOres.setLoadFinishScreen(new SimpleChoiceMessageScreen("gui." + CompactOres.MODID + ".configupdate", btn -> {
                     // update confirmed
                     LOGGER.info("Updating configuration...");
-                    cleanOldConfigs(definitionConfigDir);
-                    cleanOldConfigs(customizationConfigDir);
-                    exportDefaultConfig(ImmutableMap.of("definitions", definitionConfigDir, "customizations", customizationConfigDir));
+                    cleanOldConfigs(configDir);
+                    exportDefaultConfig(configDir);
                     // write new version config
                     configVersionConfig.close();
                     writeVersionConfig(versionConfig);
@@ -209,7 +196,7 @@ public class ConfigFileManager {
         }
     }
 
-    private void exportDefaultConfig(Map<String, Path> exports) {
+    private void exportDefaultConfig(Path exportDir) {
         // load modid list
         List<String> modids = new ArrayList<>();
         try (InputStream is = getClass().getResourceAsStream("/assets/compactores/default_config/modid_list.txt");
@@ -224,17 +211,14 @@ public class ConfigFileManager {
             throw new RuntimeException("Unable to initialize compactores configs: When preparing to export default configs: " + e.getClass().getName() + ": " + e.getMessage());
         }
         // copy configs
-        for (String k : exports.keySet()) {
-            Path targetDir = exports.get(k);
-            for (String modid : modids) {
-                Path targetFile = targetDir.resolve(modid + ".toml");
-                URL sourceFile = getClass().getResource("/assets/compactores/default_config/" + k + "/" + modid + ".toml");
-                LOGGER.debug("Exporting default config file: " + sourceFile.toExternalForm() + " -> " + targetFile.toAbsolutePath().toString());
-                try {
-                    Files.copy(sourceFile.openStream(), targetFile);
-                } catch (IOException e) {
-                    throw new RuntimeException("Unable to initialize compactores config: Failed to copy default configuration files: " + e.getClass().getName() + ": " + e.getMessage());
-                }
+        for (String modid : modids) {
+            Path targetFile = exportDir.resolve(modid + ".toml");
+            URL sourceFile = getClass().getResource("/assets/compactores/default_config/configs/" + modid + ".toml");
+            LOGGER.debug("Exporting default config file: " + sourceFile.toExternalForm() + " -> " + targetFile.toAbsolutePath().toString());
+            try {
+                Files.copy(sourceFile.openStream(), targetFile);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to initialize compactores config: Failed to copy default configuration files: " + e.getClass().getName() + ": " + e.getMessage());
             }
         }
     }
@@ -243,6 +227,7 @@ public class ConfigFileManager {
         try {
             Files.list(sourceDir)
                     .filter(p -> Files.isRegularFile(p))
+                    .filter(p -> !p.equals(versionConfig))
                     .filter(p -> p.toString().toLowerCase(Locale.ROOT).endsWith(".toml"))
                     .forEach(p -> {
                         FileConfig cfg = FileConfig.of(p);
@@ -254,12 +239,8 @@ public class ConfigFileManager {
         }
     }
 
-    public Set<FileConfig> getDefinitionConfigs() {
-        return Collections.unmodifiableSet(definitionConfigs);
-    }
-
-    public Set<FileConfig> getCustomizationConfigs() {
-        return Collections.unmodifiableSet(customizationConfigs);
+    public Set<FileConfig> getConfigs() {
+        return Collections.unmodifiableSet(configs);
     }
 
     public void handleConfigLoadingFailed(Exception e) {
@@ -271,9 +252,8 @@ public class ConfigFileManager {
                 Minecraft.getInstance().shutdown();
             }, btn -> {
                 LOGGER.info("Resetting configuration...");
-                cleanOldConfigs(definitionConfigDir);
-                cleanOldConfigs(customizationConfigDir);
-                exportDefaultConfig(ImmutableMap.of("definitions", definitionConfigDir, "customizations", customizationConfigDir));
+                cleanOldConfigs(configDir);
+                exportDefaultConfig(configDir);
                 configVersionConfig.close();
                 writeVersionConfig(versionConfig);
                 Minecraft.getInstance().shutdown();
