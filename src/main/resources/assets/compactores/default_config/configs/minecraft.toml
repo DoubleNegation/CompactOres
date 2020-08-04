@@ -26,3 +26,12 @@ oreTexture = ":block/emerald_ore"
 oreTexture = ":block/nether_quartz_ore"
 rockTexture = ":block/netherrack"
 lateGeneration = true
+
+[":nether_gold_ore"]
+oreTexture = ":block/nether_gold_ore"
+rockTexture = ":block/netherrack"
+lateGeneration = true
+
+[":gilded_blackstone"]
+oreTexture = ":block/gilded_blackstone"
+rockTexture = ":block/blackstone"
