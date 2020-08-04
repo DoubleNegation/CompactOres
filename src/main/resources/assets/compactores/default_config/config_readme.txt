@@ -11,44 +11,21 @@ Also remember that you need to restart the game for any configuration changes to
 Changing Ore Textures:
     Your best bet is to do this with a resource pack or a mod like ResourceLoader.
     You can manually overwrite all Compact Ore textures by adding new textures with these names:
-    assets/compactores/textures/<ore_resource_name>.png
-    You can find the value for <ore_resource_name> by looking at an ore block in-game and opening the F3 menu.
-    On the right side of the F3 menu, under the heading Targeted Block, there is a line starting with ore:
-    Replace <ore_resource_name> with the entire string after ore: . Example:
-    assets/compactores/textures/minecraft__coal_ore.png
+    assets/compactores/textures/<ore_block_name>.png
+    You can find the value for <ore_block_name> by looking at an ore block in-game and opening the F3 menu.
+    On the right side of the F3 menu, the first line under the heading "Targeted Block" shows the ore name
+    (which starts with compactores:compactore__)
+    Replace <ore_block_name> with the part of the ore name after compactores: . Example:
+    assets/compactores/textures/compactore__minecraft__coal_ore.png
     Note that the textures are not located in textures/block/ like most other textures, but are directly
     in the textures/ directory.
 
     If you have chosen this option and are comfortable in dealing with complex configurations, you may also want to
-    take a look at the section 'Defining Ores / Changing Ore Definitions' to disable the auto-generated texture
-    (speeds up resource loading and therefore startup time).
-
-    If you instead want to change the parameters which are used for the auto-generated textures, check out the
-    'Defining Ores / Changing Ore Definitions' section of this file.
+    keep reading to find out how to disable the auto-generated texture (speeds up resource loading and therefore
+    startup time).
 
 
-Customizing Rarity And Drops:
-    These parameters are specified in the so-called customization configs.
-    You can find them in the customizations directory.
-
-    In the customizations directory, there is a file called _global.toml.
-    In that file, there is a ["!global"] section. It contains settings that apply to all ores that no specific
-    settings are specified for. The defaults for these values are:
-    minRolls = 3                 # Every compact ore will drop at least 3x as much as a normal ore
-    maxRolls = 5                 # Every compact ore will drop at most 5x as much as a normal ore
-    spawnProbability = 0.1       # A newly generated ore will have a 10% chance of being a compact ore
-
-    You can also change these three values for specific ores. To do that, find the file which correlates with the
-    mod which adds the ore that you want to change (vanilla ores are in minecraft.toml).
-    In that file, you will be able to find a section corresponding to the ore that you want to change.
-    Simply place the options below the section headings (=lines with square brackets around them) to apply them.
-
-    You can also change options for all ores which have a section in a file by adding an additional ["!local"]
-    heading to the file and placing your options below that.
-
-
-Defining Ores / Changing Ore Definitions:
-    Ore definitions are stored in the definitions directory.
+Customizing, Adding and Removing Ores:
     By default, there is a _global.toml file for global settings as well as a further file for each supported mod,
     named after the modid of the mod.
     When editing these files, please note that there is an extended resource location syntax for specifying block and
@@ -57,17 +34,40 @@ Defining Ores / Changing Ore Definitions:
      -            :example_resource   =>     namespace = filename (without .toml)    name = example_resource
      - example_mod:example_resource   =>     namespace = example_mod                 name = example_resource
 
-    To define an ore, add a new top-level section to any file which is in the definitions directory, but not a
-    subdirectory of it.
+    To customize an ore, open the file corresponding to the ore's mod. The look for the section which has the
+    ore's block id as its heading. Change the options in the section to your liking.
+
+    To define an ore, add a new top-level section to any file which is in the config directory (except this one),
+    but not a subdirectory of it.
     The name of the section should be a resource location which resolves to the namespaced block id of the ore block.
 
     A local block can also be added to any file. The options in the local block will apply to all ores that are
     defined in the same file as the local block is located. The local block section's name is "!local".
 
-    When defining a new ore, please make sure to also add a corresponding section heading to the customization file
-    to make sure that local customization settings apply and to help users customize the ore more easily.
-
-    The following options exist for defining an ore:
+    The following options exist for defining and customizing an ore:
+     - minRolls
+           Type: integer
+           Required: no
+           Default: 3
+           Allowed scopes: global, local, ore
+           Function: The minimum drop multiplier when a compact ore is broken.
+                     A compact ore will drop at least minRolls times as much as the normal ore.
+     - maxRolls
+           Type: integer
+           Required: no
+           Default: 5
+           Allowed scopes: global, local, ore
+           Function: The maximum drop multiplier when a compact ore is broken.
+                     A compact ore will drop at most maxRolls times as much as the normal ore.
+     - spawnProbability
+           Type: decimal number
+           Required: no
+           Default: 0.1
+           Allowed scopes: global, local, ore
+           Function: The likelihood that any ore block which is generated will be a compact ore.
+                     Range: 0 (=0%) to 1 (=100%)
+                     CAUTION: The decimal point is required for this option to work. If you want to set it to 1,
+                              use 1.0 instead of just 1
      - generateTexture
            Type: boolean
            Required: no
@@ -76,7 +76,7 @@ Defining Ores / Changing Ore Definitions:
            Function: Can be used to disable texture generation for an ore to increase resource loading speed.
                      Use if the generated texture is overridden by a texture from a resource pack anyway.
      - maxOreLayerColorDiff
-           Type: int
+           Type: integer
            Required: no
            Default: 50
            Allowed scopes: global, local, ore
