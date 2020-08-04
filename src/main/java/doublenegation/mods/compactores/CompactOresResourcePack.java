@@ -41,7 +41,7 @@ public class CompactOresResourcePack implements IPackFinder {
             generatePack(packData);
             pack = new InMemoryResourcePack(PACK_NAME, packData, path -> {
                 if(!path.endsWith(".mcmeta")) return true;
-                return DistExecutor.runForDist(() -> () -> {
+                return DistExecutor.unsafeRunForDist(() -> () -> {
                     // Client only, server is always false
                     String[] split = path.split("/");
                     String filename = split[split.length - 1];

@@ -129,7 +129,7 @@ public class ConfigFileManager {
             LOGGER.warn("the Compact Ores default config. Please consider generating a new version");
             LOGGER.warn("of the default config by deleting the .minecraft/config/compactores directory");
             LOGGER.warn("config version: " + created + "      mod version: " + active);
-            DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
                 CompactOres.setLoadFinishScreen(new SimpleChoiceMessageScreen("gui." + CompactOres.MODID + ".configupdate", btn -> {
                     // update confirmed
                     LOGGER.info("Updating configuration...");
@@ -265,7 +265,7 @@ public class ConfigFileManager {
     public void handleConfigLoadingFailed(Exception e) {
         String msg = e.getClass().getName() + ": " + e.getMessage();
         LOGGER.error("Config loading failed: " + msg);
-        DistExecutor.runForDist(() -> () -> {
+        DistExecutor.unsafeRunForDist(() -> () -> {
             // client
             CompactOres.setLoadFinishScreen(new SimpleChoiceMessageScreen("gui." + CompactOres.MODID + ".configloadfailure", btn-> {
                 Minecraft.getInstance().shutdown();

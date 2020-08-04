@@ -67,7 +67,7 @@ public class CompactOres
         // the resource pack will be created only when the game attempts to load it for the first time
         // this makes sure that it will exist by the time the resources are loaded for the first time on the client
         resourcePack = new CompactOresResourcePack(CompactOres::compactOres);
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             LOGGER.info("Attaching CompactOre resources to the Minecraft client");
             Minecraft.getInstance().getResourcePackList().addPackFinder(resourcePack);
             CompactOreTexture.registerCacheInvalidator();
