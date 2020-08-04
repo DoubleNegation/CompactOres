@@ -4,11 +4,11 @@
 
   "gui.compactores.configupdate.title": "Обновление конфига Compact Ores",
   "gui.compactores.configupdate.message": "Compact Ores успешно был обновлён до версии %s!\n\nВпрочем, активная конфигурация была создана в версии %s. Это означает, что конфигурация может вести себя не так, как предполагалось, из-за изменений в моде. Если вы используете стандартную конфигурацию, то она позволяет использовать функцию автообновления. Если вы используете кастомную конфигурацию, то, пожалуйста, обновляйте игру вручную (если требуется).\n\nВНИМАНИЕ: Если вы используете функцию автообновления, все изменения, которые вы сделаете в конфигурации могут исчезнуть.\n\nВы хотите обновить вашу конфигурацию Compact Ores (требует перезагрузку игры)?",
-  "gui.compactores.configupdate.confirm": "Обновить и выйти из игры",
-  "gui.compactores.configupdate.deny": "Оставить старую версию",
+  "gui.compactores.configupdate.option1": "Обновить и выйти из игры",
+  "gui.compactores.configupdate.option2": "Оставить старую версию",
 
   "gui.compactores.configloadfailure.title": "Ошибка загрузки конфигурации Compact Ores",
   "gui.compactores.configloadfailure.message": "Compact Ores не удалось правильно загрузить, так как при загрузке конфигурации произошла следующая ошибка:\n\n%s\n\nПожалуйста, исправьте ошибку для использования Compact Ores. Вы также можете сбросить конфигурацию до конфигурации по умолчанию, чтобы попытаться избежать ошибки, но это приведет к УДАЛЕНИЮ ВСЕХ ИЗМЕНЕНИЙ, внесенных в конфигурацию.",
-  "gui.compactores.configloadfailure.deny": "Выйти из игры",
-  "gui.compactores.configloadfailure.confirm": "Сбросить конфигурацию и выйти из игры"
+  "gui.compactores.configloadfailure.option1": "Выйти из игры",
+  "gui.compactores.configloadfailure.option2": "Сбросить конфигурацию и выйти из игры"
 }

@@ -6,6 +6,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.google.common.collect.ImmutableMap;
 import doublenegation.mods.compactores.CompactOres;
+import doublenegation.mods.compactores.SimpleChoiceMessageScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -129,7 +130,7 @@ public class ConfigFileManager {
             LOGGER.warn("of the default config by deleting the .minecraft/config/compactores directory");
             LOGGER.warn("config version: " + created + "      mod version: " + active);
             DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-                CompactOres.setLoadFinishScreen(new ConfigUpdateConfirmScreen(created, active, btn -> {
+                CompactOres.setLoadFinishScreen(new SimpleChoiceMessageScreen("gui." + CompactOres.MODID + ".configupdate", btn -> {
                     // update confirmed
                     LOGGER.info("Updating configuration...");
                     cleanOldConfigs(definitionConfigDir);
@@ -149,9 +150,9 @@ public class ConfigFileManager {
                     versions.set("updated", active);
                     configVersionConfig.save();
                     if(Minecraft.getInstance().currentScreen != null) {
-                        ((ConfigUpdateConfirmScreen) Minecraft.getInstance().currentScreen).returnToPreviousScreen();
+                        ((SimpleChoiceMessageScreen) Minecraft.getInstance().currentScreen).returnToPreviousScreen();
                     }
-                }));
+                }, active, created));
             });
 
         }
@@ -266,7 +267,7 @@ public class ConfigFileManager {
         LOGGER.error("Config loading failed: " + msg);
         DistExecutor.runForDist(() -> () -> {
             // client
-            CompactOres.setLoadFinishScreen(new ConfigLoadingFailedScreen(msg, btn -> {
+            CompactOres.setLoadFinishScreen(new SimpleChoiceMessageScreen("gui." + CompactOres.MODID + ".configloadfailure", btn-> {
                 Minecraft.getInstance().shutdown();
             }, btn -> {
                 LOGGER.info("Resetting configuration...");
@@ -276,7 +277,7 @@ public class ConfigFileManager {
                 configVersionConfig.close();
                 writeVersionConfig(versionConfig);
                 Minecraft.getInstance().shutdown();
-            }));
+            }, msg));
             return null;
         }, () -> () -> {
             // server
