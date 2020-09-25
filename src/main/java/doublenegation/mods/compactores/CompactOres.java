@@ -18,6 +18,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -53,6 +54,7 @@ public class CompactOres
 
     public CompactOres() {
         // Register all event listeners
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.addListener(this::startServer);
         MinecraftForge.EVENT_BUS.addListener(this::onServerStaring);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
@@ -105,8 +107,13 @@ public class CompactOres
         }
     };
     
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        // prepare world gen features. registered later in #onBiomeLoading
+        CompactOreWorldGen.init(compactOres);
+    }
+    
     private void onBiomeLoading(final BiomeLoadingEvent event) {
-        CompactOreWorldGen.init(compactOres, event);
+        CompactOreWorldGen.register(event);
     }
 
     public static ItemGroup getItemGroup() {

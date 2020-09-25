@@ -29,9 +29,11 @@ import java.util.stream.Stream;
 public class CompactOreWorldGen {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    
+    private static Set<ConfiguredFeature<?, ?>> normalFeatures = new HashSet<>();
+    private static Set<ConfiguredFeature<?, ?>> lateFeatures = new HashSet<>();
 
-    public static void init(List<CompactOre> ores, BiomeLoadingEvent event) {
-        // TODO: this probably runs too early to reliably work with other mod's ores. find a better way.
+    public static void init(List<CompactOre> ores) {
         Map<Float, Set<CompactOre>> normalGeneratingOresByProbability = new HashMap<>();
         Map<Float, Set<CompactOre>> lateGeneratingOresByProbability = new HashMap<>();
         for(CompactOre ore : ores) {
@@ -42,20 +44,21 @@ public class CompactOreWorldGen {
             }
             m.get(ore.getSpawnProbability()).add(ore);
         }
-        Set<ConfiguredFeature<?, ?>> normalGeneratingConfiguredFeatures =
-                normalGeneratingOresByProbability.keySet().stream()
+        normalFeatures = normalGeneratingOresByProbability.keySet().stream()
                         .map(prob -> make(prob, normalGeneratingOresByProbability.get(prob)))
                         .collect(Collectors.toSet());
-        Set<ConfiguredFeature<?, ?>> lateGeneratingConfiguredFeatures =
-                lateGeneratingOresByProbability.keySet().stream()
+        lateFeatures = lateGeneratingOresByProbability.keySet().stream()
                         .map(prob -> make(prob, lateGeneratingOresByProbability.get(prob)))
                         .collect(Collectors.toSet());
-        LOGGER.info("Registering " + (normalGeneratingConfiguredFeatures.size() + lateGeneratingConfiguredFeatures.size()) +
-                " world generation features (" + normalGeneratingConfiguredFeatures.size() + " normal, " +
-                lateGeneratingConfiguredFeatures.size() + " late)");
+        LOGGER.info("Registering " + (normalFeatures.size() + lateFeatures.size()) + " world generation features (" + 
+                normalFeatures.size() + " normal, " + lateFeatures.size() + " late)");
+    }
+    
+    public static void register(BiomeLoadingEvent event) {
+        // TODO: this probably runs too early to reliably work with other mod's ores. find a better way.
         BiomeGenerationSettingsBuilder generation = event.getGeneration();
-        normalGeneratingConfiguredFeatures.forEach(feature -> generation.withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature));
-        lateGeneratingConfiguredFeatures.forEach(feature -> generation.withFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, feature));
+        normalFeatures.forEach(feature -> generation.withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature));
+        lateFeatures.forEach(feature -> generation.withFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, feature));
     }
 
     private static ConfiguredFeature<?, ?> make(float prob, Set<CompactOre> ores) {
