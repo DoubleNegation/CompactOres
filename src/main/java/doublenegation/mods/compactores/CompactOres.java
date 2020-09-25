@@ -13,11 +13,11 @@ import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -39,11 +39,11 @@ public class CompactOres
     private static final DeferredRegister<Placement<?>> DECORATORS = DeferredRegister.create(ForgeRegistries.DECORATORS, MODID);
     private static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, MODID);
 
-//    public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
-//            "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig.codec));
-//
-//    public static final RegistryObject<CompactOreWorldGen.MultiReplaceBlockFeature> MULTI_REPLACE_BLOCK = FEATURES.register(
-//            "multi_replace_block", () -> new CompactOreWorldGen.MultiReplaceBlockFeature(CompactOreWorldGen.MultiReplaceBlockConfig.codec));
+    public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
+            "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig.codec));
+
+    public static final RegistryObject<CompactOreWorldGen.MultiReplaceBlockFeature> MULTI_REPLACE_BLOCK = FEATURES.register(
+            "multi_replace_block", () -> new CompactOreWorldGen.MultiReplaceBlockFeature(CompactOreWorldGen.MultiReplaceBlockConfig.codec));
 
     private static List<CompactOre> compactOres;
     private static CompactOresResourcePack resourcePack;
@@ -53,10 +53,10 @@ public class CompactOres
 
     public CompactOres() {
         // Register all event listeners
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::loadComplete);
         MinecraftForge.EVENT_BUS.addListener(this::startServer);
         MinecraftForge.EVENT_BUS.addListener(this::onServerStaring);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
+        MinecraftForge.EVENT_BUS.addListener(this::onBiomeLoading);
 
         // Load the config
         compactOres = ConfigLoader.loadOres();
@@ -104,13 +104,9 @@ public class CompactOres
             return new ItemStack(compactOres.size() > 0 ? compactOres.get(0).getCompactOreBlockItem() : Items.STONE, 1);
         }
     };
-
-    private void loadComplete(final FMLLoadCompleteEvent event) {
-        // This initialization needs to happen as late as possible to make sure that compact ores are generated
-        // after all other ores.
-        // also should be synchronized since world gen registration is currently a mess
-        //DeferredWorkQueue.runLater(() -> CompactOreWorldGen.init(compactOres));
-        //CompactOreWorldGen.init(compactOres);
+    
+    private void onBiomeLoading(final BiomeLoadingEvent event) {
+        CompactOreWorldGen.init(compactOres, event);
     }
 
     public static ItemGroup getItemGroup() {
