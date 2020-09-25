@@ -39,11 +39,11 @@ public class CompactOres
     private static final DeferredRegister<Placement<?>> DECORATORS = DeferredRegister.create(ForgeRegistries.DECORATORS, MODID);
     private static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, MODID);
 
-    public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
-            "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig.codec));
-
-    public static final RegistryObject<CompactOreWorldGen.MultiReplaceBlockFeature> MULTI_REPLACE_BLOCK = FEATURES.register(
-            "multi_replace_block", () -> new CompactOreWorldGen.MultiReplaceBlockFeature(CompactOreWorldGen.MultiReplaceBlockConfig.codec));
+//    public static final RegistryObject<CompactOreWorldGen.AllWithProbability> ALL_WITH_PROBABILITY = DECORATORS.register(
+//            "all_with_probability", () -> new CompactOreWorldGen.AllWithProbability(CompactOreWorldGen.ProbabilityConfig.codec));
+//
+//    public static final RegistryObject<CompactOreWorldGen.MultiReplaceBlockFeature> MULTI_REPLACE_BLOCK = FEATURES.register(
+//            "multi_replace_block", () -> new CompactOreWorldGen.MultiReplaceBlockFeature(CompactOreWorldGen.MultiReplaceBlockConfig.codec));
 
     private static List<CompactOre> compactOres;
     private static CompactOresResourcePack resourcePack;
@@ -107,8 +107,10 @@ public class CompactOres
 
     private void loadComplete(final FMLLoadCompleteEvent event) {
         // This initialization needs to happen as late as possible to make sure that compact ores are generated
-        // after all other ores
-        CompactOreWorldGen.init(compactOres);
+        // after all other ores.
+        // also should be synchronized since world gen registration is currently a mess
+        //DeferredWorkQueue.runLater(() -> CompactOreWorldGen.init(compactOres));
+        //CompactOreWorldGen.init(compactOres);
     }
 
     public static ItemGroup getItemGroup() {
