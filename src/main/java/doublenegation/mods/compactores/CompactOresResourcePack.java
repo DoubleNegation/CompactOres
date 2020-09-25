@@ -230,7 +230,7 @@ public class CompactOresResourcePack implements IPackFinder {
     }
 
     @Override
-    public void func_230230_a_(Consumer<ResourcePackInfo> packConsumer, ResourcePackInfo.IFactory iFactory) {
+    public void findPacks(Consumer<ResourcePackInfo> packConsumer, ResourcePackInfo.IFactory iFactory) {
         packConsumer.accept(ResourcePackInfo.createResourcePack(PACK_NAME, true/*isAlwaysEnabled*/,
                 this::getPack, iFactory, ResourcePackInfo.Priority.BOTTOM, IPackNameDecorator.BUILTIN));
     }
