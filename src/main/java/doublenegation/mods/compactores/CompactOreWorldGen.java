@@ -55,7 +55,6 @@ public class CompactOreWorldGen {
     }
     
     public static void register(BiomeLoadingEvent event) {
-        // TODO: this probably runs too early to reliably work with other mod's ores. find a better way.
         BiomeGenerationSettingsBuilder generation = event.getGeneration();
         normalFeatures.forEach(feature -> generation.withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature));
         lateFeatures.forEach(feature -> generation.withFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, feature));

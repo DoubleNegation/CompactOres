@@ -15,6 +15,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
@@ -58,7 +59,8 @@ public class CompactOres
         MinecraftForge.EVENT_BUS.addListener(this::startServer);
         MinecraftForge.EVENT_BUS.addListener(this::onServerStaring);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
-        MinecraftForge.EVENT_BUS.addListener(this::onBiomeLoading);
+        // lowest priority means the features are registered and therefore generated after (most) others of the stage
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::onBiomeLoading);
 
         // Load the config
         compactOres = ConfigLoader.loadOres();
