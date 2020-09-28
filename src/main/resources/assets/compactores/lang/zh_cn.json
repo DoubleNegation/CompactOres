@@ -1,0 +1,17 @@
+{
+  "block.compactores.compact_ore": "密集 %s",
+  "block.compactores.missing_ore": "错误的矿石-配置文件匹配错误",
+  "itemGroup.compactores": "密集矿石",
+
+  "gui.compactores.configupdate.title": "密集矿石配置更新",
+  "gui.compactores.configupdate.message": "密集矿石已经成功升级到 %s 版本!\n\n但是，配置文件是在 %s 版本下创建的，可能因为mod更新发生错误。 如果你在用一直未修改过的配置文件，建议您点击下面的自动更新。如果你在用修改过的配置文件，请手动更新。（如果有需要的话）.\n\n警告：如果你用了自动更新功能，你原先的所有配置会丢失！\n\n你要更新配置文件吗？（游戏需要重启）",
+  "gui.compactores.configupdate.confirm": "更新并退出游戏",
+  "gui.compactores.configupdate.deny": "不更新",
+
+  "gui.compactores.configloadfailure.title": "密集矿石加载配置出错",
+  "gui.compactores.configloadfailure.message": "密集矿石加载错误因为以下配置有错误：\n\n%s\n\n请修复好再使用此mod。你可以将配置文件重置来避免报错，但你做的所有改动都会丢失。",
+  "gui.compactores.configloadfailure.deny": "退出游戏",
+  "gui.compactores.configloadfailure.confirm": "重置配置文件并退出游戏",
+
+  "chat.compactores.desync_warning": "§4§kiI|!'§r §6密集矿石警告：§r 服务器的配置文件和客户端的配置文件不匹配，可能会造成错误，请同步配置文件来获得最好的游玩效果。§4§kiI|!'§r"
+}
