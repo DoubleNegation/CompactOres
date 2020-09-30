@@ -2,7 +2,6 @@ package doublenegation.mods.compactores;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import cpw.mods.modlauncher.api.INameMappingService;
 import doublenegation.mods.compactores.config.ConfigLoader;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -183,12 +182,12 @@ public class CompactOres
     
     private <T> Tag<T> findBaseTag(ITag<T> tag) {
         try {
-            Class<?> namedTagClass = Class.forName(ObfuscationReflectionHelper.remapName(INameMappingService.Domain.CLASS, "net.minecraft.tags.TagRegistry$NamedTag"));
+            @SuppressWarnings("unchecked")
+            Class<ITag<?>> namedTagClass = (Class<ITag<?>>) Class.forName("net.minecraft.tags.TagRegistry$NamedTag");
             if (tag instanceof Tag) {
                 return (Tag<T>) tag;
             } else if (namedTagClass.isAssignableFrom(tag.getClass())) {
-                @SuppressWarnings("unchecked")
-                Field f = ObfuscationReflectionHelper.findField((Class<ITag<?>>)namedTagClass, "field_232942_b_");
+                Field f = ObfuscationReflectionHelper.findField(namedTagClass, "field_232942_b_");
                 f.setAccessible(true);
                 @SuppressWarnings("unchecked")
                 ITag<T> baseTag = (ITag<T>)f.get(tag);
