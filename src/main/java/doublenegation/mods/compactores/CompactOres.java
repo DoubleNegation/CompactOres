@@ -1,17 +1,30 @@
 package doublenegation.mods.compactores;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import cpw.mods.modlauncher.api.INameMappingService;
 import doublenegation.mods.compactores.config.ConfigLoader;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.MainMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.LootTableManager;
+import net.minecraft.loot.RandomValueRange;
+import net.minecraft.loot.TableLootEntry;
+import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -19,18 +32,25 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Mod(CompactOres.MODID)
 public class CompactOres
@@ -57,7 +77,6 @@ public class CompactOres
         // Register all event listeners
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.addListener(this::startServer);
-        MinecraftForge.EVENT_BUS.addListener(this::onServerStaring);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
         // lowest priority means the features are registered and therefore generated after (most) others of the stage
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::onBiomeLoading);
@@ -125,11 +144,63 @@ public class CompactOres
     public void startServer(final FMLServerAboutToStartEvent event) {
         LOGGER.info("Attaching CompactOre resources to the Minecraft server");
         event.getServer().getResourcePacks().addPackFinder(resourcePack);
+        // when the server initially starts, it has already loaded its data.
+        // the additional compact ores data is injected here.
+        // if the server's resources are reloaded, the loot tables and tags are then re-obtained from the CompactOresResourcePack.
+        LOGGER.info("Injecting post-first-load CompactOres server data into the Minecraft Server");
+        LootTableManager ltm = event.getServer().getDataPackRegistries().getLootTableManager();
+        Map<ResourceLocation, LootTable> tables = 
+                ltm.getLootTableKeys().stream().collect(Collectors.toMap(Function.identity(), ltm::getLootTableFromLocation));
+        for(CompactOre ore : compactOres) {
+            LootTable table = LootTable.builder().addLootPool(
+                    LootPool.builder()
+                            .rolls(new RandomValueRange(ore.getMinRolls(), ore.getMaxRolls()))
+                            .addEntry(TableLootEntry.builder(ore.getBaseBlock().getLootTable()))).build();
+            tables.put(ore.getCompactOreBlock().getLootTable(), table);
+        }
+        ObfuscationReflectionHelper.setPrivateValue(LootTableManager.class, ltm, ImmutableMap.copyOf(tables), "field_186527_c");
+        // tags
+        // (accesstransformers are involved here)
+        Tag<Block> oreBlockTag = findBaseTag(ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation("forge", "ores")));
+        if(oreBlockTag != null) {
+            Set<Block> oreBlockTagContents = new HashSet<>(oreBlockTag.contents);
+            oreBlockTagContents.addAll(compactOres.stream().map(CompactOre::getCompactOreBlock).collect(Collectors.toSet()));
+            oreBlockTag.contents = oreBlockTagContents;
+            List<Block> oreBlockTagImmutableContents = new ArrayList<>(oreBlockTag.immutableContents);
+            oreBlockTagImmutableContents.addAll(compactOres.stream().map(CompactOre::getCompactOreBlock).collect(Collectors.toList()));
+            oreBlockTag.immutableContents = ImmutableList.copyOf(oreBlockTagImmutableContents);
+        }
+        Tag<Item> oreItemTag = findBaseTag(ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, new ResourceLocation("forge", "ores")));
+        if(oreItemTag != null) {
+            Set<Item> oreItemTagContents = new HashSet<>(oreItemTag.contents);
+            oreItemTagContents.addAll(compactOres.stream().map(CompactOre::getCompactOreBlockItem).collect(Collectors.toSet()));
+            oreItemTag.contents = oreItemTagContents;
+            List<Item> oreItemTagImmutableContents = new ArrayList<>(oreItemTag.immutableContents);
+            oreItemTagImmutableContents.addAll(compactOres.stream().map(CompactOre::getCompactOreBlockItem).collect(Collectors.toList()));
+            oreItemTag.immutableContents = ImmutableList.copyOf(oreItemTagImmutableContents);
+        }
     }
-
-    public void onServerStaring(final FMLServerStartingEvent event) {
-        // temporarily work around early datapack loading, TODO: use the hook from forge pr #6919 once it's merged
-        event.getServer().getCommandManager().handleCommand(event.getServer().getCommandSource(), "reload");
+    
+    private <T> Tag<T> findBaseTag(ITag<T> tag) {
+        try {
+            Class<?> namedTagClass = Class.forName(ObfuscationReflectionHelper.remapName(INameMappingService.Domain.CLASS, "net.minecraft.tags.TagRegistry$NamedTag"));
+            if (tag instanceof Tag) {
+                return (Tag<T>) tag;
+            } else if (namedTagClass.isAssignableFrom(tag.getClass())) {
+                @SuppressWarnings("unchecked")
+                Field f = ObfuscationReflectionHelper.findField((Class<ITag<?>>)namedTagClass, "field_232942_b_");
+                f.setAccessible(true);
+                @SuppressWarnings("unchecked")
+                ITag<T> baseTag = (ITag<T>)f.get(tag);
+                return findBaseTag(baseTag);
+            } else {
+                LOGGER.error("Unexpected problem encountered when trying to inject compact ore tags - compact ores wil not be tagged");
+                return null;
+            }
+        } catch(ClassNotFoundException | ObfuscationReflectionHelper.UnableToFindFieldException | IllegalAccessException | ClassCastException e) {
+            LOGGER.error("Unexpected problem encountered when trying to inject compact ore tags - compact ores will not be tagged", e);
+            return null;
+        }
     }
 
     // global block break listener that fires multiple events for the base block when a compact ore is broken
