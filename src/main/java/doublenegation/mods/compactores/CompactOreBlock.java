@@ -27,7 +27,8 @@ public class CompactOreBlock extends Block {
     private final CompactOre ore;
 
     public CompactOreBlock(CompactOre ore) {
-        super(Properties.create(Material.ROCK).sound(SoundType.STONE));
+        // all vanilla ores (except gilded blackstone) have hardness and resistance values of 3, so use 3 here too
+        super(Properties.create(Material.ROCK).sound(SoundType.STONE).setRequiresTool().hardnessAndResistance(3, 3));
         this.ore = ore;
     }
 
