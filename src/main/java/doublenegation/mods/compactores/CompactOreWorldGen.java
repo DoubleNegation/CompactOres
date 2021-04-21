@@ -113,7 +113,7 @@ public class CompactOreWorldGen {
             super(arg0);
         }
         @Override
-        public boolean func_241855_a(ISeedReader worldIn, ChunkGenerator generator, Random rand, BlockPos pos, MultiReplaceBlockConfig config) {
+        public boolean generate(ISeedReader worldIn, ChunkGenerator generator, Random rand, BlockPos pos, MultiReplaceBlockConfig config) {
             if(config.replacementMap.containsKey(worldIn.getBlockState(pos))) {
                 worldIn.setBlockState(pos, config.replacementMap.get(worldIn.getBlockState(pos)), 2);
             }
