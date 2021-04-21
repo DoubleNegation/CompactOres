@@ -45,7 +45,8 @@ public class CompactOresResourcePack implements IPackFinder {
                     // Client only, server is always false
                     String[] split = path.split("/");
                     String filename = split[split.length - 1];
-                    String name = filename.substring(0, filename.length() - ".png.mcmeta".length());
+                    if(!filename.startsWith("compactore__") || !filename.endsWith(".png.mcmeta")) return false;
+                    String name = filename.substring("compactore__".length(), filename.length() - ".png.mcmeta".length());
                     CompactOre ore = CompactOres.getForResourceName(name);
                     if(ore == null) return false;
                     ResourceLocation baseTexture = ore.getBaseUnderlyingTexture();
