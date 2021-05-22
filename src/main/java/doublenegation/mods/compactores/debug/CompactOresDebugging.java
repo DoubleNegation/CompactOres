@@ -42,6 +42,7 @@ public class CompactOresDebugging {
             }
         });
         WorldGenDebugging.init();
+        TextureDumper.init();
     }
     
     static Flags getFlags(MinecraftServer server) {

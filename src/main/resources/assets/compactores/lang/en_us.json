@@ -18,5 +18,7 @@
   "commands.compactores.debugworldgen.success": "Enabled Compact Ores World Gen Debugging in %s. The game may hang for a while while all currently loaded chunks are cleared.",
   "commands.compactores.debugworldgen.success.fallback_world_name": "this world",
   "commands.compactores.debugworldgen.failure": "World Gen Debugging is already enabled in this world.",
-  "commands.compactores.genoretester.success": "Successfully generated an ore tester with %d ores."
+  "commands.compactores.genoretester.success": "Successfully generated an ore tester with %d ores.",
+  "commands.compactores.texturedump.failure": "Failed to write texture dump.",
+  "commands.compactores.texturedump.success": "Saved texture dump to %s"
 }

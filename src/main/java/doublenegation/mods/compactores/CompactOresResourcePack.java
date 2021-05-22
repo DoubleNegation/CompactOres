@@ -35,7 +35,7 @@ public class CompactOresResourcePack implements IPackFinder {
         this.oreListSupplier = oreListSupplier;
     }
 
-    private synchronized InMemoryResourcePack getPack() {
+    synchronized InMemoryResourcePack getPack() {
         if(pack == null) {
             packData = new HashMap<>();
             generatePack(packData);
@@ -172,9 +172,6 @@ public class CompactOresResourcePack implements IPackFinder {
                     BufferedImage img = info.generateImage();
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(img, "PNG", baos);
-                    if ("true".equals(System.getProperty("compactores.dumpTextures"))) {
-                        TextureDumper.dump(ore, baos.toByteArray());
-                    }
                     return baos.toByteArray();
                 } catch (Exception e) {
                     LOGGER.error("Failed to generate compact ore texture for " + ore.name().getPath() + ", using missing texture instead.");

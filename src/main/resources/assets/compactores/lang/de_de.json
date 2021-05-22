@@ -18,5 +18,7 @@
   "commands.compactores.debugworldgen.success": "Compact Ores Welt-Generator Debugging wurde in %s aktiviert. Das Spiel könnte eine Weile hängen, während alle aktuell geladenen Chunks geleert werden.",
   "commands.compactores.debugworldgen.success.fallback_world_name": "dieser Welt",
   "commands.compactores.debugworldgen.failure": "Welt-Generator Debugging ist in dieser Welt bereits aktiviert.",
-  "commands.compactores.genoretester.success": "Ein Erz-tester mit %d Erzen wurde erfolgreich generiert."
+  "commands.compactores.genoretester.success": "Ein Erz-tester mit %d Erzen wurde erfolgreich generiert.",
+  "commands.compactores.texturedump.failure": "Texturen-dump konnte nicht erstellt werden.",
+  "commands.compactores.texturedump.success": "Texturen-dump wurde nach %s gespeichert."
 }

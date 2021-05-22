@@ -17,6 +17,7 @@ import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTableManager;
 import net.minecraft.loot.RandomValueRange;
 import net.minecraft.loot.TableLootEntry;
+import net.minecraft.resources.ResourcePackType;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
@@ -41,6 +42,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -123,6 +126,10 @@ public class CompactOres
             }
         }
         return null;
+    }
+    
+    public static InputStream getGeneratedResource(ResourcePackType type, ResourceLocation location) throws IOException {
+        return resourcePack.getPack().getResourceStream(type, location);
     }
 
     private static ItemGroup itemGroup = new ItemGroup(CompactOres.MODID) {
