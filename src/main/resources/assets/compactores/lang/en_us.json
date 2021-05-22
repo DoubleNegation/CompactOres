@@ -17,5 +17,6 @@
   "commands.compactores.debugging_disabled": "Compact Ores debugging is currently disabled. Enable it to use this command.",
   "commands.compactores.debugworldgen.success": "Enabled Compact Ores World Gen Debugging in %s. The game may hang for a while while all currently loaded chunks are cleared.",
   "commands.compactores.debugworldgen.success.fallback_world_name": "this world",
-  "commands.compactores.debugworldgen.failure": "World Gen Debugging is already enabled in this world."
+  "commands.compactores.debugworldgen.failure": "World Gen Debugging is already enabled in this world.",
+  "commands.compactores.genoretester.success": "Successfully generated an ore tester with %d ores."
 }

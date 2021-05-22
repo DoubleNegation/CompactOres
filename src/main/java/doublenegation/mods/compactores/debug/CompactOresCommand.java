@@ -8,7 +8,8 @@ public class CompactOresCommand {
     public static void register(RegisterCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("compactores")
                 .requires(source -> source.hasPermissionLevel(4))
-                .then(Commands.literal("debugworldgen").executes(WorldGenDebugging::executeCommand)));
+                .then(Commands.literal("debugworldgen").executes(WorldGenDebugging::executeCommand))
+                .then(Commands.literal("genoretester").executes(OreTester::executeCommand)));
     }
     
 }
