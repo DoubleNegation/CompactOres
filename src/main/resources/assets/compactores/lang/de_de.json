@@ -10,5 +10,12 @@
   "gui.compactores.configloadfailure.title": "Compact Ores Konfigurationsladefehler",
   "gui.compactores.configloadfailure.message": "Compact Ores konnte nicht richtig geladen werden, da beim laden der Konfiguration folgender Fehler aufgetreten ist:\n\n%s\n\nBitte behebe den Fehler um Compact Ores zu verwenden. Du kannst auch versuchen die Standardkonfiguration wiederherzustellen um den Fehler zu vermeiden, dabei gehen aber ALLE Änderungen die an der Konfiguration vorgenommen wurden VERLOREN.",
   "gui.compactores.configloadfailure.option1": "Spiel beenden",
-  "gui.compactores.configloadfailure.option2": "Konfiguration zurücksetzen und Spiel beenden"
+  "gui.compactores.configloadfailure.option2": "Konfiguration zurücksetzen und Spiel beenden",
+  
+  "chat.compactores.debugging_enabled": "Compact Ores debugging ist momentan aktiviert. Es wird empfohlen, diese Option in Produktivumgebungen zu deaktivieren.",
+
+  "commands.compactores.debugging_disabled": "Compact Ores debugging ist momentan deaktiviert. Aktiviere es, um diesen Befehl zu verwenden.",
+  "commands.compactores.debugworldgen.success": "Compact Ores Welt-Generator Debugging wurde in %s aktiviert. Das Spiel könnte eine Weile hängen, während alle aktuell geladenen Chunks geleert werden.",
+  "commands.compactores.debugworldgen.success.fallback_world_name": "dieser Welt",
+  "commands.compactores.debugworldgen.failure": "Welt-Generator Debugging ist in dieser Welt bereits aktiviert."
 }

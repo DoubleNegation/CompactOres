@@ -10,5 +10,12 @@
   "gui.compactores.configloadfailure.title": "Compact Ores config loading error",
   "gui.compactores.configloadfailure.message": "Compact Ores could not load properly because the following error occurred while loading the configuration:\n\n%s\n\nPlease fix the error to use Compact Ores. You can also reset your config to the default config to attempt avoiding the error, but this will DELETE ALL CHANGES that you have made to the configuration.",
   "gui.compactores.configloadfailure.option1": "Quit game",
-  "gui.compactores.configloadfailure.option2": "Reset config and quit game"
+  "gui.compactores.configloadfailure.option2": "Reset config and quit game",
+  
+  "chat.compactores.debugging_enabled": "Compact Ores debugging is currently enabled. Consider disabling it for production use.",
+  
+  "commands.compactores.debugging_disabled": "Compact Ores debugging is currently disabled. Enable it to use this command.",
+  "commands.compactores.debugworldgen.success": "Enabled Compact Ores World Gen Debugging in %s. The game may hang for a while while all currently loaded chunks are cleared.",
+  "commands.compactores.debugworldgen.success.fallback_world_name": "this world",
+  "commands.compactores.debugworldgen.failure": "World Gen Debugging is already enabled in this world."
 }

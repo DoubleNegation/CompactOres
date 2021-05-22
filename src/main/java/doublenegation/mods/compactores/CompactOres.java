@@ -3,6 +3,7 @@ package doublenegation.mods.compactores;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import doublenegation.mods.compactores.config.ConfigLoader;
+import doublenegation.mods.compactores.debug.CompactOresDebugging;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.MainMenuScreen;
@@ -96,6 +97,9 @@ public class CompactOres
             Minecraft.getInstance().getResourcePackList().addPackFinder(resourcePack);
             CompactOreTexture.registerCacheInvalidator();
         });
+        
+        // initialize debugging (if it is enabled)
+        CompactOresDebugging.init();
 
     }
 

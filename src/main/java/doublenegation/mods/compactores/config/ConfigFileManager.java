@@ -6,6 +6,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import doublenegation.mods.compactores.CompactOres;
 import doublenegation.mods.compactores.SimpleChoiceMessageScreen;
+import doublenegation.mods.compactores.debug.CompactOresDebugging;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -141,7 +142,10 @@ public class ConfigFileManager {
                     }
                 }, active, created));
             });
-
+        }
+        // check if debugging should be enabled, and if so, enable it
+        if(versions.contains("debug") && versions.get("debug") instanceof Boolean && (Boolean)versions.get("debug")) {
+            CompactOresDebugging.enable();
         }
         return true;
     }
@@ -177,6 +181,7 @@ public class ConfigFileManager {
         String version = getOwnVersion();
         versionCfg.add("created", version);
         versionCfg.add("updated", version);
+        versionCfg.add("debug", false);
         configVersionConfig.add("versions", versionCfg);
         configVersionConfig.setComment("versions", getConfigReadme());
         configVersionConfig.save();
