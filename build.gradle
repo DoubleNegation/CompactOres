@@ -86,10 +86,6 @@ minecraft {
 }
 
 repositories {
-    /*maven {
-        name = "CurseForge"
-        url = "https://minecraft.curseforge.com/api/maven/"
-    }*/
 }
 
 dependencies {
@@ -116,9 +112,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    /*// from CurseForge maven
-    compile fg.deobf('ore-excavation:OreExcavation:1.7.151')*/
-
+    compileOnly files('libs/fake-oreexcavation-api.jar')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -134,6 +128,7 @@ jar {
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+    exclude('fake-oreexcavation-api.jar')
 }
 
 // Example configuration to allow publishing using the maven-publish task

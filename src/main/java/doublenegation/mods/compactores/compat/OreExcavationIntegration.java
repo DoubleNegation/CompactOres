@@ -1,9 +1,7 @@
 package doublenegation.mods.compactores.compat;
 
-/*import doublenegation.mods.compactores.CompactOre;
-import doublenegation.mods.compactores.CompactOreBlock;
+import doublenegation.mods.compactores.CompactOre;
 import doublenegation.mods.compactores.CompactOres;
-import net.minecraft.block.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import oreexcavation.events.EventExcavate;
 import oreexcavation.groups.BlockEntry;
@@ -11,11 +9,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.List;*/
+import java.util.List;
 
 public class OreExcavationIntegration {
 
-    /*private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static void init() {
         MinecraftForge.EVENT_BUS.addListener(OreExcavationIntegration::onExcavate);
@@ -39,19 +37,9 @@ public class OreExcavationIntegration {
             CompactOre ore = CompactOres.getFor(entry.idName);
             if(ore != null) {
                 LOGGER.info("Excavating " + entry.idName + ", which has a compact variant - adding compact variant to block group");
-                excavateEvent.getAgent().blockGroup.add(new StrictlyMatchingBlockStateEntry(CompactOres.COMPACT_ORE.get().getDefaultState().with(CompactOreBlock.ORE_PROPERTY, ore)));
+                excavateEvent.getAgent().blockGroup.add(new BlockEntry(ore.getCompactOreBlock().getDefaultState()));
             }
         }
     }
-
-    public static class StrictlyMatchingBlockStateEntry extends BlockEntry {
-        public StrictlyMatchingBlockStateEntry(BlockState state) {
-            super(state);
-        }
-        @Override
-        public boolean checkMatch(BlockState blockState) {
-            return this.state.equals(blockState);
-        }
-    }*/
 
 }

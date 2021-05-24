@@ -31,6 +31,7 @@ import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -100,6 +101,16 @@ public class CompactOres
             Minecraft.getInstance().getResourcePackList().addPackFinder(resourcePack);
             CompactOreTexture.registerCacheInvalidator();
         });
+
+        // Initialize ore excavation integration without risking classloading if ore excavation is not present
+        if(ModList.get().isLoaded("oreexcavation")) {
+            try {
+                Class<?> clazz = Class.forName("doublenegation.mods.compactores.compat.OreExcavationIntegration");
+                clazz.getDeclaredMethod("init").invoke(null);
+            } catch(Exception e) {
+                LOGGER.error("Failed to initialize OreExcavation integration", e);
+            }
+        }
         
         // initialize debugging (if it is enabled)
         CompactOresDebugging.init();
