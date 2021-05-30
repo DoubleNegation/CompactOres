@@ -46,6 +46,7 @@ public class TextureDumper {
             if((dumpsDir.exists() && !dumpsDir.isDirectory()) || (!dumpsDir.exists() && !dumpsDir.mkdir())) {
                 error();
                 LOGGER.error("Can not write texture dump: failed to create compactores_texture_dumps directory");
+                return;
             }
             long subdirId = System.currentTimeMillis();
             File subdir;
@@ -55,6 +56,7 @@ public class TextureDumper {
             if(!subdir.mkdir()) {
                 error();
                 LOGGER.error("Can not write texture dump: failed to create directory for dump");
+                return;
             }
             try {
                 int read;
