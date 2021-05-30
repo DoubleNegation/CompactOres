@@ -136,6 +136,8 @@ public class ConfigFileManager {
                     LOGGER.info("Not updating configuration - writing new version to version config...");
                     // update "updated" field in version config (so we don't ask again until next update)
                     versions.set("updated", active);
+                    // update the config readme to match the current version of Compact Ores
+                    configVersionConfig.setComment("versions", getConfigReadme(active));
                     configVersionConfig.save();
                     if(Minecraft.getInstance().currentScreen != null) {
                         ((SimpleChoiceMessageScreen) Minecraft.getInstance().currentScreen).returnToPreviousScreen();
@@ -183,16 +185,16 @@ public class ConfigFileManager {
         versionCfg.add("updated", version);
         versionCfg.add("debug", false);
         configVersionConfig.add("versions", versionCfg);
-        configVersionConfig.setComment("versions", getConfigReadme());
+        configVersionConfig.setComment("versions", getConfigReadme(version));
         configVersionConfig.save();
     }
 
-    private String getConfigReadme() {
+    private String getConfigReadme(String version) {
         try(InputStream is = getClass().getResourceAsStream("/assets/compactores/default_config/config_readme.txt");
             Scanner sc = new Scanner(is)) {
             StringBuilder sb = new StringBuilder();
             while(sc.hasNextLine()) {
-                sb.append(sc.nextLine());
+                sb.append(sc.nextLine().replace("${VERSION}", version));
                 sb.append('\n');
             }
             return sb.toString();

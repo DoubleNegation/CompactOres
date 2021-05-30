@@ -1,5 +1,6 @@
 Welcome to the Compact Ores configuration!
 
+This is the configuration readme for Compact Ores version ${VERSION}.
 You will find instructions for performing several tasks in the Compact Ores configuration here.
 
 These instructions refer to the default configuration. If the configuration was changed by someone,
