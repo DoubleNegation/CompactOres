@@ -43,6 +43,7 @@ public class OreConfigHolder {
                 .oreTexture(Utils.parseResourceLocationExtra(config.getOreConfigValue(oreName, "oreTexture"), config.getFilenameNamespace()))
                 .rockTexture(Utils.parseResourceLocationExtra(config.getOreConfigValue(oreName, "rockTexture"), config.getFilenameNamespace()))
                 .lateGeneration(config.getOreConfigValue(oreName, "lateGeneration"))
+                .experimentalGenerator(config.getOreConfigValue(oreName, "experimentalGenerator"))
                 .useGetDrops(config.getOreConfigValue(oreName, "useGetDrops"))
                 // customization
                 .minRolls((Integer) Optional.ofNullable(config).map(c -> c.getOreConfigValue(oreName, "minRolls")).orElse(null))

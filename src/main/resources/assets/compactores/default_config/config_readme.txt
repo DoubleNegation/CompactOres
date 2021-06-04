@@ -83,6 +83,16 @@ Customizing, Adding and Removing Ores:
            Allowed scopes: global, local, ore
            Function: Relevant for texture generation. Changes the threshold for differentiating between
                      rock-pixels and ore-pixels on the ore texture.
+     - experimentalGenerator
+            Type: boolean
+            Required: no
+            Default: false
+            Allowed scopes: global, local, ore
+            Function: Enables a new, experimental method of generating compact ores. This fixes the long-standing
+                      problem that some ores near chunk boundaries can't generate as compact ores. This also allows
+                      for and automatically enables retrogen of compact ores.
+                      Warning: Switching from the stable to the experimental generator in an existing world will
+                      lead to generation of additional compact ores in all already generated chunks.
      - oreTexture
            Type: resource location
            Required: no

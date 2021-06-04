@@ -4,6 +4,8 @@
 generateTexture = true
 # Default = 50
 maxOreLayerColorDiff = 50
+# Default = false
+experimentalGenerator = false
 # Default = 3
 minRolls = 3
 # Default = 5

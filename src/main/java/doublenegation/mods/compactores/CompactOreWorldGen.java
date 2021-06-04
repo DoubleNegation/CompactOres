@@ -36,8 +36,13 @@ public class CompactOreWorldGen {
     public static void init(List<CompactOre> ores) {
         Map<Float, Set<CompactOre>> normalGeneratingOresByProbability = new HashMap<>();
         Map<Float, Set<CompactOre>> lateGeneratingOresByProbability = new HashMap<>();
+        Set<CompactOre> experimentalGeneratorOres = new HashSet<>();
         for(CompactOre ore : ores) {
             if(ore.getBaseBlock() == null) continue; // invalid block specified - can not generate that
+            if(ore.isExperimentalGenerator()) {
+                experimentalGeneratorOres.add(ore);
+                continue;
+            }
             Map<Float, Set<CompactOre>> m = ore.isLateGeneration() ? lateGeneratingOresByProbability : normalGeneratingOresByProbability;
             if(!m.containsKey(ore.getSpawnProbability())) {
                 m.put(ore.getSpawnProbability(), new HashSet<>());
@@ -50,6 +55,9 @@ public class CompactOreWorldGen {
         lateFeatures = lateGeneratingOresByProbability.keySet().stream()
                         .map(prob -> make(prob, lateGeneratingOresByProbability.get(prob)))
                         .collect(Collectors.toSet());
+        if(experimentalGeneratorOres.size() > 0) {
+            ExperimentalWorldGen.init(experimentalGeneratorOres);
+        }
         LOGGER.info("Registering " + (normalFeatures.size() + lateFeatures.size()) + " world generation features (" + 
                 normalFeatures.size() + " normal, " + lateFeatures.size() + " late)");
     }

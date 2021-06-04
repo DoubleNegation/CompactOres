@@ -8,6 +8,7 @@ public class OreBuilder {
     // GLOBAL DEFINITION DEFAULTS
     private static boolean G_GENERATETEXTURE = true;
     private static int G_MAXORELAYERCOLORDIFF = 50;
+    private static boolean G_EXPERIMENTALGENERATOR = false;
 
     // GLOBAL CUSTOMIZATION DEFAULTS
     private static int G_MINROLLS = 3;
@@ -20,6 +21,7 @@ public class OreBuilder {
     private ResourceLocation L_ORETEXTURE;
     private ResourceLocation L_ROCKTEXTURE;
     private boolean L_LATEGENRATION; /* default value = false, defined in Factory */
+    private Boolean L_EXPERIMENTALGENERATOR;
     private boolean L_USEGETDROPS; /* default value = false, defined in Factory */
 
     // LOCAL CUSTOMIZATION DEFAULTS
@@ -33,6 +35,7 @@ public class OreBuilder {
     private ResourceLocation oreTexture;
     private ResourceLocation rockTexture;
     private Boolean lateGeneration;
+    private Boolean experimentalGenerator;
     private Boolean useGetDrops;
 
     // private customization values
@@ -51,6 +54,10 @@ public class OreBuilder {
         G_MAXORELAYERCOLORDIFF = value;
     }
 
+    public static void setGlobalExperimentalGenerator(boolean value) {
+        G_EXPERIMENTALGENERATOR = value;
+    }
+    
     public static void setGlobalMinRolls(int value) {
         G_MINROLLS = value;
     }
@@ -68,6 +75,7 @@ public class OreBuilder {
                        ResourceLocation localOreTexture,
                        ResourceLocation localRockTexture,
                        Boolean localLateGeneration,
+                       Boolean experimentalGenerator,
                        Boolean localUseGetDrops,
                        Integer localMinRolls,
                        Integer localMaxRolls,
@@ -77,6 +85,7 @@ public class OreBuilder {
         L_ORETEXTURE = localOreTexture;
         L_ROCKTEXTURE = localRockTexture;
         L_LATEGENRATION = localLateGeneration;
+        L_EXPERIMENTALGENERATOR = experimentalGenerator;
         L_USEGETDROPS = localUseGetDrops;
         L_MINROLLS = localMinRolls;
         L_MAXROLLS = localMaxRolls;
@@ -105,6 +114,11 @@ public class OreBuilder {
 
     public OreBuilder lateGeneration(Boolean lateGeneration) {
         this.lateGeneration = lateGeneration;
+        return this;
+    }
+    
+    public OreBuilder experimentalGenerator(Boolean experimentalGenerator) {
+        this.experimentalGenerator = experimentalGenerator;
         return this;
     }
 
@@ -143,13 +157,15 @@ public class OreBuilder {
         ResourceLocation actualOreTexture = oreTexture != null ? oreTexture : L_ORETEXTURE;
         ResourceLocation actualRockTexture = rockTexture != null ? rockTexture : L_ROCKTEXTURE;
         boolean actualLateGeneration = lateGeneration != null ? lateGeneration : L_LATEGENRATION;
+        boolean actualExperimentalGenerator = experimentalGenerator != null ? experimentalGenerator : L_EXPERIMENTALGENERATOR != null ? L_EXPERIMENTALGENERATOR : G_EXPERIMENTALGENERATOR;
         boolean actualUseGetDrops = useGetDrops != null ? useGetDrops : L_USEGETDROPS;
         // customization
         int actualMinRolls = minRolls != null ? minRolls : L_MINROLLS != null ? L_MINROLLS : G_MINROLLS;
         int actualMaxRolls = maxRolls != null ? maxRolls : L_MAXROLLS != null ? L_MAXROLLS : G_MAXROLLS;
         float actualSpawnProbability = spawnProbability != null ? spawnProbability : L_SPAWNPROBABILITY != null ? L_SPAWNPROBABILITY : G_SPAWNPROBABILITY;
         return new CompactOre(baseBlock, actualMinRolls, actualMaxRolls, actualOreTexture, actualRockTexture,
-                actualSpawnProbability, actualMaxOreLayerColorDiff, actualLateGeneration, actualGenerateTexture, actualUseGetDrops);
+                actualSpawnProbability, actualMaxOreLayerColorDiff, actualLateGeneration, actualExperimentalGenerator,
+                actualGenerateTexture, actualUseGetDrops);
     }
 
     public static class Factory {
@@ -160,6 +176,7 @@ public class OreBuilder {
         private ResourceLocation oreTexture;
         private ResourceLocation rockTexture;
         private boolean lateGeneration = false;
+        private Boolean experimentalGenerator;
         private boolean useGetDrops = false;
 
         // customization
@@ -199,6 +216,11 @@ public class OreBuilder {
             }
             return this;
         }
+        
+        public Factory experimentalGenerator(Boolean experimentalGenerator) {
+            this.experimentalGenerator = experimentalGenerator;
+            return this;
+        }
 
         public Factory useGetDrops(Boolean useGetDrops) {
             if(useGetDrops != null) {
@@ -228,6 +250,7 @@ public class OreBuilder {
                     oreTexture,
                     rockTexture,
                     lateGeneration,
+                    experimentalGenerator,
                     useGetDrops,
                     minRolls,
                     maxRolls,
