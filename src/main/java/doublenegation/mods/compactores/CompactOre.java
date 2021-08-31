@@ -149,7 +149,6 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     @Override
     public int compareTo(CompactOre compactOre) {
-        ModList.get().getMods();
         if(this.baseBlockLoc.getNamespace().equals(compactOre.baseBlockLoc.getNamespace())) {
             return this.baseBlockLoc.getPath().compareTo(compactOre.baseBlockLoc.getPath());
         } else {
