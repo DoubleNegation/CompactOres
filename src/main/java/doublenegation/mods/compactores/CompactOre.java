@@ -41,6 +41,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
     private int maxOreLayerColorDiff;
     private boolean lateGeneration;
     private boolean experimentalGenerator;
+    private boolean retrogen;
     private boolean generateTexture;
     private boolean useGetDrops;
     private RegistryObject<CompactOreBlock> compactOreBlock;
@@ -49,7 +50,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
                       ResourceLocation baseUnderlyingTexture, float spawnProbability, int maxOreLayerColorDiff,
-                      boolean lateGeneration, boolean experimentalGenerator, boolean generateTexture,
+                      boolean lateGeneration, boolean experimentalGenerator, boolean retrogen, boolean generateTexture,
                       boolean useGetDrops) {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
@@ -60,6 +61,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
         this.maxOreLayerColorDiff = maxOreLayerColorDiff;
         this.lateGeneration = lateGeneration;
         this.experimentalGenerator = experimentalGenerator;
+        this.retrogen = retrogen;
         this.generateTexture = generateTexture;
         this.useGetDrops = useGetDrops;
         String resourceName = baseBlockLoc.toString().replace(":", "__");
@@ -119,6 +121,10 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
 
     public boolean isExperimentalGenerator() {
         return experimentalGenerator;
+    }
+
+    public boolean isRetrogen() {
+        return retrogen;
     }
 
     public boolean isGenerateTexture() {

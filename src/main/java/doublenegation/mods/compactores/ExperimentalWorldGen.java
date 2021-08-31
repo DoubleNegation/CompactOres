@@ -25,10 +25,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ExperimentalWorldGen {
@@ -48,11 +51,12 @@ public class ExperimentalWorldGen {
         ServerWorld world = (ServerWorld) event.getWorld();
         WorldGenData data = world.getSavedData().getOrCreate(WorldGenData::new, WorldGenData.NAME);
         ChunkPos chunkPos = event.getChunk().getPos();
-        Set<ResourceLocation> newOres = data.missingOresForChunk(chunkPos);
+        Set<ResourceLocation> newOres = data.missingOresForChunk(chunkPos,
+                loc -> Optional.ofNullable(CompactOres.getFor(loc)).map(CompactOre::isRetrogen).orElse(false));
         if(!newOres.isEmpty()) {
             world.getServer().enqueue(new TickDelayedTask(0, () -> {
                 generate(world, chunkPos, newOres);
-                data.generated(chunkPos);
+                data.generated(chunkPos, newOres);
             }));
         }
     }
@@ -156,16 +160,35 @@ public class ExperimentalWorldGen {
             compound.put("chunks", chunks);
             return compound;
         }
-        
-        private Set<ResourceLocation> missingOresForChunk(ChunkPos pos) {
+
+        private Set<ResourceLocation> missingOresForChunk(ChunkPos pos, Predicate<ResourceLocation> retrogenAllowed) {
             if(!chunkStates.containsKey(pos)) return setups.get(currentSetup);
             if(chunkStates.get(pos) == currentSetup) return Collections.emptySet();
             Set<ResourceLocation> setup = setups.get(chunkStates.get(pos));
-            return setups.get(currentSetup).stream().filter(ore -> !setup.contains(ore)).collect(Collectors.toSet());
+            return setups.get(currentSetup).stream().filter(ore -> !setup.contains(ore)).filter(retrogenAllowed).collect(Collectors.toSet());
         }
-        
-        private void generated(ChunkPos pos) {
-            chunkStates.put(pos, currentSetup);
+
+        private void generated(ChunkPos pos, Set<ResourceLocation> newOres) {
+            Set<ResourceLocation> currentOresInChunk = chunkStates.containsKey(pos) ? new HashSet<>(setups.get(chunkStates.get(pos))) : new HashSet<>();
+            currentOresInChunk.addAll(newOres);
+            // find the setup which now matches the chunk, or create a new one if necessary
+            if(currentOresInChunk.equals(setups.get(currentSetup))) {
+                chunkStates.put(pos, currentSetup);
+            } else {
+                boolean found = false;
+                for(int i = 0; i < setups.size(); i++) {
+                    if(currentOresInChunk.equals(setups.get(i))) {
+                        chunkStates.put(pos, i);
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found) {
+                    int setup = setups.size();
+                    setups.add(setup, currentOresInChunk);
+                    chunkStates.put(pos, setup);
+                }
+            }
             markDirty();
         }
         
