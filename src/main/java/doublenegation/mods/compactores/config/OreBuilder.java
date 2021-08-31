@@ -21,10 +21,10 @@ public class OreBuilder {
     private Integer L_MAXORELAYERCOLORDIFF;
     private ResourceLocation L_ORETEXTURE;
     private ResourceLocation L_ROCKTEXTURE;
-    private boolean L_LATEGENRATION; /* default value = false, defined in Factory */
+    private boolean L_LATEGENRATION; /* default value = false, defined in Builder */
     private Boolean L_EXPERIMENTALGENERATOR;
     private Boolean L_RETROGEN;
-    private boolean L_USEGETDROPS; /* default value = false, defined in Factory */
+    private boolean L_USEGETDROPS; /* default value = false, defined in Builder */
 
     // LOCAL CUSTOMIZATION DEFAULTS
     private Integer L_MINROLLS;
@@ -183,7 +183,7 @@ public class OreBuilder {
                 actualRetrogen, actualGenerateTexture, actualUseGetDrops);
     }
 
-    public static class Factory {
+    public static class Builder {
 
         // definition
         private Boolean generateTexture;
@@ -200,72 +200,72 @@ public class OreBuilder {
         private Integer maxRolls;
         private Float spawnProbability;
 
-        private Factory() {}
+        private Builder() {}
 
-        public static Factory createFactory() {
-            return new Factory();
+        public static Builder create() {
+            return new Builder();
         }
 
-        public Factory generateTexture(Boolean generateTexture) {
+        public Builder generateTexture(Boolean generateTexture) {
             this.generateTexture = generateTexture;
             return this;
         }
 
-        public Factory maxOreLayerColorDiff(Integer maxOreLayerColorDiff) {
+        public Builder maxOreLayerColorDiff(Integer maxOreLayerColorDiff) {
             this.maxOreLayerColorDiff = maxOreLayerColorDiff;
             return this;
         }
 
-        public Factory oreTexture(ResourceLocation oreTexture) {
+        public Builder oreTexture(ResourceLocation oreTexture) {
             this.oreTexture = oreTexture;
             return this;
         }
 
-        public Factory rockTexture(ResourceLocation rockTexture) {
+        public Builder rockTexture(ResourceLocation rockTexture) {
             this.rockTexture = rockTexture;
             return this;
         }
 
-        public Factory lateGeneration(Boolean lateGeneration) {
+        public Builder lateGeneration(Boolean lateGeneration) {
             if(lateGeneration != null) {
                 this.lateGeneration = lateGeneration;
             }
             return this;
         }
         
-        public Factory experimentalGenerator(Boolean experimentalGenerator) {
+        public Builder experimentalGenerator(Boolean experimentalGenerator) {
             this.experimentalGenerator = experimentalGenerator;
             return this;
         }
 
-        public Factory retrogen(Boolean retrogen) {
+        public Builder retrogen(Boolean retrogen) {
             this.retrogen = retrogen;
             return this;
         }
 
-        public Factory useGetDrops(Boolean useGetDrops) {
+        public Builder useGetDrops(Boolean useGetDrops) {
             if(useGetDrops != null) {
                 this.useGetDrops = useGetDrops;
             }
             return this;
         }
 
-        public Factory minRolls(Integer minRolls) {
+        public Builder minRolls(Integer minRolls) {
             this.minRolls = minRolls;
             return this;
         }
 
-        public Factory maxRolls(Integer maxRolls) {
+        public Builder maxRolls(Integer maxRolls) {
             this.maxRolls = maxRolls;
             return this;
         }
 
-        public Factory spawnProbability(Float spawnProbability) {
+        public Builder spawnProbability(Float spawnProbability) {
             this.spawnProbability = spawnProbability;
             return this;
         }
 
-        public OreBuilder create() {
+        public OreBuilder build() {
             return new OreBuilder(generateTexture,
                     maxOreLayerColorDiff,
                     oreTexture,

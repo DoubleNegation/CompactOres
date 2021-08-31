@@ -78,13 +78,13 @@ public class ConfigLoader {
                         .filter(v -> v instanceof Number).ifPresent(v -> OreBuilder.setGlobalSpawnProbability((float) (double) v));
             }
 
-            OreBuilderFactoryProvider obfp = new OreBuilderFactoryProvider();
+            OreBuilderBuilderProvider obbp = new OreBuilderBuilderProvider();
             List<CompactOre> enabledOres = new ArrayList<>();
             Set<String> activeOreMods = new HashSet<>(), inactiveOreMods = new HashSet<>();
             int disabledOres = 0;
             ModList modList = ModList.get();
             for (ResourceLocation orename : configs.keySet()) {
-                OreConfigHolder och = new OreConfigHolder(orename, obfp);
+                OreConfigHolder och = new OreConfigHolder(orename, obbp);
                 och.setConfig(configs.get(orename));
                 if(modList.isLoaded(orename.getNamespace())) {
                     try {
@@ -118,25 +118,25 @@ public class ConfigLoader {
 
     }
 
-    private static class OreBuilderFactoryProvider implements Function<ConfigFile, OreBuilder> {
+    private static class OreBuilderBuilderProvider implements Function<ConfigFile, OreBuilder> {
 
-        private final Map<ConfigFile, OreBuilder.Factory> factories = new HashMap<>();
+        private final Map<ConfigFile, OreBuilder.Builder> builders = new HashMap<>();
 
         @Override
         public synchronized OreBuilder apply(ConfigFile config) {
-            if(factories.containsKey(config)) {
-                return factories.get(config).create();
+            if(builders.containsKey(config)) {
+                return builders.get(config).build();
             } else {
-                OreBuilder.Factory fact = createFactory(config);
-                factories.put(config, fact);
-                return fact.create();
+                OreBuilder.Builder builder = createBuilder(config);
+                builders.put(config, builder);
+                return builder.build();
             }
         }
 
-        private OreBuilder.Factory createFactory(ConfigFile config) {
-            OreBuilder.Factory fact = OreBuilder.Factory.createFactory();
+        private OreBuilder.Builder createBuilder(ConfigFile config) {
+            OreBuilder.Builder builder = OreBuilder.Builder.create();
             if(config.hasLocalConfig()) {
-                fact.generateTexture(config.getLocalConfigValue("generateTexture"))
+                builder.generateTexture(config.getLocalConfigValue("generateTexture"))
                         .maxOreLayerColorDiff(config.getLocalConfigValue("maxOreLayerColorDiff"))
                         .oreTexture(Utils.parseResourceLocationExtra(config.getLocalConfigValue("oreTexture"), config.getFilenameNamespace()))
                         .rockTexture(Utils.parseResourceLocationExtra(config.getLocalConfigValue("rockTexture"), config.getFilenameNamespace()))
@@ -148,7 +148,7 @@ public class ConfigLoader {
                         .maxRolls(config.getLocalConfigValue("maxRolls"))
                         .spawnProbability(config.getLocalConfigValue("spawnProbability"));
             }
-            return fact;
+            return builder;
         }
 
     }
