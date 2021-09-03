@@ -68,8 +68,6 @@ public class ConfigLoader {
                         .filter(v -> v instanceof Boolean).ifPresent(v -> OreBuilder.setGlobalExperimentalGenerator((boolean) v));
                 Optional.ofNullable(globalConfig.getGlobalConfigValue("retrogen"))
                         .filter(v -> v instanceof Boolean).ifPresent(v -> OreBuilder.setGlobalRetrogen((boolean) v));
-                Optional.ofNullable(globalConfig.getGlobalConfigValue("redrawOreBase"))
-                        .filter(v -> v instanceof Boolean).ifPresent(v -> CompactOreTexture.setRedrawOreBase((boolean) v));
                 Optional.ofNullable(globalConfig.getGlobalConfigValue("minRolls"))
                         .filter(v -> v instanceof Integer).ifPresent(v -> OreBuilder.setGlobalMinRolls((int) v));
                 Optional.ofNullable(globalConfig.getGlobalConfigValue("maxRolls"))
