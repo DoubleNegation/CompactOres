@@ -281,11 +281,11 @@ public class CompactOreTexture {
     }
 
     private static int r(int rgb) {
-        return (rgb / 0x10000) & 0xFF;
+        return (rgb >> 16) & 0xFF;
     }
 
     private static int g(int rgb) {
-        return (rgb / 0x100) & 0xFF;
+        return (rgb >> 8) & 0xFF;
     }
 
     private static int b(int rgb) {
