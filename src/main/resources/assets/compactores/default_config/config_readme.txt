@@ -9,6 +9,32 @@ some things might be different!
 Also remember that you need to restart the game for any configuration changes to take effect!
 
 
+Debugging and the /compactores command:
+    Compact Ores is receiving an ever-growing number of debugging features that can be very useful when creating a
+    configuration. To be able to use them, change the `debug = false` at the end of this file to `debug = true`.
+    (If such a line does not exist, simply add a new one saying `debug = true`).
+    Restart the game after this (if it was already running)
+    Once debugging is enabled, the following subcommands of the /compactores command can be used:
+
+    /compactores debugworldgen
+        Enables World Gen Debugging for the current world.
+        This will make it so that all non-ore blocks are removed from the world. Only regular ores and compact ores
+        will remain. This makes it easier to see if all ores generate properly.
+
+    /compactores genoretester
+        Generates an "Ore Tester" at your current location
+        An ore tester is a structure which contains every single ore and its compact variant, organized neatly by mod.
+        This makes configuring textures and testing whether drops work properly easier.
+
+    /compactores texturedump
+        Saves all compact ore textures to a new directory in .minecraft/compactores_texture_dumps/
+
+    /compactores textureeditor
+        Opens a GUI for finding the perfect texture generation parameters of the ore block the player is looking at.
+        This allows you to test significantly more settings in a shorter time than if you had to restart the game for
+        each change.
+
+
 Changing Ore Textures:
     Your best bet is to do this with a resource pack or a mod like ResourceLoader.
     You can manually overwrite all Compact Ore textures by adding new textures with these names:
