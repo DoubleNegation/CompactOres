@@ -11,6 +11,8 @@ import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.resource.VanillaResourceType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -28,8 +30,12 @@ import java.util.function.IntToDoubleFunction;
 
 public class CompactOreTexture {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static Map<ResourceLocation, TextureInfo> generatedTextureCache = new HashMap<>();
     private static Map<ResourceLocation, TextureInfo> baseTextureCache = new HashMap<>();
+    private static int numTexturesGenerated = 0;
+    private static long textureGenerationTime = 0L;
 
     public static TextureInfo generate(ResourceLocation baseBlock, ResourceLocation baseTexture,
                                        ResourceLocation oreBlock, ResourceLocation oreTexture, int maxOreLayerDiff) {
@@ -37,6 +43,7 @@ public class CompactOreTexture {
             return generatedTextureCache.get(oreBlock);
         }
         try {
+            long generationStart = System.currentTimeMillis();
             TextureInfo base;
             if(baseTextureCache.containsKey(baseTexture)) {
                 base = baseTextureCache.get(baseTexture);
@@ -82,6 +89,8 @@ public class CompactOreTexture {
             // Finally generate the new texture
             TextureInfo result = generateCompactTexture(base, ore, maxOreLayerDiff);
             generatedTextureCache.put(oreBlock, result);
+            numTexturesGenerated++;
+            textureGenerationTime += (System.currentTimeMillis() - generationStart);
             return result;
         } catch(Exception e) {
             throw new RuntimeException("Unable to generate compact ore texture (baseBlock=" + baseBlock +
@@ -571,6 +580,9 @@ public class CompactOreTexture {
                         // All texture caches are invalidated here immediately AFTER resource loading has COMPLETED.
                         baseTextureCache.clear();
                         generatedTextureCache.clear();
+                        LOGGER.info("Generating {} compact ore textures took {} seconds", numTexturesGenerated, (int)Math.round(textureGenerationTime / 1000.));
+                        numTexturesGenerated = 0;
+                        textureGenerationTime = 0L;
                     }
                 }
         );
