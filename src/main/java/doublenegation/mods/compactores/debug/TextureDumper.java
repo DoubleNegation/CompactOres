@@ -1,11 +1,9 @@
 package doublenegation.mods.compactores.debug;
 
-import com.mojang.brigadier.context.CommandContext;
 import doublenegation.mods.compactores.CompactOre;
 import doublenegation.mods.compactores.CompactOres;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.command.CommandSource;
 import net.minecraft.resources.ResourcePackType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
@@ -28,14 +26,6 @@ public class TextureDumper {
     
     static void init() {
         MinecraftForge.EVENT_BUS.addListener(TextureDumper::onClientChat);
-    }
-
-    public static int executeCommandServer(CommandContext<CommandSource> ctx) {
-        // This will only happen if the player hasn't enabled debugging.
-        // If debugging is enabled, the ClientChatEvent handler stops the command from going to the server
-        // and handles the texture dumping client-side.
-        ctx.getSource().sendErrorMessage(new TranslationTextComponent("commands.compactores.debugging_disabled"));
-        return 0;
     }
 
     private static void onClientChat(ClientChatEvent event) {

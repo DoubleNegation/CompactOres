@@ -8,8 +8,10 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.DistExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,7 +44,10 @@ public class CompactOresDebugging {
             }
         });
         WorldGenDebugging.init();
-        TextureDumper.init();
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            TextureDumper.init();
+            TextureEditor.init();
+        });
     }
     
     static Flags getFlags(MinecraftServer server) {

@@ -571,6 +571,38 @@ public class CompactOreTexture {
                 return new TextureInfo(textureOwner, textures, frametimes, interpolate);
             }
         }
+        public static TextureInfo generateForEditorRendering(ResourceLocation textureLocation, int maxOreLayerColorDiff) {
+            TextureInfo textureInfo;
+            if(textureLocation.getNamespace().equals(CompactOres.MODID)) {
+                CompactOre ore = CompactOres.getForResourceName(textureLocation.getPath().substring("compactore__".length()));
+                if(ore == null) return null;
+                try {
+                    textureInfo = CompactOreTexture.generate(null, ore.getBaseUnderlyingTexture(),
+                            ore.getBaseBlockRegistryName(), ore.getBaseOreTexture(), maxOreLayerColorDiff);
+                } catch(RuntimeException e) {
+                    LOGGER.warn("Failed to prepare texture for texture editor", e);
+                    return null;
+                }
+                // invalidate caches right away - the next call will almost certainly be with a different diff,
+                // and the cache would prevent that from working
+                baseTextureCache.clear();
+                generatedTextureCache.clear();
+            } else {
+                try {
+                    textureInfo = generate(null, textureLocation);
+                } catch(IOException e) {
+                    LOGGER.warn("Failed to prepare texture for texture editor", e);
+                    return null;
+                }
+            }
+            if(textureInfo.getWidth() < 32) {
+                textureInfo = scale(textureInfo, 32 / textureInfo.getWidth());
+            }
+            if(textureInfo.isInterpolate()) {
+                textureInfo = interpolateManually(textureInfo);
+            }
+            return textureInfo;
+        }
     }
 
     public static void registerCacheInvalidator() {
