@@ -226,8 +226,14 @@ public class CompactOreTexture {
 
     private static BufferedImage actuallyFinallyMakeTheTexture(BufferedImage base, BufferedImage ore, int maxOreLayerDiff) {
         int w = base.getWidth(), h = base.getHeight();
-        BufferedImage oreLayer = maxOreLayerDiff < 0 ?
-                findOreLayerExactMatch(base, ore, w, h) : findOreLayerAttempt3(base, ore, w, h, maxOreLayerDiff);
+        BufferedImage oreLayer;
+        if(maxOreLayerDiff < 0) {
+            oreLayer = findOreLayerExactMatch(base, ore, w, h);
+        } else if(maxOreLayerDiff < 1000) {
+            oreLayer = findOreLayerAttempt3(base, ore, w, h, maxOreLayerDiff);
+        } else {
+            oreLayer = findOreLayerRGBChange(base, ore, w, h, maxOreLayerDiff);
+        }
         BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = result.createGraphics();
         int xOff = Math.max(1, w / 16), yOff = Math.max(1, h / 16);
@@ -274,6 +280,95 @@ public class CompactOreTexture {
                 }
                 if(!isRock) {
                     oreLayer.setRGB(x, y, a);
+                }
+            }
+        }
+        return oreLayer;
+    }
+
+    private static BufferedImage findOreLayerRGBChange(BufferedImage base, BufferedImage ore, int w, int h, int maxDiff) {
+        BufferedImage oreLayer = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        int rMin = Integer.MAX_VALUE, rMax = Integer.MIN_VALUE,
+                gMin = Integer.MAX_VALUE, gMax = Integer.MIN_VALUE,
+                bMin = Integer.MAX_VALUE, bMax = Integer.MIN_VALUE;
+        int rAvg = 0, gAvg = 0, bAvg = 0, numAvgSamples = 0;
+        // find color change ranges and average color in base texture
+        for(int x = 0; x < w; x++) {
+            for(int y = 0; y < h; y++) {
+                int baseRgb = base.getRGB(x, y);
+                int baseR = r(baseRgb), baseG = g(baseRgb), baseB = b(baseRgb);
+                int[][] coords = new int[][]{{(x + 1) % w, y}, {x, (y + 1) % h}};
+                for(int[] arr : coords) {
+                    int rgb = base.getRGB(arr[0], arr[1]);
+                    int r = r(rgb), g = g(rgb), b = b(rgb);
+                    int dr = Math.abs(baseR - r), dg = Math.abs(baseG - g), db = Math.abs(baseB - b);
+                    if(dr < rMin) rMin = dr;
+                    if(dr > rMax) rMax = dr;
+                    if(dg < gMin) gMin = dg;
+                    if(dg > gMax) gMax = dg;
+                    if(db < bMin) bMin = db;
+                    if(db > bMax) bMax = db;
+                }
+                rAvg += baseR;
+                gAvg += baseG;
+                bAvg += baseB;
+                numAvgSamples++;
+            }
+        }
+        maxDiff -= 1050;
+        rMin -= maxDiff;
+        rMax += maxDiff;
+        gMin -= maxDiff;
+        gMax += maxDiff;
+        bMin -= maxDiff;
+        bMax += maxDiff;
+        rAvg /= numAvgSamples;
+        gAvg /= numAvgSamples;
+        bAvg /= numAvgSamples;
+        // find pixel most similar to average color in ore texture
+        int startX = 0, startY = 0, startDiff = Integer.MAX_VALUE;
+        for(int x = 0; x < w; x++) {
+            for(int y = 0; y < h; y++) {
+                int rgb = ore.getRGB(x, y);
+                int r = r(rgb), g = g(rgb), b = b(rgb);
+                int diff = Math.abs(rAvg - r) + Math.abs(gAvg - g) + Math.abs(bAvg - b);
+                if(diff < startDiff) {
+                    startX = x;
+                    startY = y;
+                }
+            }
+        }
+        // find all connected pixels within the threshold
+        boolean[][] baseMap = new boolean[w][h];
+        baseMap[startX][startY] = true;
+        boolean found = true;
+        while(found) {
+            found = false;
+            for(int x = 0; x < w; x++) {
+                for(int y = 0; y < h; y++) {
+                    if(baseMap[x][y]) {
+                        int baseRgb = ore.getRGB(x, y);
+                        int baseR = r(baseRgb), baseG = g(baseRgb), baseB = b(baseRgb);
+                        int[][] neighbors = new int[][]{{(x + 1) % w, y}, {x, (y + 1) % h}, {(x - 1 + w) % w, y}, {x, (y - 1 + h) % h}};
+                        for(int[] n : neighbors) {
+                            if(baseMap[n[0]][n[1]]) continue;
+                            int rgb = ore.getRGB(n[0], n[1]);
+                            int r = r(rgb), g = g(rgb), b = b(rgb);
+                            int dr = Math.abs(baseR - r), dg = Math.abs(baseG - g), db = Math.abs(baseB - b);
+                            if(dr >= rMin && dr <= rMax && dg >= gMin && dg <= gMax && db >= bMin && db <= bMax) {
+                                baseMap[n[0]][n[1]] = true;
+                                found = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // all unconnected pixels are the ore layer
+        for(int x = 0; x < w; x++) {
+            for(int y = 0; y < h; y++) {
+                if(!baseMap[x][y]) {
+                    oreLayer.setRGB(x, y, ore.getRGB(x, y));
                 }
             }
         }
