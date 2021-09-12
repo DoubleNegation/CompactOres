@@ -81,8 +81,14 @@ Customizing, Adding and Removing Ores:
            Required: no
            Default: 50
            Allowed scopes: global, local, ore
-           Function: Relevant for texture generation. Changes the threshold for differentiating between
+           Function: Relevant for texture generation. Changes the algorithm and threshold for differentiating between
                      rock-pixels and ore-pixels on the ore texture.
+                     The following values correspond to certain algorithms:
+                      -2 = Automatic RGB Channel Change Intensity (recommended, will likely be default in the future)
+                      -1 = Exact Match
+                      0 ~ 765 = Sum of RGB Channel Differences
+                      1000 ~ 1180 = RGB Channel Change Intensity
+                     Any values outside these ranges lead to undefined behavior.
      - experimentalGenerator
             Type: boolean
             Required: no
