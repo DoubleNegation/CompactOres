@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntToDoubleFunction;
 
 public class CompactOreTexture {
 
@@ -227,7 +228,9 @@ public class CompactOreTexture {
     private static BufferedImage actuallyFinallyMakeTheTexture(BufferedImage base, BufferedImage ore, int maxOreLayerDiff) {
         int w = base.getWidth(), h = base.getHeight();
         BufferedImage oreLayer;
-        if(maxOreLayerDiff < 0) {
+        if(maxOreLayerDiff < -1) {
+            oreLayer = findOreLayerAutoRGBChange(base, ore, w, h);
+        } else if(maxOreLayerDiff < 0) {
             oreLayer = findOreLayerExactMatch(base, ore, w, h);
         } else if(maxOreLayerDiff < 1000) {
             oreLayer = findOreLayerAttempt3(base, ore, w, h, maxOreLayerDiff);
@@ -373,6 +376,34 @@ public class CompactOreTexture {
             }
         }
         return oreLayer;
+    }
+
+    private static BufferedImage findOreLayerAutoRGBChange(BufferedImage base, BufferedImage ore, int w, int h) {
+        final double threshold = .5D;
+        final int min = 1000, max = 1100;
+        IntToDoubleFunction valueForDiff = maxDiff -> {
+            BufferedImage oreLayer = findOreLayerRGBChange(base, ore, w, h, maxDiff);
+            int px = 0;
+            for(int x = 0; x < w; x++) {
+                for(int y = 0; y < h; y++) {
+                    if((oreLayer.getRGB(x, y) & 0xFF000000) != 0) {
+                        px++;
+                    }
+                }
+            }
+            return (double)px / (double)(w * h);
+        };
+        int below = min, above = max;
+        // perform a binary search to find the lowest value smaller than threshold
+        while(below + 1 < above) {
+            int middle = below + (above - below) / 2;
+            if(valueForDiff.applyAsDouble(middle) > threshold) {
+                below = middle;
+            } else {
+                above = middle;
+            }
+        }
+        return findOreLayerRGBChange(base, ore, w, h, above);
     }
 
     private static int r(int rgb) {
