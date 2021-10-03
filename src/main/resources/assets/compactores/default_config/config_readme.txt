@@ -160,6 +160,7 @@ Customizing, Adding and Removing Ores:
                      than usual. This can be required for some compact ores to generate at all.
                      However, it should be enabled with caution, as it causes the compact ore to not generate at all
                      in certain circumstances (like a mining dimension)
+                     This option only works (and is only necessary) when using the old, non-experimental generator.
      - useGetDrops
            Type: boolean
            Required: no
