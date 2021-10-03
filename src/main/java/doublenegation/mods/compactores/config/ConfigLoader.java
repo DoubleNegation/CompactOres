@@ -144,7 +144,7 @@ public class ConfigLoader {
                         .useGetDrops(config.getLocalConfigValue("useGetDrops"))
                         .minRolls(config.getLocalConfigValue("minRolls"))
                         .maxRolls(config.getLocalConfigValue("maxRolls"))
-                        .spawnProbability(config.getLocalConfigValue("spawnProbability"));
+                        .spawnProbability(Optional.ofNullable(config.<Double>getLocalConfigValue("spawnProbability")).map(p -> (float)(double)p).orElse(null));
             }
             return builder;
         }
