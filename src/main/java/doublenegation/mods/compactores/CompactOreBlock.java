@@ -1,21 +1,20 @@
 package doublenegation.mods.compactores;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.storage.loot.LootContext;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -28,7 +27,7 @@ public class CompactOreBlock extends Block {
 
     public CompactOreBlock(CompactOre ore) {
         // all vanilla ores (except gilded blackstone) have hardness and resistance values of 3, so use 3 here too
-        super(Properties.create(Material.ROCK).sound(SoundType.STONE).setRequiresTool().hardnessAndResistance(3, 3));
+        super(Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops().strength(3, 3));
         this.ore = ore;
     }
 
@@ -37,64 +36,48 @@ public class CompactOreBlock extends Block {
     }
 
     @Override
-    public float getExplosionResistance(BlockState state, IBlockReader world, BlockPos pos, Explosion explosion) {
-        return ore.getBaseBlock().getExplosionResistance(ore.getBaseBlock().getDefaultState(), world, pos, explosion);
+    public float getExplosionResistance(BlockState state, BlockGetter world, BlockPos pos, Explosion explosion) {
+        return ore.getBaseBlock().getExplosionResistance(ore.getBaseBlock().defaultBlockState(), world, pos, explosion);
     }
 
     @Override
-    public int getExpDrop(BlockState state, IWorldReader world, BlockPos pos, int fortune, int silktouch) {
-        Random rand = Optional.of(world.getChunk(pos)).map(IChunk::getWorldForge).map(IWorld::getRandom).orElse(new Random());
+    public int getExpDrop(BlockState state, LevelReader world, BlockPos pos, int fortune, int silktouch) {
+        Random rand = Optional.of(world.getChunk(pos)).map(ChunkAccess::getWorldForge).map(LevelAccessor::getRandom).orElse(new Random());
         int r = ore.getMinRolls() + rand.nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
-        return ore.getBaseBlock().getExpDrop(ore.getBaseBlock().getDefaultState(), world, pos, fortune, silktouch) * r;
+        return ore.getBaseBlock().getExpDrop(ore.getBaseBlock().defaultBlockState(), world, pos, fortune, silktouch) * r;
     }
 
     @Override
-    public int getHarvestLevel(BlockState state) {
-        return ore.getBaseBlock().getHarvestLevel(ore.getBaseBlock().getDefaultState());
-    }
-
-    @Nullable
-    @Override
-    public ToolType getHarvestTool(BlockState state) {
-        return ore.getBaseBlock().getHarvestTool(ore.getBaseBlock().getDefaultState());
+    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+        return ore.getBaseBlock().defaultBlockState().getDestroyProgress(player, worldIn, pos);
     }
 
     @Override
-    public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-        return ore.getBaseBlock().getDefaultState().getPlayerRelativeBlockHardness(player, worldIn, pos);
+    public MaterialColor defaultMaterialColor() {
+        return ore.getBaseBlock().defaultMaterialColor();
     }
 
     @Override
-    public MaterialColor getMaterialColor() {
-        return ore.getBaseBlock().getMaterialColor();
+    public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos pos, Player player) {
+        return ore.getBaseBlock().canHarvestBlock(ore.getBaseBlock().defaultBlockState(), world, pos, player);
     }
 
     @Override
-    public boolean canHarvestBlock(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return ore.getBaseBlock().canHarvestBlock(ore.getBaseBlock().getDefaultState(), world, pos, player);
-    }
-
-    @Override
-    public boolean isToolEffective(BlockState state, ToolType tool) {
-        return ore.getBaseBlock().isToolEffective(ore.getBaseBlock().getDefaultState(), tool);
-    }
-
-    @Override
-    public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return ore.getBaseBlock().getSoundType(ore.getBaseBlock().getDefaultState(), world, pos, entity);
+    public SoundType getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
+        return ore.getBaseBlock().getSoundType(ore.getBaseBlock().defaultBlockState(), world, pos, entity);
     }
 
     @Override
     public SoundType getSoundType(BlockState state) {
-        return ore.getBaseBlock().getSoundType(ore.getBaseBlock().getDefaultState());
+        return ore.getBaseBlock().getSoundType(ore.getBaseBlock().defaultBlockState());
     }
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         if(ore.isUseGetDrops()) {
             List<ItemStack> parentList = super.getDrops(state, builder);
-            List<ItemStack> oreList = ore.getBaseBlock().getDrops(ore.getBaseBlock().getDefaultState(), builder);
-            Random rand = builder.getWorld().getRandom();
+            List<ItemStack> oreList = ore.getBaseBlock().getDrops(ore.getBaseBlock().defaultBlockState(), builder);
+            Random rand = builder.getLevel().getRandom();
             int r = ore.getMinRolls() + rand.nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
             for(int i = 0; i < r; i++) {
                 for(ItemStack stack : oreList) {

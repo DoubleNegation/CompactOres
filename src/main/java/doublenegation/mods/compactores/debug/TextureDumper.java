@@ -2,14 +2,14 @@ package doublenegation.mods.compactores.debug;
 
 import doublenegation.mods.compactores.CompactOre;
 import doublenegation.mods.compactores.CompactOres;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
@@ -31,8 +31,8 @@ public class TextureDumper {
     private static void onClientChat(ClientChatEvent event) {
         if(event.getMessage().replaceAll(" +", " ").equals("/compactores texturedump")) {
             event.setCanceled(true);
-            Minecraft.getInstance().ingameGUI.getChatGUI().addToSentMessages(event.getMessage());
-            File dumpsDir = new File(Minecraft.getInstance().gameDir, "compactores_texture_dumps");
+            Minecraft.getInstance().gui.getChat().addRecentChat(event.getMessage());
+            File dumpsDir = new File(Minecraft.getInstance().gameDirectory, "compactores_texture_dumps");
             if((dumpsDir.exists() && !dumpsDir.isDirectory()) || (!dumpsDir.exists() && !dumpsDir.mkdir())) {
                 error();
                 LOGGER.error("Can not write texture dump: failed to create compactores_texture_dumps directory");
@@ -52,22 +52,22 @@ public class TextureDumper {
                 int read;
                 byte[] buf = new byte[4096];
                 for (CompactOre ore : CompactOres.compactOres()) {
-                    try (InputStream is = CompactOres.getGeneratedResource(ResourcePackType.CLIENT_RESOURCES, 
+                    try (InputStream is = CompactOres.getGeneratedResource(PackType.CLIENT_RESOURCES,
                                 new ResourceLocation(CompactOres.MODID, "textures/" + ore.name().getPath() + ".png"));
-                            FileOutputStream fos = new FileOutputStream(new File(subdir, ore.getString() + ".png"))) {
+                         FileOutputStream fos = new FileOutputStream(new File(subdir, ore.getSerializedName() + ".png"))) {
                         while((read = is.read(buf)) != -1) {
                             fos.write(buf, 0, read);
                         }
                     }
                 }
                 // show success message
-                ClientPlayerEntity player = Minecraft.getInstance().player;
+                LocalPlayer player = Minecraft.getInstance().player;
                 if(player != null) {
                     final File subdir_ = subdir;
-                    player.sendMessage(new TranslationTextComponent("commands.compactores.texturedump.success", 
-                                new StringTextComponent(subdir_.getAbsolutePath()).mergeStyle(TextFormatting.UNDERLINE)
-                                    .modifyStyle(s -> s.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, subdir_.getAbsolutePath())))), 
-                            player.getUniqueID());
+                    player.sendMessage(new TranslatableComponent("commands.compactores.texturedump.success",
+                                new TextComponent(subdir_.getAbsolutePath()).withStyle(ChatFormatting.UNDERLINE)
+                                    .withStyle(s -> s.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, subdir_.getAbsolutePath())))),
+                            player.getUUID());
                 }
             } catch(IOException e) {
                 error();
@@ -77,9 +77,9 @@ public class TextureDumper {
     }
     
     private static void error() {
-        ClientPlayerEntity player = Minecraft.getInstance().player;
+        LocalPlayer player = Minecraft.getInstance().player;
         if(player == null) return;
-        player.sendMessage(new TranslationTextComponent("commands.compactores.texturedump.failure").mergeStyle(TextFormatting.RED), player.getUniqueID());
+        player.sendMessage(new TranslatableComponent("commands.compactores.texturedump.failure").withStyle(ChatFormatting.RED), player.getUUID());
     }
     
 }

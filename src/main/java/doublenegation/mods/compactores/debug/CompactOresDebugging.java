@@ -1,13 +1,13 @@
 package doublenegation.mods.compactores.debug;
 
 import doublenegation.mods.compactores.CompactOres;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -39,8 +39,8 @@ public class CompactOresDebugging {
             return;
         }
         MinecraftForge.EVENT_BUS.addListener((final EntityJoinWorldEvent event) -> {
-            if(event.getWorld().isRemote && event.getEntity() instanceof PlayerEntity) {
-                event.getEntity().sendMessage(new TranslationTextComponent("chat.compactores.debugging_enabled"), event.getEntity().getUniqueID());
+            if(event.getWorld().isClientSide && event.getEntity() instanceof Player) {
+                event.getEntity().sendMessage(new TranslatableComponent("chat.compactores.debugging_enabled"), event.getEntity().getUUID());
             }
         });
         WorldGenDebugging.init();
@@ -51,31 +51,31 @@ public class CompactOresDebugging {
     }
     
     static Flags getFlags(MinecraftServer server) {
-        ServerWorld world = server.getWorld(World.OVERWORLD);
+        ServerLevel world = server.getLevel(Level.OVERWORLD);
         if(world == null) throw new IllegalStateException("Server does not have an overworld, can not access Debug Data.");
         return getFlags(world);
     }
     
-    private static Flags getFlags(ServerWorld world) {
-        return world.getSavedData().getOrCreate(Flags::new, Flags.NAME);
+    private static Flags getFlags(ServerLevel world) {
+        return world.getDataStorage().get(Flags::read, Flags.NAME);
     }
 
-    static class Flags extends WorldSavedData {
+    static class Flags extends SavedData {
         private static final String NAME = CompactOres.MODID + "_DebugFlags";
 
         private boolean debugWorldGen = false;
 
-        private Flags() {
-            super(NAME);
+        private Flags(boolean debugWorldGen) {
+            this.debugWorldGen = debugWorldGen;
+        }
+
+        public static Flags read(CompoundTag nbt) {
+            boolean debugWorldGen = nbt.getBoolean("debugWorldGen");
+            return new Flags(debugWorldGen);
         }
 
         @Override
-        public void read(CompoundNBT nbt) {
-            debugWorldGen = nbt.getBoolean("debugWorldGen");
-        }
-
-        @Override
-        public CompoundNBT write(CompoundNBT compound) {
+        public CompoundTag save(CompoundTag compound) {
             compound.putBoolean("debugWorldGen", debugWorldGen);
             return compound;
         }

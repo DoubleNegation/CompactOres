@@ -1,22 +1,23 @@
 package doublenegation.mods.compactores;
 
-import net.minecraft.block.Block;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.IntArrayNBT;
-import net.minecraft.nbt.IntNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SharedSeedRandom;
-import net.minecraft.util.concurrent.TickDelayedTask;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.TickTask;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.RandomSupport;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.ChunkEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,29 +48,29 @@ public class ExperimentalWorldGen {
     }
     
     private static void onChunkLoad(ChunkEvent.Load event) {
-        if(!(event.getWorld() instanceof ServerWorld)) return;
-        ServerWorld world = (ServerWorld) event.getWorld();
-        WorldGenData data = world.getSavedData().getOrCreate(WorldGenData::new, WorldGenData.NAME);
+        if(!(event.getWorld() instanceof ServerLevel)) return;
+        ServerLevel world = (ServerLevel) event.getWorld();
+        WorldGenData data = world.getDataStorage().get(WorldGenData::read, WorldGenData.NAME);
         ChunkPos chunkPos = event.getChunk().getPos();
         Set<ResourceLocation> newOres = data.missingOresForChunk(chunkPos,
                 loc -> Optional.ofNullable(CompactOres.getFor(loc)).map(CompactOre::isRetrogen).orElse(false));
         if(!newOres.isEmpty()) {
-            world.getServer().enqueue(new TickDelayedTask(0, () -> {
+            world.getServer().doRunTask(new TickTask(0, () -> {
                 generate(world, chunkPos, newOres);
                 data.generated(chunkPos, newOres);
             }));
         }
     }
     
-    private static void generate(ServerWorld world, ChunkPos pos, Set<ResourceLocation> ores) {
+    private static void generate(ServerLevel world, ChunkPos pos, Set<ResourceLocation> ores) {
         LOGGER.debug("Generating {} compact ore types in chunk ({}|{}|{})", ores.size(),
-                world.getDimensionKey().getLocation(), pos.x, pos.z);
+                world.dimension().getRegistryName(), pos.x, pos.z);
         // initialize the random number generator
         // the "123" parameter would normally be some kind of sequence number that is incremented by one for every
         // feature that is generated, but since we're not generating as a feature in the sequence of features, we
         // just hardcode any old number and call it a day.
-        SharedSeedRandom rand = new SharedSeedRandom();
-        rand.setFeatureSeed(world.getSeed(), 123, GenerationStage.Decoration.UNDERGROUND_ORES.ordinal());
+        WorldgenRandom rand = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.seedUniquifier()));
+        rand.setFeatureSeed(world.getSeed(), 123, GenerationStep.Decoration.UNDERGROUND_ORES.ordinal());
         // now generate, using the same rng calls in the same order as the other generator would use.
         // can't lead to the same ore pattern though, since our seed will be different :(
         for(int x = 0; x < 16; x++) {
@@ -79,46 +80,44 @@ public class ExperimentalWorldGen {
                     BlockPos blockPos = new BlockPos(16 * pos.x + x, y, 16 * pos.z + z);
                     Block block = world.getBlockState(blockPos).getBlock();
                     if(ores.contains(block.getRegistryName()) && randVal <= oreByBlock.get(block).getSpawnProbability()) {
-                        world.setBlockState(blockPos, oreByBlock.get(block).getCompactOreBlock().getDefaultState(), 2 | 16);
+                        world.setBlock(blockPos, oreByBlock.get(block).getCompactOreBlock().defaultBlockState(), 2 | 16);
                     }
                 }
             }
         }
     }
     
-    private static class WorldGenData extends WorldSavedData {
+    private static class WorldGenData extends SavedData {
         private static final String NAME = CompactOres.MODID + "_WorldGenData";
         
-        private int currentSetup;
-        private final List<Set<ResourceLocation>> setups = new ArrayList<>();
-        private final Map<ChunkPos, Integer> chunkStates = new HashMap<>();
+        private final int currentSetup;
+        private final List<Set<ResourceLocation>> setups;
+        private final Map<ChunkPos, Integer> chunkStates;
 
-        private WorldGenData() {
-            super(NAME);
-            // defaults
-            currentSetup = 0;
-            setups.add(0, CompactOres.compactOres().stream().map(CompactOre::getBaseBlockRegistryName).collect(Collectors.toSet()));
+        private WorldGenData(int currentSetup, List<Set<ResourceLocation>> setups, Map<ChunkPos, Integer> chunkStates) {
+            this.currentSetup = currentSetup;
+            this.setups = setups;
+            this.chunkStates = chunkStates;
         }
 
-        @Override
-        public void read(CompoundNBT nbt) {
-            this.currentSetup = -1;
-            this.setups.clear();
-            this.chunkStates.clear();
+        public static WorldGenData read(CompoundTag nbt) {
+            int theCurrentSetup = -1;
+            List<Set<ResourceLocation>> theSetups = new ArrayList<>();
+            Map<ChunkPos, Integer> theChunkStates = new HashMap<>();
             Set<ResourceLocation> currentSetup = CompactOres.compactOres().stream().map(CompactOre::getBaseBlockRegistryName).collect(Collectors.toSet());
-            ListNBT setups = nbt.getList("setups", Constants.NBT.TAG_LIST);
+            ListTag setups = nbt.getList("setups", Tag.TAG_LIST);
             for(int i = 0; i < setups.size(); i++) {
-                this.setups.add(i, setups.getList(i).stream().map(INBT::getString).map(Utils::parseResourceLocation).collect(Collectors.toSet()));
-                if(this.currentSetup == -1 && currentSetup.equals(this.setups.get(i))) {
-                    this.currentSetup = i;
+                theSetups.add(i, setups.getList(i).stream().map(Tag::toString).map(Utils::parseResourceLocation).collect(Collectors.toSet()));
+                if(theCurrentSetup == -1 && currentSetup.equals(theSetups.get(i))) {
+                    theCurrentSetup = i;
                 }
             }
-            if(this.currentSetup == -1) {
-                this.currentSetup = setups.size();
-                this.setups.add(currentSetup);
+            if(theCurrentSetup == -1) {
+                theCurrentSetup = setups.size();
+                theSetups.add(currentSetup);
             }
-            CompoundNBT chunks = nbt.getCompound("chunks");
-            for(String regionKey : chunks.keySet()) {
+            CompoundTag chunks = nbt.getCompound("chunks");
+            for(String regionKey : chunks.getAllKeys()) {
                 String[] tk = regionKey.split("\\.");
                 if(tk.length != 3 || !tk[0].equals("r")) {
                     LOGGER.warn("Unexpected region key in {}: {}", NAME, regionKey);
@@ -128,24 +127,25 @@ public class ExperimentalWorldGen {
                 int[] data = chunks.getIntArray(regionKey);
                 for(int i = 0; i < data.length; i++) {
                     if(data[i] >= 0) {
-                        chunkStates.put(new ChunkPos(rrx + i % 32, rrz + i / 32), data[i]);
+                        theChunkStates.put(new ChunkPos(rrx + i % 32, rrz + i / 32), data[i]);
                     }
                 }
             }
+            return new WorldGenData(theCurrentSetup, theSetups, theChunkStates);
         }
 
         @Override
-        public CompoundNBT write(CompoundNBT compound) {
-            ListNBT setups = new ListNBT();
+        public CompoundTag save(CompoundTag compound) {
+            ListTag setups = new ListTag();
             for(Set<ResourceLocation> setup : this.setups) {
                 // unused "setups" are currently also saved to disk - is that a problem?
                 // they shouldn't be too large, right? and removing them properly would be a lot of effort.
-                ListNBT setupNBT = new ListNBT();
-                setupNBT.addAll(setup.stream().map(ResourceLocation::toString).map(StringNBT::valueOf).collect(Collectors.toList()));
+                ListTag setupNBT = new ListTag();
+                setupNBT.addAll(setup.stream().map(ResourceLocation::toString).map(StringTag::valueOf).collect(Collectors.toList()));
                 setups.add(setupNBT);
             }
             compound.put("setups", setups);
-            CompoundNBT chunks = new CompoundNBT();
+            CompoundTag chunks = new CompoundTag();
             for(ChunkPos chunk : chunkStates.keySet()) {
                 int rx = (int)Math.floor(chunk.x / 32f);
                 int rz = (int)Math.floor(chunk.z / 32f);
@@ -153,9 +153,9 @@ public class ExperimentalWorldGen {
                 if(!chunks.contains(key)) {
                     int[] d = new int[32 * 32];
                     Arrays.fill(d, -1);
-                    chunks.put(key, new IntArrayNBT(d));
+                    chunks.put(key, new IntArrayTag(d));
                 }
-                ((IntArrayNBT)chunks.get(key)).set(32 * (chunk.z - 32 * rz) + (chunk.x - 32 * rx), IntNBT.valueOf(chunkStates.get(chunk)));
+                ((IntArrayTag)chunks.get(key)).set(32 * (chunk.z - 32 * rz) + (chunk.x - 32 * rx), IntTag.valueOf(chunkStates.get(chunk)));
             }
             compound.put("chunks", chunks);
             return compound;
@@ -189,7 +189,7 @@ public class ExperimentalWorldGen {
                     chunkStates.put(pos, setup);
                 }
             }
-            markDirty();
+            setDirty();
         }
         
     }

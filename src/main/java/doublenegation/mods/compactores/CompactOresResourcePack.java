@@ -3,8 +3,11 @@ package doublenegation.mods.compactores;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.*;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.fml.DistExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +25,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class CompactOresResourcePack implements IPackFinder {
+public class CompactOresResourcePack implements RepositorySource {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String PACK_NAME = "CompactOres dynamic resources";
@@ -54,7 +57,7 @@ public class CompactOresResourcePack implements IPackFinder {
                     if(!ore.isGenerateTexture() || baseTexture == null || oreTexture == null) return false;
                     ResourceLocation baseMeta = new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + ".mcmeta");
                     ResourceLocation oreMeta = new ResourceLocation(oreTexture.getNamespace(), oreTexture.getPath() + ".mcmeta");
-                    IResourceManager rm = Minecraft.getInstance().getResourceManager();
+                    ResourceManager rm = Minecraft.getInstance().getResourceManager();
                     return rm.hasResource(baseMeta) || rm.hasResource(oreMeta);
                 }, () -> () -> false);
             });
@@ -228,9 +231,9 @@ public class CompactOresResourcePack implements IPackFinder {
     }
 
     @Override
-    public void findPacks(Consumer<ResourcePackInfo> packConsumer, ResourcePackInfo.IFactory iFactory) {
-        packConsumer.accept(ResourcePackInfo.createResourcePack(PACK_NAME, true/*isAlwaysEnabled*/,
-                this::getPack, iFactory, ResourcePackInfo.Priority.BOTTOM, IPackNameDecorator.BUILTIN));
+    public void loadPacks(Consumer<Pack> packConsumer, Pack.PackConstructor packConstructor) {
+        packConsumer.accept(Pack.create(PACK_NAME, true/*isAlwaysEnabled*/, this::getPack, packConstructor,
+                Pack.Position.BOTTOM, PackSource.BUILT_IN));
     }
 
 }

@@ -1,8 +1,8 @@
 package doublenegation.mods.compactores;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -70,7 +70,7 @@ public class Utils {
 
         private Screen returnTarget;
 
-        protected ReturningScreen(ITextComponent titleIn) {
+        protected ReturningScreen(Component titleIn) {
             super(titleIn);
         }
 
@@ -80,7 +80,7 @@ public class Utils {
 
         public void returnToPreviousScreen() {
             if(minecraft != null)
-                minecraft.displayGuiScreen(returnTarget);
+                minecraft.setScreen(returnTarget);
         }
 
     }

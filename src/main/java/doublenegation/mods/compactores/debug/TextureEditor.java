@@ -1,22 +1,22 @@
 package doublenegation.mods.compactores.debug;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import doublenegation.mods.compactores.CompactOre;
 import doublenegation.mods.compactores.CompactOreTexture;
 import doublenegation.mods.compactores.CompactOres;
-import net.minecraft.block.Block;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.event.ClientChatEvent;
+import net.minecraftforge.client.gui.widget.Slider;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.gui.widget.Slider;
 
 import java.awt.image.BufferedImage;
 import java.util.Optional;
@@ -32,23 +32,23 @@ public class TextureEditor {
     private static void onClientChat(ClientChatEvent event) {
         if (event.getMessage().replaceAll(" +", " ").equals("/compactores textureeditor")) {
             event.setCanceled(true);
-            Minecraft.getInstance().ingameGUI.getChatGUI().addToSentMessages(event.getMessage());
-            if(Minecraft.getInstance().objectMouseOver != null && Minecraft.getInstance().objectMouseOver.getType() == RayTraceResult.Type.BLOCK
-                    && Minecraft.getInstance().world != null) {
-                Block block = Minecraft.getInstance().world.getBlockState(((BlockRayTraceResult) Minecraft.getInstance().objectMouseOver).getPos()).getBlock();
+            Minecraft.getInstance().gui.getChat().addRecentChat(event.getMessage());
+            if(Minecraft.getInstance().hitResult != null && Minecraft.getInstance().hitResult.getType() == HitResult.Type.BLOCK
+                    && Minecraft.getInstance().level != null) {
+                Block block = Minecraft.getInstance().level.getBlockState(((BlockHitResult) Minecraft.getInstance().hitResult).getBlockPos()).getBlock();
                 Optional<CompactOre> activeOre = CompactOres.compactOres().stream().filter(
                             ore -> ore.getBaseBlockRegistryName().equals(block.getRegistryName()) || ore.name().equals(block.getRegistryName()))
                         .findAny();
                 if(activeOre.isPresent()) {
-                    Minecraft.getInstance().enqueue(() -> {
-                        Minecraft.getInstance().displayGuiScreen(new EditorScreen(activeOre.get()));
+                    Minecraft.getInstance().submitAsync(() -> {
+                        Minecraft.getInstance().setScreen(new EditorScreen(activeOre.get()));
                     });
                     return;
                 }
             }
-            ClientPlayerEntity player = Minecraft.getInstance().player;
+            LocalPlayer player = Minecraft.getInstance().player;
             if(player == null) return;
-            player.sendMessage(new TranslationTextComponent("commands.compactores.no_ore").mergeStyle(TextFormatting.RED), player.getUniqueID());
+            player.sendMessage(new TranslatableComponent("commands.compactores.no_ore").withStyle(ChatFormatting.RED), player.getUUID());
         }
     }
 
@@ -66,7 +66,7 @@ public class TextureEditor {
         private CompactOreTexture.TextureInfo compactOreTexture;
 
         protected EditorScreen(CompactOre ore) {
-            super(new TranslationTextComponent("gui.compactores.textureeditor.title", ore.getBaseBlockRegistryName().toString()));
+            super(new TranslatableComponent("gui.compactores.textureeditor.title", ore.getBaseBlockRegistryName().toString()));
             this.ore = ore;
             value = ore.getMaxOreLayerColorDiff();
             for(int i = GeneratorMode.values().length - 1; i >= 0; i--) {
@@ -80,16 +80,16 @@ public class TextureEditor {
         @Override
         protected void init() {
             super.init();
-            addButton(new Button(fromRight(0), fromTop(0), 20, 20, new StringTextComponent("X"), btn -> closeScreen()));
+            addWidget(new Button(fromRight(0), fromTop(0), 20, 20, new TextComponent("X"), btn -> onClose()));
             rockTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.getBaseUnderlyingTexture(), -1);
             oreTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.getBaseOreTexture(), -1);
             compactOreTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.name(), value);
             GeneratorMode mode = GeneratorMode.values()[generatorMode];
-            addButton(new Button(fromLeft(20), fromTop(114), 280, 20,
-                    new TranslationTextComponent("gui.compactores.textureeditor.detector", new TranslationTextComponent(mode.translationKey)), this::nextMode));
-            valueSlider = addButton(new Slider(fromLeft(20), fromTop(144), 280, 20,
-                    new TranslationTextComponent("gui.compactores.textureeditor.detector_param"),
-                    new StringTextComponent(""), 0, mode.maxAdjust, value - mode.baseValue, false, true, btn -> {}));
+            addWidget(new Button(fromLeft(20), fromTop(114), 280, 20,
+                    new TranslatableComponent("gui.compactores.textureeditor.detector", new TranslatableComponent(mode.translationKey)), this::nextMode));
+            valueSlider = addWidget(new Slider(fromLeft(20), fromTop(144), 280, 20,
+                    new TranslatableComponent("gui.compactores.textureeditor.detector_param"),
+                    new TextComponent(""), 0, mode.maxAdjust, value - mode.baseValue, false, true, btn -> {}));
             valueSlider.visible = mode.adjustable;
         }
 
@@ -106,7 +106,7 @@ public class TextureEditor {
             GeneratorMode mode = GeneratorMode.values()[generatorMode];
             value = mode.adjustable ? mode.baseValue + mode.initialAdjust : mode.baseValue;
             compactOreTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.name(), value);
-            button.setMessage(new TranslationTextComponent("gui.compactores.textureeditor.detector", new TranslationTextComponent(mode.translationKey)));
+            button.setMessage(new TranslatableComponent("gui.compactores.textureeditor.detector", new TranslatableComponent(mode.translationKey)));
             valueSlider.dragging = false;
             valueSlider.maxValue = mode.maxAdjust;
             valueSlider.sliderValue = (double) mode.initialAdjust / mode.maxAdjust;
@@ -115,7 +115,7 @@ public class TextureEditor {
         }
 
         @Override
-        public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
             // check for slider update
             GeneratorMode mode = GeneratorMode.values()[generatorMode];
             int newValue = mode.adjustable ? mode.baseValue + (int) Math.round(valueSlider.sliderValue * mode.maxAdjust) : mode.baseValue;
@@ -127,17 +127,17 @@ public class TextureEditor {
             renderDirtBackground(0);
             drawCenteredString(matrixStack, font, title, fromLeft(160), fromTop(10), 0xFFFFFF);
             renderTextureInfo(matrixStack, rockTexture, fromLeft(0), fromTop(30));
-            drawString(matrixStack, font, new TranslationTextComponent("gui.compactores.textureeditor.rock_texture"),
+            drawString(matrixStack, font, new TranslatableComponent("gui.compactores.textureeditor.rock_texture"),
                     fromLeft(42), fromTop(36), 0xFFFFFF);
             drawString(matrixStack, font, ore.getBaseUnderlyingTexture().toString(), fromLeft(42), fromTop(46), 0xFFFFFF);
             renderTextureInfo(matrixStack, oreTexture, fromLeft(0), fromTop(72));
-            drawString(matrixStack, font, new TranslationTextComponent("gui.compactores.textureeditor.ore_texture"),
+            drawString(matrixStack, font, new TranslatableComponent("gui.compactores.textureeditor.ore_texture"),
                     fromLeft(42), fromTop(78), 0xFFFFFF);
             drawString(matrixStack, font, ore.getBaseOreTexture().toString(), fromLeft(42), fromTop(88), 0xFFFFFF);
             renderTextureInfo(matrixStack, compactOreTexture, fromLeft(0), fromTop(174));
-            drawString(matrixStack, font, new TranslationTextComponent("gui.compactores.textureeditor.compact_ore_texture"),
+            drawString(matrixStack, font, new TranslatableComponent("gui.compactores.textureeditor.compact_ore_texture"),
                     fromLeft(42), fromTop(180), 0xFFFFFF);
-            drawString(matrixStack, font, new TranslationTextComponent("gui.compactores.textureeditor.update_config", "maxOreLayerColorDiff = " + value),
+            drawString(matrixStack, font, new TranslatableComponent("gui.compactores.textureeditor.update_config", "maxOreLayerColorDiff = " + value),
                     fromLeft(42), fromTop(190), 0xFFFFFF);
             super.render(matrixStack, mouseX, mouseY, partialTicks);
         }
@@ -158,12 +158,12 @@ public class TextureEditor {
             return width / 2 + 160 - dst;
         }
 
-        private void renderTextureInfo(MatrixStack matrixStack, CompactOreTexture.TextureInfo tex, int x, int y) {
+        private void renderTextureInfo(PoseStack matrixStack, CompactOreTexture.TextureInfo tex, int x, int y) {
             if(tex == null) return;
             renderBufferedImage(matrixStack, tex.getTextures().get(tickCounter % tex.getTextures().size()), x, y);
         }
 
-        private void renderBufferedImage(MatrixStack matrixStack, BufferedImage image, int x, int y) {
+        private void renderBufferedImage(PoseStack matrixStack, BufferedImage image, int x, int y) {
             for(int i = 0; i < image.getWidth(); i++) {
                 for(int j = 0; j < image.getHeight(); j++) {
                     fill(matrixStack, x + i, y + j, x + i + 1, y + j + 1, image.getRGB(i, j));

@@ -1,13 +1,13 @@
 package doublenegation.mods.compactores;
 
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.GameData;
 
 public class CompactOreBlockItem extends BlockItem {
@@ -15,14 +15,14 @@ public class CompactOreBlockItem extends BlockItem {
     private final CompactOre ore;
 
     public CompactOreBlockItem(CompactOre ore) {
-        super(ore.getCompactOreBlock(), new Item.Properties().group(CompactOres.getItemGroup()));
+        super(ore.getCompactOreBlock(), new Item.Properties().tab(CompactOres.getItemGroup()));
         this.ore = ore;
     }
 
     // make sure that there is an order to the ore list
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        if(isInGroup(group)) {
+    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
+        if(getCreativeTabs().contains(group)) {
             for (int i = 0; i < items.size(); i++) {
                 if (items.get(i).getItem() instanceof CompactOreBlockItem) {
                     if (ore.compareTo(((CompactOreBlockItem) items.get(i).getItem()).ore) < 0) {
@@ -36,15 +36,10 @@ public class CompactOreBlockItem extends BlockItem {
     }
 
     @Override
-    public ITextComponent getDisplayName(ItemStack stack) {
-        return getName();
-    }
-
-    @Override
-    public ITextComponent getName() {
+    public Component getName(ItemStack stack) {
         Item baseItem = GameData.getBlockItemMap().get(ore.getBaseBlock());
-        ITextComponent baseName = baseItem == null ? new StringTextComponent("<unknown>") :
-                baseItem.getDisplayName(new ItemStack(baseItem, 1));
-        return new TranslationTextComponent("block." + ore.name().getNamespace() + ".compact_ore", baseName);
+        Component baseName = baseItem == null ? new TextComponent("<unknown>") :
+                baseItem.getName(new ItemStack(baseItem, 1));
+        return new TranslatableComponent("block." + ore.name().getNamespace() + ".compact_ore", baseName);
     }
 }

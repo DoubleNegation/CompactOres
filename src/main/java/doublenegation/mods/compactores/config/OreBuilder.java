@@ -1,7 +1,7 @@
 package doublenegation.mods.compactores.config;
 
 import doublenegation.mods.compactores.CompactOre;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class OreBuilder {
 

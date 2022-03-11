@@ -1,10 +1,10 @@
 package doublenegation.mods.compactores;
 
-import net.minecraft.resources.IResourcePack;
-import net.minecraft.resources.ResourcePack;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.resources.data.IMetadataSectionSerializer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.AbstractPackResources;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class InMemoryResourcePack implements IResourcePack {
+public class InMemoryResourcePack implements PackResources {
 
     private String name;
     private Map<String, Supplier<byte[]>> data;
@@ -35,7 +35,7 @@ public class InMemoryResourcePack implements IResourcePack {
     }
 
     @Override
-    public InputStream getRootResourceStream(String fileName) {
+    public InputStream getRootResource(String fileName) {
         if(fileName.contains("/") || fileName.contains("\\")) {
             throw new IllegalArgumentException("Must be a root filename");
         }
@@ -46,14 +46,14 @@ public class InMemoryResourcePack implements IResourcePack {
     }
 
     @Override
-    public InputStream getResourceStream(ResourcePackType type, ResourceLocation location) throws IOException {
-        String path = type.getDirectoryName() + "/" + location.getNamespace() + "/" + location.getPath();
+    public InputStream getResource(PackType type, ResourceLocation location) throws IOException {
+        String path = type.getDirectory() + "/" + location.getNamespace() + "/" + location.getPath();
         if(data.containsKey(path)) return s(data.get(path));
         else throw new FileNotFoundException(type + ", " + location);
     }
 
     @Override
-    public Collection<ResourceLocation> getAllResourceLocations(ResourcePackType type, String namespaceIn, String pathIn, int maxDepthIn, Predicate<String> filterIn) {
+    public Collection<ResourceLocation> getResources(PackType type, String namespaceIn, String pathIn, int maxDepthIn, Predicate<String> filterIn) {
         return data.keySet().stream().filter(s -> s.contains("/")).filter(doesActuallyExist).map(s -> {
                     String[] tk = s.split("/");
                     String typeStr = tk[0];
@@ -61,7 +61,7 @@ public class InMemoryResourcePack implements IResourcePack {
                     String path = s.substring(typeStr.length() + namespace.length() + 2);
                     String filename = tk[tk.length - 1];
                     return new String[]{typeStr, namespace, path, filename};
-                }).filter(tk -> tk[0].equals(type.getDirectoryName()))
+                }).filter(tk -> tk[0].equals(type.getDirectory()))
                 .filter(tk -> tk[1].startsWith(namespaceIn))
                 .filter(tk -> tk[2].startsWith(pathIn))
                 .filter(tk -> filterIn.test(tk[3]))
@@ -71,23 +71,23 @@ public class InMemoryResourcePack implements IResourcePack {
     }
 
     @Override
-    public boolean resourceExists(ResourcePackType type, ResourceLocation location) {
-        String path = type.getDirectoryName() + "/" + location.getNamespace() + "/" + location.getPath();
+    public boolean hasResource(PackType type, ResourceLocation location) {
+        String path = type.getDirectory() + "/" + location.getNamespace() + "/" + location.getPath();
         return data.containsKey(path) && doesActuallyExist.test(path);
     }
 
     @Override
-    public Set<String> getResourceNamespaces(ResourcePackType type) {
-        return data.keySet().stream().filter(s -> s.startsWith(type.getDirectoryName())).map(s -> s.split("/")[1])
+    public Set<String> getNamespaces(PackType type) {
+        return data.keySet().stream().filter(s -> s.startsWith(type.getDirectory())).map(s -> s.split("/")[1])
                 .collect(Collectors.toSet());
     }
 
     @Nullable
     @Override
-    public <T> T getMetadata(IMetadataSectionSerializer<T> deserializer) throws IOException {
-        // copied from net.minecraft.resources.VanillaPack
-        try (InputStream inputstream = this.getRootResourceStream("pack.mcmeta")) {
-            return ResourcePack.getResourceMetadata(deserializer, inputstream);
+    public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer) throws IOException {
+        // adapted from net.minecraft.server.packs.VanillaPackResources
+        try (InputStream inputstream = this.getRootResource("pack.mcmeta")) {
+            return AbstractPackResources.getMetadataFromStream(deserializer, inputstream);
         } catch (FileNotFoundException | RuntimeException var16) {
             return null;
         }

@@ -1,16 +1,16 @@
 package doublenegation.mods.compactores;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
+import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
+public class CompactOre implements Comparable<CompactOre>, StringRepresentable {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, CompactOres.MODID);
@@ -152,7 +152,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
         if(this.baseBlockLoc.getNamespace().equals(compactOre.baseBlockLoc.getNamespace())) {
             return this.baseBlockLoc.getPath().compareTo(compactOre.baseBlockLoc.getPath());
         } else {
-            List<ModInfo> modList = ModList.get().getMods();
+            List<IModInfo> modList = ModList.get().getMods();
             int thisIndex = -1, otherIndex = -1;
             for(int i = 0; i < modList.size(); i++) {
                 String modId = modList.get(i).getModId();
@@ -165,7 +165,7 @@ public class CompactOre implements Comparable<CompactOre>, IStringSerializable {
     }
 
     @Override
-    public String getString() {
+    public String getSerializedName() {
         return resourceName;
     }
 

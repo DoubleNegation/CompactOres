@@ -37,7 +37,7 @@ public class OreExcavationIntegration {
             CompactOre ore = CompactOres.getFor(entry.idName);
             if(ore != null) {
                 LOGGER.info("Excavating " + entry.idName + ", which has a compact variant - adding compact variant to block group");
-                excavateEvent.getAgent().blockGroup.add(new BlockEntry(ore.getCompactOreBlock().getDefaultState()));
+                excavateEvent.getAgent().blockGroup.add(new BlockEntry(ore.getCompactOreBlock().defaultBlockState()));
             }
         }
     }

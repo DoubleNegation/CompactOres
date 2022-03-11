@@ -2,7 +2,7 @@ package doublenegation.mods.compactores.config;
 
 import doublenegation.mods.compactores.CompactOre;
 import doublenegation.mods.compactores.Utils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
 import java.util.function.Function;

@@ -130,7 +130,7 @@ public class ConfigFileManager {
                     configVersionConfig = CommentedFileConfig.of(versionConfig);
                     configVersionConfig.load();
                     // quit the game
-                    Minecraft.getInstance().shutdown();
+                    Minecraft.getInstance().stop();
                 }, btn -> {
                     // update denied
                     LOGGER.info("Not updating configuration - writing new version to version config...");
@@ -139,8 +139,8 @@ public class ConfigFileManager {
                     // update the config readme to match the current version of Compact Ores
                     configVersionConfig.setComment("versions", getConfigReadme(active));
                     configVersionConfig.save();
-                    if(Minecraft.getInstance().currentScreen != null) {
-                        ((SimpleChoiceMessageScreen) Minecraft.getInstance().currentScreen).returnToPreviousScreen();
+                    if(Minecraft.getInstance().screen != null) {
+                        ((SimpleChoiceMessageScreen) Minecraft.getInstance().screen).returnToPreviousScreen();
                     }
                 }, active, created));
             });
@@ -256,14 +256,14 @@ public class ConfigFileManager {
         DistExecutor.unsafeRunForDist(() -> () -> {
             // client
             CompactOres.setLoadFinishScreen(new SimpleChoiceMessageScreen("gui." + CompactOres.MODID + ".configloadfailure", btn-> {
-                Minecraft.getInstance().shutdown();
+                Minecraft.getInstance().stop();
             }, btn -> {
                 LOGGER.info("Resetting configuration...");
                 cleanOldConfigs(configDir);
                 exportDefaultConfig(configDir);
                 configVersionConfig.close();
                 writeVersionConfig(versionConfig);
-                Minecraft.getInstance().shutdown();
+                Minecraft.getInstance().stop();
             }, msg));
             return null;
         }, () -> () -> {
