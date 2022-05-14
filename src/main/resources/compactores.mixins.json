@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "doublenegation.mods.compactores.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "compactores.refmap.json",
+  "mixins": [
+    "MinecraftServerMixin"
+  ],
+  "client": [
+  ],
+  "minVersion": "0.8"
+}

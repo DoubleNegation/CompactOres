@@ -7,13 +7,13 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
@@ -44,7 +44,6 @@ public class CompactOres
     public CompactOres() {
         // Register all event listeners
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        MinecraftForge.EVENT_BUS.addListener(this::startServer);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
 
         // Load the config
@@ -116,68 +115,11 @@ public class CompactOres
         return itemGroup;
     }
 
-    public void startServer(final ServerAboutToStartEvent event) {
+    public static void registerServerPackFinder(PackRepository packRepository) {
         LOGGER.info("Attaching CompactOre resources to the Minecraft server");
-        event.getServer().getPackRepository().addPackFinder(resourcePack);
-        // when the server initially starts, it has already loaded its data.
-        // the additional compact ores data is injected here.
-        // if the server's resources are reloaded, the loot tables and tags are then re-obtained from the CompactOresResourcePack.
-        /*LOGGER.info("Injecting post-first-load CompactOres server data into the Minecraft Server");
-        LootTables ltm = event.getServer().getLootTables();
-        Map<ResourceLocation, LootTable> tables =
-                ltm.getIds().stream().collect(Collectors.toMap(Function.identity(), ltm::get));
-        for(CompactOre ore : compactOres) {
-            LootTable table = LootTable.lootTable().withPool(
-                    LootPool.lootPool()
-                            .setRolls(UniformGenerator.between(ore.getMinRolls(), ore.getMaxRolls()))
-                            //.addEntry(TableLootEntry.builder(ore.getBaseBlock().getLootTable()))).build(); // I HAVE NO IDEA HOW TO GET THIS LINE WORKING RN
-            tables.put(ore.getCompactOreBlock().getLootTable(), table);
-        }
-        ObfuscationReflectionHelper.setPrivateValue(LootTables.class, ltm, ImmutableMap.copyOf(tables), "field_186527_c");
-        // tags
-        // (accesstransformers are involved here)
-        Tag<Block> oreBlockTag = findBaseTag(ForgeTagHandler.makeWrapperTag(ForgeRegistries.BLOCKS, new ResourceLocation("forge", "ores")));
-        if(oreBlockTag != null) {
-            Set<Block> oreBlockTagContents = new HashSet<>(oreBlockTag.contents);
-            oreBlockTagContents.addAll(compactOres.stream().map(CompactOre::getCompactOreBlock).collect(Collectors.toSet()));
-            oreBlockTag.contents = oreBlockTagContents;
-            List<Block> oreBlockTagImmutableContents = new ArrayList<>(oreBlockTag.immutableContents);
-            oreBlockTagImmutableContents.addAll(compactOres.stream().map(CompactOre::getCompactOreBlock).collect(Collectors.toList()));
-            oreBlockTag.immutableContents = ImmutableList.copyOf(oreBlockTagImmutableContents);
-        }
-        Tag<Item> oreItemTag = findBaseTag(ForgeTagHandler.makeWrapperTag(ForgeRegistries.ITEMS, new ResourceLocation("forge", "ores")));
-        if(oreItemTag != null) {
-            Set<Item> oreItemTagContents = new HashSet<>(oreItemTag.contents);
-            oreItemTagContents.addAll(compactOres.stream().map(CompactOre::getCompactOreBlockItem).collect(Collectors.toSet()));
-            oreItemTag.contents = oreItemTagContents;
-            List<Item> oreItemTagImmutableContents = new ArrayList<>(oreItemTag.immutableContents);
-            oreItemTagImmutableContents.addAll(compactOres.stream().map(CompactOre::getCompactOreBlockItem).collect(Collectors.toList()));
-            oreItemTag.immutableContents = ImmutableList.copyOf(oreItemTagImmutableContents);
-        }*/
+        packRepository.addPackFinder(resourcePack);
     }
     
-    /*private <T> Tag<T> findBaseTag(ITag<T> tag) {
-        try {
-            @SuppressWarnings("unchecked")
-            Class<ITag<?>> namedTagClass = (Class<ITag<?>>) Class.forName("net.minecraft.tags.TagRegistry$NamedTag");
-            if (tag instanceof Tag) {
-                return (Tag<T>) tag;
-            } else if (namedTagClass.isAssignableFrom(tag.getClass())) {
-                Field f = ObfuscationReflectionHelper.findField(namedTagClass, "field_232942_b_");
-                f.setAccessible(true);
-                @SuppressWarnings("unchecked")
-                ITag<T> baseTag = (ITag<T>)f.get(tag);
-                return findBaseTag(baseTag);
-            } else {
-                LOGGER.error("Unexpected problem encountered when trying to inject compact ore tags - compact ores wil not be tagged");
-                return null;
-            }
-        } catch(ClassNotFoundException | ObfuscationReflectionHelper.UnableToFindFieldException | IllegalAccessException | ClassCastException e) {
-            LOGGER.error("Unexpected problem encountered when trying to inject compact ore tags - compact ores will not be tagged", e);
-            return null;
-        }
-    }*/
-
     // global block break listener that fires multiple events for the base block when a compact ore is broken
     public void onBlockBroken(final BlockEvent.BreakEvent breakEvent) {
         if(!(breakEvent.getState().getBlock() instanceof CompactOreBlock)) return;
