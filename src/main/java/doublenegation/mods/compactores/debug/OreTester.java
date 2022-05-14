@@ -45,31 +45,31 @@ public class OreTester {
     
     private static void base(ServerLevel world, BlockPos pos) {
         for(int i = 0; i <= 8; i++) {
-            world.setBlock(pos.offset(0, 0, i), Blocks.BEDROCK.defaultBlockState(), 0);
+            world.setBlock(pos.offset(0, 0, i), Blocks.BEDROCK.defaultBlockState(), 2 | 16);
         }
-        world.setBlock(pos.offset(0, 1, 0), Blocks.BEDROCK.defaultBlockState(), 0);
-        world.setBlock(pos.offset(0, 1, 1), Blocks.AIR.defaultBlockState(), 0);
-        world.setBlock(pos.offset(0, 1, 2), Blocks.AIR.defaultBlockState(), 0);
-        world.setBlock(pos.offset(0, 1, 8), Blocks.BEDROCK.defaultBlockState(), 0);
-        world.setBlock(pos.offset(0, 2, 0), Blocks.AIR.defaultBlockState(), 0);
-        world.setBlock(pos.offset(0, 2, 1), Blocks.AIR.defaultBlockState(), 0);
-        world.setBlock(pos.offset(0, 2, 2), Blocks.AIR.defaultBlockState(), 0);
-        world.setBlock(pos.offset(0, 2, 3), Blocks.AIR.defaultBlockState(), 0);
-        world.setBlock(pos.offset(0, 2, 8), Blocks.BEDROCK.defaultBlockState(), 0);
+        world.setBlock(pos.offset(0, 1, 0), Blocks.BEDROCK.defaultBlockState(), 2 | 16);
+        world.setBlock(pos.offset(0, 1, 1), Blocks.AIR.defaultBlockState(), 2 | 16);
+        world.setBlock(pos.offset(0, 1, 2), Blocks.AIR.defaultBlockState(), 2 | 16);
+        world.setBlock(pos.offset(0, 1, 8), Blocks.BEDROCK.defaultBlockState(), 2 | 16);
+        world.setBlock(pos.offset(0, 2, 0), Blocks.AIR.defaultBlockState(), 2 | 16);
+        world.setBlock(pos.offset(0, 2, 1), Blocks.AIR.defaultBlockState(), 2 | 16);
+        world.setBlock(pos.offset(0, 2, 2), Blocks.AIR.defaultBlockState(), 2 | 16);
+        world.setBlock(pos.offset(0, 2, 3), Blocks.AIR.defaultBlockState(), 2 | 16);
+        world.setBlock(pos.offset(0, 2, 8), Blocks.BEDROCK.defaultBlockState(), 2 | 16);
         for(int i = 3; i <= 4; i++) {
             for(int j = 0; j <= 7; j++) {
-                world.setBlock(pos.offset(0, i, j), Blocks.AIR.defaultBlockState(), 0);
+                world.setBlock(pos.offset(0, i, j), Blocks.AIR.defaultBlockState(), 2 | 16);
             }
-            world.setBlock(pos.offset(0, i, 8), Blocks.BEDROCK.defaultBlockState(), 0);
+            world.setBlock(pos.offset(0, i, 8), Blocks.BEDROCK.defaultBlockState(), 2 | 16);
         }
     }
     
     private static void content(ServerLevel world, BlockPos pos, BlockState compact, BlockState normal) {
         for(int i = 3; i <= 7; i++) {
-            world.setBlock(pos.offset(0, 1, i), compact, 0);
+            world.setBlock(pos.offset(0, 1, i), compact, 2 | 16);
         }
         for(int i = 4; i <= 7; i++) {
-            world.setBlock(pos.offset(0, 2, i), normal, 0);
+            world.setBlock(pos.offset(0, 2, i), normal, 2 | 16);
         }
     }
     
