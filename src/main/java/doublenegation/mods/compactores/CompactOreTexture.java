@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.IntToDoubleFunction;
 
 public class CompactOreTexture {
@@ -605,17 +605,14 @@ public class CompactOreTexture {
     }
 
     public static void registerCacheInvalidator() {
-        ((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener(
-                (preparationBarrier, resourceManager, profilerFiller, profilerFiller_, executor, executor_) -> {
-                    // All texture caches are invalidated here immediately AFTER resource loading has COMPLETED.
-                    baseTextureCache.clear();
-                    generatedTextureCache.clear();
-                    LOGGER.info("Generating {} compact ore textures took {} seconds", numTexturesGenerated, (int)Math.round(textureGenerationTime / 1000.));
-                    numTexturesGenerated = 0;
-                    textureGenerationTime = 0L;
-                    return CompletableFuture.completedFuture(null);
-                }
-        );
+        ((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener((ResourceManagerReloadListener) rm -> {
+            // All texture caches are invalidated here immediately AFTER resource loading has COMPLETED.
+            baseTextureCache.clear();
+            generatedTextureCache.clear();
+            LOGGER.info("Generating {} compact ore textures took {} seconds", numTexturesGenerated, (int)Math.round(textureGenerationTime / 1000.));
+            numTexturesGenerated = 0;
+            textureGenerationTime = 0L;
+        });
     }
 
 }
