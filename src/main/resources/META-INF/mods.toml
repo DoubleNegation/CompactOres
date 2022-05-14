@@ -6,7 +6,7 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[34,)" #mandatory (31 is current forge version)
+loaderVersion="[40,)" #mandatory (31 is current forge version)
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
 license="MIT License"
@@ -32,9 +32,9 @@ credits="Inspired by RWTema's Dense Ores, made possible with the excellent tools
 authors="DoubleNegation" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-This mod generates dense ores in the world.
+This mod generates compact ores in the world, which are just like normal ores, except they have an increased resource yield!
 
-Dense Ores are created from config files and resources of other mods, making virtually all modded ores compatible!
+Compact Ores are created from config files and resources of other mods, making virtually all modded ores compatible!
 
 Translation credits:
 Chinese: liuseniubi
@@ -47,7 +47,7 @@ Russian: NeverMall
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[34.0,)" #mandatory
+    versionRange="[40.0,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
