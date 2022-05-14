@@ -57,7 +57,11 @@ public class CompactOresDebugging {
     }
     
     private static Flags getFlags(ServerLevel world) {
-        return world.getDataStorage().get(Flags::read, Flags.NAME);
+        Flags flags = world.getDataStorage().get(Flags::read, Flags.NAME);
+        if(flags == null) {
+            world.getDataStorage().set(Flags.NAME, flags = new Flags(false));
+        }
+        return flags;
     }
 
     static class Flags extends SavedData {

@@ -22,6 +22,8 @@ import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +31,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 public class WorldGenDebugging {
     
@@ -38,6 +46,8 @@ public class WorldGenDebugging {
     private static final Set<ResourceLocation> ores = new HashSet<>();
     private static Method getChunks;
     private static Field serverLevelData;
+
+    private static final List<Triple<TickTask, MinecraftServer, BiPredicate<TickTask, MinecraftServer>>> tasksForDelayedExecution = new ArrayList<>();
     
     static void init() {
         MinecraftForge.EVENT_BUS.addListener(WorldGenDebugging::onChunkLoad);
@@ -50,14 +60,30 @@ public class WorldGenDebugging {
             getChunks = ObfuscationReflectionHelper.findMethod(ChunkMap.class, "m_140416_"/*getChunks*/);
             getChunks.setAccessible(true);
         } catch(Exception e) {
-            LOGGER.error("Unable to find ChunkManager#getLoadedChunksIterable - `/compactores debugworldgen` will not clear the world immediately.", e);
+            LOGGER.error("Unable to find ChunkMap#getChunks - `/compactores debugworldgen` will not clear the world immediately.", e);
         }
         try {
             serverLevelData = ObfuscationReflectionHelper.findField(ServerLevel.class, "f_8549_"/*serverLevelData*/);
             serverLevelData.setAccessible(true);
         } catch(Exception e) {
-            LOGGER.error("Unable to find MinecraftServer#anvilConverterForAnvilFile", e);
+            LOGGER.error("Unable to find ServerLevel#serverLevelData", e);
         }
+        new Timer("Compact Ores World Gen Debugging Delayed Execution Thread").scheduleAtFixedRate(new TimerTask() {
+            @Override public void run() {
+                synchronized(tasksForDelayedExecution) {
+                    Iterator<Triple<TickTask, MinecraftServer, BiPredicate<TickTask, MinecraftServer>>> it = tasksForDelayedExecution.iterator();
+                    while(it.hasNext()) {
+                        Triple<TickTask, MinecraftServer, BiPredicate<TickTask, MinecraftServer>> task = it.next();
+                        if(task.getRight().test(task.getLeft(), task.getMiddle())) {
+                            task.getMiddle().submit(task.getLeft());
+                            it.remove();
+                        } else if(task.getMiddle().isStopped()) {
+                            it.remove();
+                        }
+                    }
+                }
+            }
+        }, 0, 100);
     }
     
     public static int executeCommand(CommandContext<CommandSourceStack> ctx) {
@@ -95,7 +121,14 @@ public class WorldGenDebugging {
         ServerLevel world = (ServerLevel) iWorld;
         CompactOresDebugging.Flags flags = CompactOresDebugging.getFlags(world.getServer());
         if(!flags.isDebugWorldGen()) return;
-        world.getServer().doRunTask(new TickTask(0, () -> processChunk(world, event.getChunk())));
+        synchronized(tasksForDelayedExecution) {
+            // i couldn't get the event loop functions in MinecraftServer to delay the tasks until the next tick,
+            // so i'm doing this manually here. not pretty, but it works.
+            tasksForDelayedExecution.add(
+                    new ImmutableTriple<>(new TickTask(world.getServer().getTickCount(), () -> processChunk(world, event.getChunk())),
+                                        world.getServer(),
+                                        (task, server) -> server.getTickCount() - 20 >= task.getTick()));
+        }
     }
     
     private static void processChunk(ServerLevel world, ChunkAccess chunk) {
@@ -104,7 +137,7 @@ public class WorldGenDebugging {
         ChunkPos cp = chunk.getPos();
         int cx = 16 * cp.x;
         int cz = 16 * cp.z;
-        for(int y = 0; y < world.getHeight(); y++) {
+        for(int y = world.getMinBuildHeight(); y < world.getHeight(); y++) {
             for(int z = 0; z < 16; z++) {
                 for(int x = 0; x < 16; x++) {
                     if(!ores.contains(chunk.getBlockState(new BlockPos(x, y, z)).getBlock().getRegistryName())) {
@@ -115,7 +148,7 @@ public class WorldGenDebugging {
             }
         }
         long end = System.currentTimeMillis();
-        LOGGER.info("Removed {} blocks from chunk ({}|{}|{}) in {}ms.", count, world.dimension().getRegistryName(), cp.x, cp.z, (end - start));
+        LOGGER.info("Removed {} blocks from chunk ({}|{}|{}) in {}ms.", count, world.dimension().location(), cp.x, cp.z, (end - start));
     }
 
     private static Component tryFindWorldName(MinecraftServer server) {
