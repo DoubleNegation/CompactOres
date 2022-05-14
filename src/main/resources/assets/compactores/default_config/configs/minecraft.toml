@@ -22,6 +22,41 @@ oreTexture = ":block/lapis_ore"
 [":emerald_ore"]
 oreTexture = ":block/emerald_ore"
 
+[":copper_ore"]
+oreTexture = ":block/copper_ore"
+
+[":deepslate_coal_ore"]
+oreTexture = ":block/deepslate_coal_ore"
+rockTexture = ":block/deepslate"
+
+[":deepslate_iron_ore"]
+oreTexture = ":block/deepslate_iron_ore"
+rockTexture = ":block/deepslate"
+
+[":deepslate_gold_ore"]
+oreTexture = ":block/deepslate_gold_ore"
+rockTexture = ":block/deepslate"
+
+[":deepslate_redstone_ore"]
+oreTexture = ":block/deepslate_redstone_ore"
+rockTexture = ":block/deepslate"
+
+[":deepslate_diamond_ore"]
+oreTexture = ":block/deepslate_diamond_ore"
+rockTexture = ":block/deepslate"
+
+[":deepslate_lapis_ore"]
+oreTexture = ":block/deepslate_lapis_ore"
+rockTexture = ":block/deepslate"
+
+[":deepslate_emerald_ore"]
+oreTexture = ":block/deepslate_emerald_ore"
+rockTexture = ":block/deepslate"
+
+[":deepslate_copper_ore"]
+oreTexture = ":block/deepslate_copper_ore"
+rockTexture = ":block/deepslate"
+
 [":nether_quartz_ore"]
 oreTexture = ":block/nether_quartz_ore"
 rockTexture = ":block/netherrack"
@@ -31,7 +66,3 @@ lateGeneration = true
 oreTexture = ":block/nether_gold_ore"
 rockTexture = ":block/netherrack"
 lateGeneration = true
-
-[":gilded_blackstone"]
-oreTexture = ":block/gilded_blackstone"
-rockTexture = ":block/blackstone"
