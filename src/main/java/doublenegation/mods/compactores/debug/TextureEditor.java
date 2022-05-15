@@ -40,9 +40,9 @@ public class TextureEditor {
                             ore -> ore.getBaseBlockRegistryName().equals(block.getRegistryName()) || ore.name().equals(block.getRegistryName()))
                         .findAny();
                 if(activeOre.isPresent()) {
-                    Minecraft.getInstance().submitAsync(() -> {
+                    DelayedTickTaskExecutor.submitDelayed(() -> {
                         Minecraft.getInstance().setScreen(new EditorScreen(activeOre.get()));
-                    });
+                    }, Minecraft.getInstance(), 1);
                     return;
                 }
             }
@@ -80,14 +80,14 @@ public class TextureEditor {
         @Override
         protected void init() {
             super.init();
-            addWidget(new Button(fromRight(0), fromTop(0), 20, 20, new TextComponent("X"), btn -> onClose()));
+            addRenderableWidget(new Button(fromRight(0), fromTop(0), 20, 20, new TextComponent("X"), btn -> onClose()));
             rockTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.getBaseUnderlyingTexture(), -1);
             oreTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.getBaseOreTexture(), -1);
             compactOreTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.name(), value);
             GeneratorMode mode = GeneratorMode.values()[generatorMode];
-            addWidget(new Button(fromLeft(20), fromTop(114), 280, 20,
+            addRenderableWidget(new Button(fromLeft(20), fromTop(114), 280, 20,
                     new TranslatableComponent("gui.compactores.textureeditor.detector", new TranslatableComponent(mode.translationKey)), this::nextMode));
-            valueSlider = addWidget(new Slider(fromLeft(20), fromTop(144), 280, 20,
+            valueSlider = addRenderableWidget(new Slider(fromLeft(20), fromTop(144), 280, 20,
                     new TranslatableComponent("gui.compactores.textureeditor.detector_param"),
                     new TextComponent(""), 0, mode.maxAdjust, value - mode.baseValue, false, true, btn -> {}));
             valueSlider.visible = mode.adjustable;
