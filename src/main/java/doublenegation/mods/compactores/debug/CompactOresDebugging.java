@@ -44,6 +44,7 @@ public class CompactOresDebugging {
             }
         });
         WorldGenDebugging.init();
+        DelayedTickTaskExecutor.init();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             TextureDumper.init();
             TextureEditor.init();
