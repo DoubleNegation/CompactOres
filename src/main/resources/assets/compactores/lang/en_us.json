@@ -17,6 +17,7 @@
   "gui.compactores.textureeditor.ore_texture": "Ore Texture:",
   "gui.compactores.textureeditor.compact_ore_texture": "Compact Ore Texture:",
   "gui.compactores.textureeditor.detector": "Ore Layer Detector: %s",
+  "gui.compactores.textureeditor.detector.shading_aware": "Shading-Aware",
   "gui.compactores.textureeditor.detector.auto_rgb_change_diff": "Automatic RGB Change Intensity",
   "gui.compactores.textureeditor.detector.exact_match": "Exact Match",
   "gui.compactores.textureeditor.detector.rgb_diff_sum": "RGB Differences",

@@ -172,6 +172,7 @@ public class TextureEditor {
         }
 
         private enum GeneratorMode {
+            SHADING_AWARE("gui.compactores.textureeditor.detector.shading_aware", -3, false, 0, 0),
             AUTO_RGB_CHANGE_DIFF("gui.compactores.textureeditor.detector.auto_rgb_change_diff", -2, false, 0, 0),
             EXACT_MATCH("gui.compactores.textureeditor.detector.exact_match", -1, false, 0, 0),
             RGB_DIFF_SUM("gui.compactores.textureeditor.detector.rgb_diff_sum", 0, true, 20, 765),

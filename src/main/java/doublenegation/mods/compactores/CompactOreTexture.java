@@ -10,9 +10,13 @@ import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -235,27 +239,44 @@ public class CompactOreTexture {
 
     private static BufferedImage actuallyFinallyMakeTheTexture(BufferedImage base, BufferedImage ore, int maxOreLayerDiff) {
         int w = base.getWidth(), h = base.getHeight();
-        BufferedImage oreLayer;
-        if(maxOreLayerDiff < -1) {
-            oreLayer = findOreLayerAutoRGBChange(base, ore, w, h);
+        Pair<BufferedImage, BufferedImage> layers;
+        if(maxOreLayerDiff < -2) {
+            layers = findOreLayerTheseAreGettingWorseWithEveryAttempt(base, ore, w, h);
+        } else if(maxOreLayerDiff < -1) {
+            layers = oldToNewOreLayerAdapter(findOreLayerAutoRGBChange(base, ore, w, h));
         } else if(maxOreLayerDiff < 0) {
-            oreLayer = findOreLayerExactMatch(base, ore, w, h);
+            layers = oldToNewOreLayerAdapter(findOreLayerExactMatch(base, ore, w, h));
         } else if(maxOreLayerDiff < 1000) {
-            oreLayer = findOreLayerAttempt3(base, ore, w, h, maxOreLayerDiff);
+            layers = oldToNewOreLayerAdapter(findOreLayerAttempt3(base, ore, w, h, maxOreLayerDiff));
         } else {
-            oreLayer = findOreLayerRGBChange(base, ore, w, h, maxOreLayerDiff);
+            layers = oldToNewOreLayerAdapter(findOreLayerRGBChange(base, ore, w, h, maxOreLayerDiff));
         }
+        BufferedImage specialLayer = layers.getLeft();
+        BufferedImage oreLayer = layers.getRight();
         BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = result.createGraphics();
         int xOff = Math.max(1, w / 16), yOff = Math.max(1, h / 16);
         // Start with the background rock
         g.drawImage(base, 0, 0, null);
-        // Then add the ore on top
+        // Then comes the shading around the ore
+        // do this at 50% opacity to achieve a smoother effect
+        Composite originalComposite = g.getComposite();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
+        g.drawImage(specialLayer, 0, 0, null);
+        g.drawImage(specialLayer, xOff, yOff, null);
+        g.drawImage(specialLayer, -xOff, -yOff, null);
+        g.drawImage(specialLayer, xOff, 0, null);
+        g.setComposite(originalComposite);
+        // Finally, add the ore on top
         g.drawImage(oreLayer, 0, 0, null);
         g.drawImage(oreLayer, xOff, yOff, null);
         g.drawImage(oreLayer, -xOff, -yOff, null);
         g.drawImage(oreLayer, xOff, 0, null);
         return result;
+    }
+
+    private static Pair<BufferedImage, BufferedImage> oldToNewOreLayerAdapter(BufferedImage oreLayer) {
+        return new ImmutablePair<>(new BufferedImage(oreLayer.getWidth(), oreLayer.getHeight(), BufferedImage.TYPE_INT_ARGB), oreLayer);
     }
 
     private static BufferedImage findOreLayerExactMatch(BufferedImage base, BufferedImage ore, int w, int h) {
@@ -412,6 +433,84 @@ public class CompactOreTexture {
             }
         }
         return findOreLayerRGBChange(base, ore, w, h, above);
+    }
+
+    private static Pair<BufferedImage, BufferedImage> findOreLayerTheseAreGettingWorseWithEveryAttempt(BufferedImage base, BufferedImage ore, int w, int h) {
+        // step 1: find the color range and average color of the rock
+        int minRed = Integer.MAX_VALUE, maxRed = Integer.MIN_VALUE,
+                minGreen = Integer.MAX_VALUE, maxGreen = Integer.MIN_VALUE,
+                minBlue = Integer.MAX_VALUE, maxBlue = Integer.MIN_VALUE;
+        int baseRed = 0, baseGreen = 0, baseBlue = 0, numBaseSamples = 0;
+        for(int y = 0; y < h; y++) {
+            for(int x = 0; x < w; x++) {
+                int rgb = base.getRGB(x, y);
+                if((rgb & 0xFF000000) != 0) {
+                    int r = r(rgb), g = g(rgb), b = b(rgb);
+                    minRed = Math.min(r, minRed);
+                    maxRed = Math.max(r, maxRed);
+                    minGreen = Math.min(g, minGreen);
+                    maxGreen = Math.max(g, maxGreen);
+                    minBlue = Math.min(b, minBlue);
+                    maxBlue = Math.max(b, maxBlue);
+                    baseRed += r;
+                    baseGreen += g;
+                    baseBlue += b;
+                    numBaseSamples++;
+                }
+            }
+        }
+        baseRed /= numBaseSamples;
+        baseGreen /= numBaseSamples;
+        baseBlue /= numBaseSamples;
+        // step 2: calculate the average color of all ore pixels that do not fall in the rock's color range
+        int avgRed = 0, avgGreen = 0, avgBlue = 0, numSamples = 0;
+        for(int y = 0; y < h; y++) {
+            for(int x = 0; x < w; x++) {
+                int rgb = ore.getRGB(x, y);
+                if((rgb & 0xFF000000) != 0) {
+                    int r = r(rgb), g = g(rgb), b = b(rgb);
+                    if(r >= minRed && r <= maxRed && g >= minGreen && g <= maxGreen && b >= minBlue && b <= maxBlue) {
+                        continue;
+                    }
+                    avgRed += r;
+                    avgGreen += g;
+                    avgBlue += b;
+                    numSamples++;
+                }
+            }
+        }
+        avgRed /= numSamples;
+        avgGreen /= numSamples;
+        avgBlue /= numSamples;
+        // step 3:
+
+        // if we imagine a 1d colorspace, split in two parts by the color calculated in step 2,
+        // then the colors which are in the part which does not include the average rock color are the ore layer
+
+        // we can also (kind of - is this good enough?) imagine this as the color distance from the pixel in question
+        // to the average rock color being smaller than the distance from the step 2 color to the average rock color,
+        // which actually translates into 3d
+
+        // if a color is not on the ore layer, but also not part of the rock's color range, it is shading applied
+        // around the ore
+        double step2Distance = Math.sqrt((baseRed - avgRed) * (baseRed - avgRed) + (baseGreen - avgGreen) * (baseGreen - avgGreen) + (baseBlue - avgBlue) * (baseBlue - avgBlue));
+        BufferedImage oreLayer = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage shadingLayer = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for(int y = 0; y < h; y++) {
+            for(int x = 0; x < w; x++) {
+                int rgb = ore.getRGB(x, y);
+                if((rgb & 0xFF000000) != 0) {
+                    int r = r(rgb), g = g(rgb), b = b(rgb);
+                    double selfDistance = Math.sqrt((baseRed - r) * (baseRed - r) + (baseGreen - g) * (baseGreen - g) + (baseBlue - b) * (baseBlue - b));
+                    if(selfDistance > step2Distance) {
+                        oreLayer.setRGB(x, y, rgb);
+                    } else if(r <= minRed || r >= maxRed || g <= minGreen || g >= maxGreen || b <= minBlue || b >= maxBlue) {
+                        shadingLayer.setRGB(x, y, rgb);
+                    }
+                }
+            }
+        }
+        return new ImmutablePair<>(shadingLayer, oreLayer);
     }
 
     private static int r(int rgb) {

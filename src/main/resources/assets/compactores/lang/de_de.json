@@ -17,6 +17,7 @@
   "gui.compactores.textureeditor.ore_texture": "Erztextur:",
   "gui.compactores.textureeditor.compact_ore_texture": "Kompakte Erztextur:",
   "gui.compactores.textureeditor.detector": "Erz-Ebenen-Finder: %s",
+  "gui.compactores.textureeditor.detector.shading_aware": "Schattierungs-Bewusst",
   "gui.compactores.textureeditor.detector.auto_rgb_change_diff": "Auto RGB Änderungsintensität",
   "gui.compactores.textureeditor.detector.exact_match": "Genaue Übereinstimmung",
   "gui.compactores.textureeditor.detector.rgb_diff_sum": "RGB Unterschiede",

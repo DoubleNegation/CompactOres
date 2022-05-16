@@ -2,8 +2,8 @@
 ["!global"]
 # Default = true
 generateTexture = true
-# Default = 50
-maxOreLayerColorDiff = 50
+# Default = -3
+maxOreLayerColorDiff = -3
 # Default = false
 experimentalGenerator = false
 # Default = true, only applies with experimentalGenerator = true

@@ -105,12 +105,13 @@ Customizing, Adding and Removing Ores:
      - maxOreLayerColorDiff
            Type: integer
            Required: no
-           Default: 50
+           Default: -3
            Allowed scopes: global, local, ore
            Function: Relevant for texture generation. Changes the algorithm and threshold for differentiating between
                      rock-pixels and ore-pixels on the ore texture.
                      The following values correspond to certain algorithms:
-                      -2 = Automatic RGB Channel Change Intensity (recommended, will likely be default in the future)
+                      -3 = Shading-Aware (recommended)
+                      -2 = Automatic RGB Channel Change Intensity
                       -1 = Exact Match
                       0 ~ 765 = Sum of RGB Channel Differences
                       1000 ~ 1180 = RGB Channel Change Intensity
