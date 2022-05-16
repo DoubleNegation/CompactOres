@@ -8,8 +8,9 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.TickTask;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,20 +53,29 @@ public class ExperimentalWorldGen {
         if(!(event.getWorld() instanceof ServerLevel)) return;
         ServerLevel world = (ServerLevel) event.getWorld();
         WorldGenData data = world.getDataStorage().get(WorldGenData::read, WorldGenData.NAME);
+        if(data == null) {
+            world.getDataStorage().set(WorldGenData.NAME, data = WorldGenData.createNew());
+        }
         ChunkPos chunkPos = event.getChunk().getPos();
         Set<ResourceLocation> newOres = data.missingOresForChunk(chunkPos,
                 loc -> Optional.ofNullable(CompactOres.getFor(loc)).map(CompactOre::isRetrogen).orElse(false));
         if(!newOres.isEmpty()) {
-            world.getServer().doRunTask(new TickTask(0, () -> {
+            BlockableEventLoop<Runnable> loop = ObfuscationReflectionHelper.getPrivateValue(ServerChunkCache.class, world.getChunkSource(), "f_8332_" /*mainThreadProcessor*/);
+            if(loop == null) {
+                LOGGER.error("Failed to obtain ServerChunkCache.mainThreadProcessor, can not generate Compact Ores.");
+                return;
+            }
+            WorldGenData finalData = data;
+            loop.submitAsync(() -> {
                 generate(world, chunkPos, newOres);
-                data.generated(chunkPos, newOres);
-            }));
+                finalData.generated(chunkPos, newOres);
+            });
         }
     }
     
     private static void generate(ServerLevel world, ChunkPos pos, Set<ResourceLocation> ores) {
         LOGGER.debug("Generating {} compact ore types in chunk ({}|{}|{})", ores.size(),
-                world.dimension().getRegistryName(), pos.x, pos.z);
+                world.dimension().location(), pos.x, pos.z);
         // initialize the random number generator
         // the "123" parameter would normally be some kind of sequence number that is incremented by one for every
         // feature that is generated, but since we're not generating as a feature in the sequence of features, we
@@ -107,7 +118,7 @@ public class ExperimentalWorldGen {
             Set<ResourceLocation> currentSetup = CompactOres.compactOres().stream().map(CompactOre::getBaseBlockRegistryName).collect(Collectors.toSet());
             ListTag setups = nbt.getList("setups", Tag.TAG_LIST);
             for(int i = 0; i < setups.size(); i++) {
-                theSetups.add(i, setups.getList(i).stream().map(Tag::toString).map(Utils::parseResourceLocation).collect(Collectors.toSet()));
+                theSetups.add(i, setups.getList(i).stream().map(Tag::getAsString).map(Utils::parseResourceLocation).collect(Collectors.toSet()));
                 if(theCurrentSetup == -1 && currentSetup.equals(theSetups.get(i))) {
                     theCurrentSetup = i;
                 }
@@ -132,6 +143,13 @@ public class ExperimentalWorldGen {
                 }
             }
             return new WorldGenData(theCurrentSetup, theSetups, theChunkStates);
+        }
+
+        private static WorldGenData createNew() {
+            CompoundTag root = new CompoundTag();
+            root.put("setups", new ListTag());
+            root.put("chunks", new CompoundTag());
+            return read(root);
         }
 
         @Override
