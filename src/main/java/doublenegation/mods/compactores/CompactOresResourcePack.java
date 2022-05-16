@@ -222,6 +222,7 @@ public class CompactOresResourcePack implements RepositorySource {
         final byte[] bytes = tag.toString().getBytes(StandardCharsets.UTF_8);
         resourcePack.put("data/forge/tags/blocks/ores.json", () -> bytes);
         resourcePack.put("data/forge/tags/items/ores.json", () -> bytes);
+        resourcePack.put("data/minecraft/tags/blocks/mineable/pickaxe.json", () -> bytes);
     }
 
     private void logExceptionCauseList(Throwable th) {
