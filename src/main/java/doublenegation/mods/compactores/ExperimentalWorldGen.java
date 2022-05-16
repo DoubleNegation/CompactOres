@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -42,6 +43,7 @@ public class ExperimentalWorldGen {
     private static final Logger LOGGER = LogManager.getLogger();
     
     private static Map<Block, CompactOre> oreByBlock;
+    private static final Map<ServerChunkCache, BlockableEventLoop<Runnable>> eventLoopCache = new WeakHashMap<>(3);
     
     public static void init(Set<CompactOre> ores) {
         LOGGER.info("Experimental Compact Ores world gen is active for {} ores.", ores.size());
@@ -60,7 +62,7 @@ public class ExperimentalWorldGen {
         Set<ResourceLocation> newOres = data.missingOresForChunk(chunkPos,
                 loc -> Optional.ofNullable(CompactOres.getFor(loc)).map(CompactOre::isRetrogen).orElse(false));
         if(!newOres.isEmpty()) {
-            BlockableEventLoop<Runnable> loop = ObfuscationReflectionHelper.getPrivateValue(ServerChunkCache.class, world.getChunkSource(), "f_8332_" /*mainThreadProcessor*/);
+            BlockableEventLoop<Runnable> loop = eventLoopForWorld(world);
             if(loop == null) {
                 LOGGER.error("Failed to obtain ServerChunkCache.mainThreadProcessor, can not generate Compact Ores.");
                 return;
@@ -70,6 +72,18 @@ public class ExperimentalWorldGen {
                 generate(world, chunkPos, newOres);
                 finalData.generated(chunkPos, newOres);
             });
+        }
+    }
+
+    private static BlockableEventLoop<Runnable> eventLoopForWorld(ServerLevel world) {
+        if(eventLoopCache.containsKey(world.getChunkSource())) {
+            return eventLoopCache.get(world.getChunkSource());
+        } else {
+            BlockableEventLoop<Runnable> loop = ObfuscationReflectionHelper.getPrivateValue(ServerChunkCache.class, world.getChunkSource(), "f_8332_" /*mainThreadProcessor*/);
+            if(loop != null) {
+                eventLoopCache.put(world.getChunkSource(), loop);
+            }
+            return loop;
         }
     }
     
