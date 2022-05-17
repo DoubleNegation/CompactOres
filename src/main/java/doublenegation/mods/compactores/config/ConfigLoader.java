@@ -63,8 +63,6 @@ public class ConfigLoader {
                         .filter(v -> v instanceof Boolean).ifPresent(v -> OreBuilder.setGlobalGenerateTexture((boolean) v));
                 Optional.ofNullable(globalConfig.getGlobalConfigValue("maxOreLayerColorDiff"))
                         .filter(v -> v instanceof Integer).ifPresent(v -> OreBuilder.setGlobalMaxOreLayerColorDiff((int) v));
-                Optional.ofNullable(globalConfig.getGlobalConfigValue("experimentalGenerator"))
-                        .filter(v -> v instanceof Boolean).ifPresent(v -> OreBuilder.setGlobalExperimentalGenerator((boolean) v));
                 Optional.ofNullable(globalConfig.getGlobalConfigValue("retrogen"))
                         .filter(v -> v instanceof Boolean).ifPresent(v -> OreBuilder.setGlobalRetrogen((boolean) v));
                 Optional.ofNullable(globalConfig.getGlobalConfigValue("minRolls"))
@@ -137,8 +135,6 @@ public class ConfigLoader {
                         .maxOreLayerColorDiff(config.getLocalConfigValue("maxOreLayerColorDiff"))
                         .oreTexture(Utils.parseResourceLocationExtra(config.getLocalConfigValue("oreTexture"), config.getFilenameNamespace()))
                         .rockTexture(Utils.parseResourceLocationExtra(config.getLocalConfigValue("rockTexture"), config.getFilenameNamespace()))
-                        .lateGeneration(config.getLocalConfigValue("lateGeneration"))
-                        .experimentalGenerator(config.getLocalConfigValue("experimentalGenerator"))
                         .retrogen(config.getLocalConfigValue("retrogen"))
                         .useGetDrops(config.getLocalConfigValue("useGetDrops"))
                         .minRolls(config.getLocalConfigValue("minRolls"))

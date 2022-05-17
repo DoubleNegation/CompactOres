@@ -42,8 +42,6 @@ public class OreConfigHolder {
                 .maxOreLayerColorDiff(config.getOreConfigValue(oreName, "maxOreLayerColorDiff"))
                 .oreTexture(Utils.parseResourceLocationExtra(config.getOreConfigValue(oreName, "oreTexture"), config.getFilenameNamespace()))
                 .rockTexture(Utils.parseResourceLocationExtra(config.getOreConfigValue(oreName, "rockTexture"), config.getFilenameNamespace()))
-                .lateGeneration(config.getOreConfigValue(oreName, "lateGeneration"))
-                .experimentalGenerator(config.getOreConfigValue(oreName, "experimentalGenerator"))
                 .retrogen(config.getOreConfigValue(oreName, "retrogen"))
                 .useGetDrops(config.getOreConfigValue(oreName, "useGetDrops"))
                 // customization

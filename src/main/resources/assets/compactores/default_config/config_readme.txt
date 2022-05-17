@@ -116,25 +116,13 @@ Customizing, Adding and Removing Ores:
                       0 ~ 765 = Sum of RGB Channel Differences
                       1000 ~ 1180 = RGB Channel Change Intensity
                      Any values outside these ranges lead to undefined behavior.
-     - experimentalGenerator
-            Type: boolean
-            Required: no
-            Default: false
-            Allowed scopes: global, local, ore
-            Function: Enables a new, experimental method of generating compact ores. This fixes the long-standing
-                      problem that some ores near chunk boundaries can't generate as compact ores. This also allows
-                      for and automatically enables retrogen of compact ores (see retrogen option).
-                      Warning: Switching from the stable to the experimental generator in an existing world will
-                      lead to generation of additional compact ores in all already generated chunks, even if retrogen
-                      is disabled.
      - retrogen
             Type: boolean
             Required: no
             Default: true
             Allowed scopes: global, local, ore
-            Function: If the experimental generator is in use, this option decides whether compact ores will be
-                      generated retroactively in already existing chunks or not. If the experimental generator is not
-                      in use, this option is ignored.
+            Function: This option decides whether compact ores will be generated retroactively in already existing
+            chunks or not.
      - oreTexture
            Type: resource location
            Required: no

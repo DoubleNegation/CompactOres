@@ -39,8 +39,6 @@ public class CompactOre implements Comparable<CompactOre>, StringRepresentable {
     private ResourceLocation baseUnderlyingTexture;
     private float spawnProbability;
     private int maxOreLayerColorDiff;
-    private boolean lateGeneration;
-    private boolean experimentalGenerator;
     private boolean retrogen;
     private boolean generateTexture;
     private boolean useGetDrops;
@@ -50,8 +48,7 @@ public class CompactOre implements Comparable<CompactOre>, StringRepresentable {
 
     public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
                       ResourceLocation baseUnderlyingTexture, float spawnProbability, int maxOreLayerColorDiff,
-                      boolean lateGeneration, boolean experimentalGenerator, boolean retrogen, boolean generateTexture,
-                      boolean useGetDrops) {
+                      boolean retrogen, boolean generateTexture, boolean useGetDrops) {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
@@ -59,8 +56,6 @@ public class CompactOre implements Comparable<CompactOre>, StringRepresentable {
         this.baseUnderlyingTexture = baseUnderlyingTexture == null ? null : new ResourceLocation(baseUnderlyingTexture.getNamespace(), "textures/" + baseUnderlyingTexture.getPath() + ".png");
         this.spawnProbability = spawnProbability;
         this.maxOreLayerColorDiff = maxOreLayerColorDiff;
-        this.lateGeneration = lateGeneration;
-        this.experimentalGenerator = experimentalGenerator;
         this.retrogen = retrogen;
         this.generateTexture = generateTexture;
         this.useGetDrops = useGetDrops;
@@ -113,14 +108,6 @@ public class CompactOre implements Comparable<CompactOre>, StringRepresentable {
 
     public int getMaxOreLayerColorDiff() {
         return maxOreLayerColorDiff;
-    }
-
-    public boolean isLateGeneration() {
-        return lateGeneration;
-    }
-
-    public boolean isExperimentalGenerator() {
-        return experimentalGenerator;
     }
 
     public boolean isRetrogen() {

@@ -60,9 +60,7 @@ rockTexture = ":block/deepslate"
 [":nether_quartz_ore"]
 oreTexture = ":block/nether_quartz_ore"
 rockTexture = ":block/netherrack"
-lateGeneration = true
 
 [":nether_gold_ore"]
 oreTexture = ":block/nether_gold_ore"
 rockTexture = ":block/netherrack"
-lateGeneration = true
