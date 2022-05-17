@@ -15,10 +15,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.event.ClientChatEvent;
-import net.minecraftforge.client.gui.widget.Slider;
+import net.minecraftforge.client.gui.widget.ForgeSlider;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class TextureEditor {
@@ -62,7 +64,7 @@ public class TextureEditor {
         private CompactOreTexture.TextureInfo oreTexture;
         private int generatorMode = 0; // if the value for maxOreLayerColorDiff < -1, then the constructor won't find anything, so use EXACT_MATCH in that case
         private int value;
-        private Slider valueSlider;
+        private final Map<GeneratorMode, ForgeSlider> valueSliders = new HashMap<>();
         private CompactOreTexture.TextureInfo compactOreTexture;
 
         protected EditorScreen(CompactOre ore) {
@@ -87,10 +89,19 @@ public class TextureEditor {
             GeneratorMode mode = GeneratorMode.values()[generatorMode];
             addRenderableWidget(new Button(fromLeft(20), fromTop(114), 280, 20,
                     new TranslatableComponent("gui.compactores.textureeditor.detector", new TranslatableComponent(mode.translationKey)), this::nextMode));
-            valueSlider = addRenderableWidget(new Slider(fromLeft(20), fromTop(144), 280, 20,
-                    new TranslatableComponent("gui.compactores.textureeditor.detector_param"),
-                    new TextComponent(""), 0, mode.maxAdjust, value - mode.baseValue, false, true, btn -> {}));
-            valueSlider.visible = mode.adjustable;
+            for(int i = 0; i < GeneratorMode.values().length; i++) {
+                GeneratorMode mode_j = GeneratorMode.values()[i];
+                if(mode_j.adjustable) {
+                    ForgeSlider slider = new ForgeSlider(
+                            fromLeft(20), fromTop(144), 280, 20,
+                            new TranslatableComponent("gui.compactores.textureeditor.detector_param"), new TextComponent(""),
+                            0, mode_j.maxAdjust, value - mode_j.baseValue, 1, 0, true
+                    );
+                    valueSliders.put(mode_j, slider);
+                    addRenderableWidget(slider);
+                    slider.visible = mode_j == mode;
+                }
+            }
         }
 
         @Override
@@ -107,18 +118,18 @@ public class TextureEditor {
             value = mode.adjustable ? mode.baseValue + mode.initialAdjust : mode.baseValue;
             compactOreTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.name(), value);
             button.setMessage(new TranslatableComponent("gui.compactores.textureeditor.detector", new TranslatableComponent(mode.translationKey)));
-            valueSlider.dragging = false;
-            valueSlider.maxValue = mode.maxAdjust;
-            valueSlider.sliderValue = (double) mode.initialAdjust / mode.maxAdjust;
-            valueSlider.visible = mode.adjustable;
-            valueSlider.updateSlider();
+            for(GeneratorMode mode_i : valueSliders.keySet()) {
+                ForgeSlider slider = valueSliders.get(mode_i);
+                slider.setValue(mode.initialAdjust);
+                slider.visible = mode_i == mode;
+            }
         }
 
         @Override
         public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
             // check for slider update
             GeneratorMode mode = GeneratorMode.values()[generatorMode];
-            int newValue = mode.adjustable ? mode.baseValue + (int) Math.round(valueSlider.sliderValue * mode.maxAdjust) : mode.baseValue;
+            int newValue = mode.adjustable ? mode.baseValue + (int) Math.round(valueSliders.get(mode).getValue()) : mode.baseValue;
             if(value != newValue) {
                 value = newValue;
                 compactOreTexture = CompactOreTexture.TextureInfo.generateForEditorRendering(ore.name(), value);
