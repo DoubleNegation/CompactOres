@@ -22,7 +22,7 @@ public class CompactOreBlockItem extends BlockItem {
     // make sure that there is an order to the ore list
     @Override
     public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
-        if(getCreativeTabs().contains(group)) {
+        if(getCreativeTabs().contains(group) || group == CreativeModeTab.TAB_SEARCH) {
             for (int i = 0; i < items.size(); i++) {
                 if (items.get(i).getItem() instanceof CompactOreBlockItem) {
                     if (ore.compareTo(((CompactOreBlockItem) items.get(i).getItem()).ore) < 0) {
