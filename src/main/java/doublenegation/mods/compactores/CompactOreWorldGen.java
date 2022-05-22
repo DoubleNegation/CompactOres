@@ -43,7 +43,8 @@ public class CompactOreWorldGen {
 
     public static void init(Collection<CompactOre> ores) {
         LOGGER.info("Compact Ores world gen is active for {} ores.", ores.size());
-        oreByBlock = ores.stream().collect(Collectors.toMap(CompactOre::getBaseBlock, Function.identity()));
+        oreByBlock = ores.stream().filter(ore -> ore.getBaseBlock() != null)
+                .collect(Collectors.toMap(CompactOre::getBaseBlock, Function.identity()));
         MinecraftForge.EVENT_BUS.addListener(CompactOreWorldGen::onChunkLoad);
     }
 
