@@ -30,8 +30,8 @@ public class SimpleChoiceMessageScreen extends Utils.ReturningScreen {
         super.init();
         textRenderer = MultiLineLabel.create(this.font, message, this.width - 50);
         int i = 50 + (textRenderer.getLineCount() + 1) * 9;
-        this.addWidget(new Button(this.width / 2 - 150, i + 5, 300, 20, buttonTextFirst, onFirstOption));
-        this.addWidget(new Button(this.width / 2 - 150, i + 30, 300, 20, buttonTextSecond, onSecondOption));
+        this.addRenderableWidget(new Button(this.width / 2 - 150, i + 5, 300, 20, buttonTextFirst, onFirstOption));
+        this.addRenderableWidget(new Button(this.width / 2 - 150, i + 30, 300, 20, buttonTextSecond, onSecondOption));
     }
 
     @Override
