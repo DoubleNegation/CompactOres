@@ -3,6 +3,10 @@ package doublenegation.mods.compactores.debug;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.TickTask;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStoppedEvent;
+import net.minecraftforge.fml.DistExecutor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,7 +20,8 @@ public class DelayedTickTaskExecutor {
     private static final List<Task> tasksForDelayedExecution = new ArrayList<>();
 
     public static void init() {
-        new Timer("Compact Ores World Gen Debugging Delayed Execution Thread").scheduleAtFixedRate(new TimerTask() {
+        Timer timer = new Timer("Compact Ores World Gen Debugging Delayed Execution Thread");
+        timer.scheduleAtFixedRate(new TimerTask() {
             @SuppressWarnings("resource") // we do not want to shut down the server/client here
             @Override public void run() {
                 synchronized(tasksForDelayedExecution) {
@@ -33,6 +38,9 @@ public class DelayedTickTaskExecutor {
                 }
             }
         }, 0, 100);
+        MinecraftForge.EVENT_BUS.addListener((final ServerStoppedEvent e) -> {
+            DistExecutor.unsafeRunWhenOn(Dist.DEDICATED_SERVER, () -> timer::cancel);
+        });
     }
 
     private static void submit(TickTask task, ReentrantBlockableEventLoop<? extends Runnable> eventLoop, BiPredicate<TickTask, ReentrantBlockableEventLoop<? extends Runnable>> pred) {
