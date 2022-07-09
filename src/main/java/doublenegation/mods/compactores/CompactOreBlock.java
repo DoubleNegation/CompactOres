@@ -1,8 +1,13 @@
 package doublenegation.mods.compactores;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -13,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraftforge.registries.GameData;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -85,4 +91,11 @@ public class CompactOreBlock extends Block {
         }
     }
 
+    @Override
+    public MutableComponent getName() {
+        Item baseItem = GameData.getBlockItemMap().get(ore.getBaseBlock());
+        Component baseName = baseItem == null ? new TextComponent("<unknown>") :
+                baseItem.getName(new ItemStack(baseItem, 1));
+        return new TranslatableComponent("block." + ore.name().getNamespace() + ".compact_ore", baseName);
+    }
 }
