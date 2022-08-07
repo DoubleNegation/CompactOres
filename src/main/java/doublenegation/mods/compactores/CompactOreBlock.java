@@ -15,6 +15,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -31,6 +32,13 @@ public class CompactOreBlock extends Block {
         // all vanilla stone and netherrack ores have hardness and resistance values of 3, so use 3 here too
         // deepslate ones have hardness 4.5, resistance 3, but this may be very difficult to implement
         super(Properties.of(Material.STONE).sound(SoundType.STONE).requiresCorrectToolForDrops().strength(3, 3));
+        // super constructor already initialized all the block states,
+        // but we replace them with our own custom states here
+        // the following four lines are copied and slightly adapted from net.minecraft.world.level.block.Block#Block
+        StateDefinition.Builder<Block, BlockState> builder = new StateDefinition.Builder<>(this);
+        this.createBlockStateDefinition(builder);
+        this.stateDefinition = builder.create(Block::defaultBlockState, (block, map, codec) -> new CompactOreBlockState(block, map, codec, ore));
+        this.registerDefaultState(this.stateDefinition.any());
         this.ore = ore;
     }
 
@@ -47,11 +55,6 @@ public class CompactOreBlock extends Block {
     public int getExpDrop(BlockState state, LevelReader world, BlockPos pos, int fortune, int silktouch) {
         int r = ore.getMinRolls() + RANDOM.nextInt(ore.getMaxRolls() - ore.getMinRolls() + 1);
         return ore.getBaseBlock().getExpDrop(ore.getBaseBlock().defaultBlockState(), world, pos, fortune, silktouch) * r;
-    }
-
-    @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
-        return ore.getBaseBlock().defaultBlockState().getDestroyProgress(player, worldIn, pos);
     }
 
     @Override
