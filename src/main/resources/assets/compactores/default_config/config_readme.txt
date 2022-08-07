@@ -95,6 +95,16 @@ Customizing, Adding and Removing Ores:
                      Range: 0 (=0%) to 1 (=100%)
                      CAUTION: The decimal point is required for this option to work. If you want to set it to 1,
                               use 1.0 instead of just 1
+     - breakTimeMultiplier
+           Type: decimal number
+           Required: no
+           Default: 1.0
+           Allowed scopes: global, local, ore
+           Function: How long it takes to mine the compact ore block, in multiples of the time it takes to mine the
+                     regular ore block. 1.0 means it takes the same amount of time, 2.0 means that it will take twice as
+                     long to mine the compact ore block as it takes to mine the regular ore block, etc.
+                     CAUTION: The decimal point is required for this option to work. If you want to set it to 1,
+                              use 1.0 instead of just 1, for 2 use 2.0, etc...
      - generateTexture
            Type: boolean
            Required: no

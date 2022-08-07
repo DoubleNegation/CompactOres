@@ -48,6 +48,7 @@ public class OreConfigHolder {
                 .minRolls((Integer) Optional.ofNullable(config).map(c -> c.getOreConfigValue(oreName, "minRolls")).orElse(null))
                 .maxRolls((Integer) Optional.ofNullable(config).map(c -> c.getOreConfigValue(oreName, "maxRolls")).orElse(null))
                 .spawnProbability(Optional.ofNullable(config).map(c -> c.getOreConfigValue(oreName, "spawnProbability")).map(v -> (float)(double)v).orElse(null))
+                .breakTimeMultiplier(Optional.ofNullable(config).map(c -> c.getOreConfigValue(oreName, "breakTimeMultiplier")).map(v -> (float)(double)v).orElse(null))
                 // others
                 .baseBlock(oreName)
                 // build

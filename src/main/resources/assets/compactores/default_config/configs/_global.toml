@@ -12,3 +12,5 @@ minRolls = 3
 maxRolls = 5
 # Default = 0.1
 spawnProbability = 0.1
+# Default = 1.0
+breakTimeMultiplier = 1.0

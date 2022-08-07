@@ -22,7 +22,7 @@ public class CompactOreBlockState  extends BlockState {
 
     @Override
     public float getDestroySpeed(BlockGetter p_60801_, BlockPos p_60802_) {
-        return ore.getBaseBlock().defaultBlockState().getDestroySpeed(p_60801_, p_60802_);
+        return ore.getBaseBlock().defaultBlockState().getDestroySpeed(p_60801_, p_60802_) * ore.getBreakTimeMultiplier();
     }
 
     @Override

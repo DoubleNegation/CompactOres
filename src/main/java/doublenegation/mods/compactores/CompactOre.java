@@ -42,13 +42,14 @@ public class CompactOre implements Comparable<CompactOre>, StringRepresentable {
     private boolean retrogen;
     private boolean generateTexture;
     private boolean useGetDrops;
+    private float breakTimeMultiplier;
     private RegistryObject<CompactOreBlock> compactOreBlock;
     private ResourceLocation compactOreBlockRegistryName;
     private RegistryObject<CompactOreBlockItem> compactOreBlockItem;
 
     public CompactOre(ResourceLocation baseBlockLoc, int minRolls, int maxRolls, ResourceLocation baseOreTexture,
                       ResourceLocation baseUnderlyingTexture, float spawnProbability, int maxOreLayerColorDiff,
-                      boolean retrogen, boolean generateTexture, boolean useGetDrops) {
+                      boolean retrogen, boolean generateTexture, boolean useGetDrops, float breakTimeMultiplier) {
         this.baseBlockLoc = baseBlockLoc;
         this.minRolls = minRolls;
         this.maxRolls = maxRolls;
@@ -59,6 +60,7 @@ public class CompactOre implements Comparable<CompactOre>, StringRepresentable {
         this.retrogen = retrogen;
         this.generateTexture = generateTexture;
         this.useGetDrops = useGetDrops;
+        this.breakTimeMultiplier = breakTimeMultiplier;
         String resourceName = baseBlockLoc.toString().replace(":", "__");
         while(usedResourceNames.contains(resourceName)) {
             resourceName += "_";
@@ -120,6 +122,10 @@ public class CompactOre implements Comparable<CompactOre>, StringRepresentable {
 
     public boolean isUseGetDrops() {
         return useGetDrops;
+    }
+
+    public float getBreakTimeMultiplier() {
+        return breakTimeMultiplier;
     }
 
     public ResourceLocation name() {

@@ -71,6 +71,8 @@ public class ConfigLoader {
                         .filter(v -> v instanceof Integer).ifPresent(v -> OreBuilder.setGlobalMaxRolls((int) v));
                 Optional.ofNullable(globalConfig.getGlobalConfigValue("spawnProbability"))
                         .filter(v -> v instanceof Number).ifPresent(v -> OreBuilder.setGlobalSpawnProbability((float) (double) v));
+                Optional.ofNullable(globalConfig.getGlobalConfigValue("breakTimeMultiplier"))
+                        .filter(v -> v instanceof Number).ifPresent(v -> OreBuilder.setGlobalBreakTimeMultiplier((float) (double) v));
             }
 
             OreBuilderBuilderProvider obbp = new OreBuilderBuilderProvider();
@@ -139,7 +141,8 @@ public class ConfigLoader {
                         .useGetDrops(config.getLocalConfigValue("useGetDrops"))
                         .minRolls(config.getLocalConfigValue("minRolls"))
                         .maxRolls(config.getLocalConfigValue("maxRolls"))
-                        .spawnProbability(Optional.ofNullable(config.<Double>getLocalConfigValue("spawnProbability")).map(p -> (float)(double)p).orElse(null));
+                        .spawnProbability(Optional.ofNullable(config.<Double>getLocalConfigValue("spawnProbability")).map(p -> (float)(double)p).orElse(null))
+                        .breakTimeMultiplier(Optional.ofNullable(config.<Double>getLocalConfigValue("breakTimeMultiplier")).map(p -> (float)(double)p).orElse(null));
             }
             return builder;
         }

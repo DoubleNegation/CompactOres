@@ -14,6 +14,7 @@ public class OreBuilder {
     private static int G_MINROLLS = 3;
     private static int G_MAXROLLS = 5;
     private static float G_SPAWNPROBABILITY = .1f;
+    private static float G_BREAKTIMEMULTIPLIER = 1f;
 
     // LOCAL DEFINITION DEFAULTS
     private Boolean L_GENERATETEXTURE;
@@ -27,6 +28,7 @@ public class OreBuilder {
     private Integer L_MINROLLS;
     private Integer L_MAXROLLS;
     private Float L_SPAWNPROBABILITY;
+    private Float L_BREAKTIMEMULTIPLIER;
 
     // private definition values
     private Boolean generateTexture;
@@ -40,6 +42,7 @@ public class OreBuilder {
     private Integer minRolls;
     private Integer maxRolls;
     private Float spawnProbability;
+    private Float breakTimeMultiplier;
 
     // further private values
     private ResourceLocation baseBlock;
@@ -68,6 +71,10 @@ public class OreBuilder {
         G_SPAWNPROBABILITY = value;
     }
 
+    public static void setGlobalBreakTimeMultiplier(float value) {
+        G_BREAKTIMEMULTIPLIER = value;
+    }
+
     private OreBuilder(Boolean localGenerateTexture,
                        Integer localMaxOreLayerColorDiff,
                        ResourceLocation localOreTexture,
@@ -76,7 +83,8 @@ public class OreBuilder {
                        Boolean localUseGetDrops,
                        Integer localMinRolls,
                        Integer localMaxRolls,
-                       Float localSpawnProbability) {
+                       Float localSpawnProbability,
+                       Float localBreakTimeMultiplier) {
         L_GENERATETEXTURE = localGenerateTexture;
         L_MAXORELAYERCOLORDIFF = localMaxOreLayerColorDiff;
         L_ORETEXTURE = localOreTexture;
@@ -86,6 +94,7 @@ public class OreBuilder {
         L_MINROLLS = localMinRolls;
         L_MAXROLLS = localMaxRolls;
         L_SPAWNPROBABILITY = localSpawnProbability;
+        L_BREAKTIMEMULTIPLIER = localBreakTimeMultiplier;
     }
 
     public OreBuilder generateTexture(Boolean generateTexture) {
@@ -133,6 +142,11 @@ public class OreBuilder {
         return this;
     }
 
+    public OreBuilder breakTimeMultiplier(Float breakTimeMultiplier) {
+        this.breakTimeMultiplier = breakTimeMultiplier;
+        return this;
+    }
+
     public OreBuilder baseBlock(ResourceLocation baseBlock) {
         this.baseBlock = baseBlock;
         return this;
@@ -153,8 +167,10 @@ public class OreBuilder {
         int actualMinRolls = minRolls != null ? minRolls : L_MINROLLS != null ? L_MINROLLS : G_MINROLLS;
         int actualMaxRolls = maxRolls != null ? maxRolls : L_MAXROLLS != null ? L_MAXROLLS : G_MAXROLLS;
         float actualSpawnProbability = spawnProbability != null ? spawnProbability : L_SPAWNPROBABILITY != null ? L_SPAWNPROBABILITY : G_SPAWNPROBABILITY;
+        float actualBreakTimeMultiplier = breakTimeMultiplier != null ? breakTimeMultiplier : L_BREAKTIMEMULTIPLIER != null ? L_BREAKTIMEMULTIPLIER : G_BREAKTIMEMULTIPLIER;
         return new CompactOre(baseBlock, actualMinRolls, actualMaxRolls, actualOreTexture, actualRockTexture,
-                actualSpawnProbability, actualMaxOreLayerColorDiff, actualRetrogen, actualGenerateTexture, actualUseGetDrops);
+                actualSpawnProbability, actualMaxOreLayerColorDiff, actualRetrogen, actualGenerateTexture,
+                actualUseGetDrops, actualBreakTimeMultiplier);
     }
 
     public static class Builder {
@@ -171,6 +187,7 @@ public class OreBuilder {
         private Integer minRolls;
         private Integer maxRolls;
         private Float spawnProbability;
+        private Float breakSpeedMultiplier;
 
         private Builder() {}
 
@@ -225,6 +242,11 @@ public class OreBuilder {
             return this;
         }
 
+        public Builder breakTimeMultiplier(Float breakSpeedMultiplier) {
+            this.breakSpeedMultiplier = breakSpeedMultiplier;
+            return this;
+        }
+
         public OreBuilder build() {
             return new OreBuilder(generateTexture,
                     maxOreLayerColorDiff,
@@ -234,7 +256,8 @@ public class OreBuilder {
                     useGetDrops,
                     minRolls,
                     maxRolls,
-                    spawnProbability);
+                    spawnProbability,
+                    breakSpeedMultiplier);
         }
 
     }
