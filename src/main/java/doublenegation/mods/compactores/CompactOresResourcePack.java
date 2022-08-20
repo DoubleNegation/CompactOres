@@ -228,6 +228,10 @@ public class CompactOresResourcePack implements RepositorySource {
     private void logExceptionCauseList(Throwable th) {
         do {
             LOGGER.error("   Caused by " + th.getClass().getName() + ": " + th.getMessage());
+            // In the debug log, include the full stack trace for debugging reasons:
+            for(StackTraceElement el : th.getStackTrace()) {
+                LOGGER.debug("      at " + el);
+            }
         } while((th = th.getCause()) != null);
     }
 
