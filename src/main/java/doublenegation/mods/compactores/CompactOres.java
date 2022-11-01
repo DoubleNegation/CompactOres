@@ -5,29 +5,42 @@ import doublenegation.mods.compactores.debug.CompactOresDebugging;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.TierSortingRegistry;
+import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Mod(CompactOres.MODID)
 public class CompactOres
@@ -45,6 +58,7 @@ public class CompactOres
         // Register all event listeners
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.addListener(this::onBlockBroken);
+        MinecraftForge.EVENT_BUS.addListener(this::tagsUpdated);
 
         // Load the config
         compactOres = ConfigLoader.loadOres();
@@ -109,6 +123,23 @@ public class CompactOres
     private void commonSetup(final FMLCommonSetupEvent event) {
         // prepare world gen features. registered later in #onBiomeLoading
         CompactOreWorldGen.init(compactOres);
+    }
+
+    private void tagsUpdated(final TagsUpdatedEvent event) {
+        // copy over harvestability tags from base ore block to compact ore block
+        Set<ResourceLocation> copiedTags =
+                TierSortingRegistry.getSortedTiers().stream().map(Tier::getTag).filter(Objects::nonNull).map(TagKey::location).collect(Collectors.toSet());
+        Registry<Block> blockRegistry = event.getTagManager().registryOrThrow(ForgeRegistries.BLOCKS.getRegistryKey());
+        for(CompactOre ore : compactOres()) {
+            Holder<Block> compactOreHolder = ForgeRegistries.BLOCKS.getResourceKey(ore.getCompactOreBlock()).flatMap(blockRegistry::getHolder).orElse(null);
+            Holder<Block> baseOreHolder = ForgeRegistries.BLOCKS.getResourceKey(ore.getBaseBlock()).flatMap(blockRegistry::getHolder).orElse(null);
+            if(baseOreHolder != null && (compactOreHolder instanceof Holder.Reference<Block> refHolder)) {
+                refHolder.bindTags(Stream.concat(compactOreHolder.tags(),
+                                baseOreHolder.tags().filter(tagKey -> copiedTags.contains(tagKey.location())))
+                        .collect(Collectors.toSet()));
+            }
+        }
+        Blocks.rebuildCache();
     }
     
     public static CreativeModeTab getItemGroup() {
